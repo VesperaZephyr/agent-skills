@@ -1,0 +1,12 @@
+{
+  "name": "PDF和图片文字提取",
+  "installedAt": 1790940527279,
+  "source": "marketplace",
+  "version": "2.1.0",
+  "skillId": "skill_2082741997694226432",
+  "pay_mode": 0,
+  "description_zh": "零依赖提取PDF与图片文字，扫描件交AI视觉识别，支持表格结构化与批量处理",
+  "description_en": "Extract text from PDFs and images with zero extra dependencies; scanned pages use AI vision, plus table and batch support.",
+  "iconSource": "letter:auto",
+  "installedContentHash": "sha256:feeb4105c1a522c8e7fb7944af153c2c07717f9d3722659b3f66b5577257e81e"
+}

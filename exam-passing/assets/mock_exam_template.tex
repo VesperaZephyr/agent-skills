@@ -1,0 +1,99 @@
+% !TeX program = xelatex
+\documentclass[11pt,a4paper,UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2.2cm,bottom=2.2cm}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\large\textbf{2026--2027学年第一学期期末考试《数学建模》模拟试卷}}
+\fancyfoot[C]{第 \thepage\ 页\quad 共 \pageref{LastPage}\ 页}
+
+\begin{document}
+
+\begin{center}
+\textbf{课程代码：\underline{MATH3012} \qquad 考试形式：闭卷 \qquad 考试时长：120 分钟} \\[0.2cm]
+学院：\underline{\hspace{2.5cm}} 专业班级：\underline{\hspace{2.5cm}} 姓名：\underline{\hspace{2.5cm}} 学号：\underline{\hspace{2.5cm}}
+\end{center}
+
+\vspace{0.3cm}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{题号} & \textbf{一} & \textbf{二} & \textbf{三} & \textbf{四} & \textbf{五} & \textbf{总分} \\
+\hline
+\textbf{满分} & 15 & 15 & 20 & 25 & 25 & 100 \\
+\hline
+\textbf{得分} & & & & & & \\
+\hline
+\textbf{评卷人} & & & & & & \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{一、 单项选择题（本大题共 5 小题，每小题 3 分，共 15 分）}
+\begin{enumerate}[label=\arabic*.]
+    \item 在经典报亭卖报模型（Newsvendor Problem）中，设购进价为 $b$，零售价为 $a$，退回价为 $c$（$a > b > c$），若需求量 $r$ 的概率分布函数为 $F(r)$，则使得期望收益最大的订购量 $x^*$ 满足的临界条件是（\qquad ）。\\
+    A. $F(x^*) = \frac{a-b}{a-c}$ \qquad B. $F(x^*) = \frac{b-c}{a-c}$ \qquad C. $F(x^*) = \frac{a-c}{a-b}$ \qquad D. $F(x^*) = \frac{a-b}{b-c}$
+
+    \item 针对正规战争的兰彻斯特（Lanchester）平方律模型 $\frac{\mathrm{d}x}{\mathrm{d}t} = -a y, \frac{\mathrm{d}y}{\mathrm{d}t} = -b x$，双方初始兵力分别为 $x_0, y_0$。甲军最终获胜的充分必要条件是（\qquad ）。\\
+    A. $a x_0 > b y_0$ \qquad B. $b x_0^2 > a y_0^2$ \qquad C. $a x_0^2 > b y_0^2$ \qquad D. $b x_0 > a y_0$
+
+    \item 在层次分析法（AHP）中，对于一个 4 阶正互反判断矩阵，查表得 $RI = 0.90$。若计算得出最大特征根 $\lambda_{\max} = 4.18$，则其一致性比率 $CR$ 为（\qquad ）。\\
+    A. 0.05 \qquad B. 0.067 \qquad C. 0.089 \qquad D. 0.12
+
+    \item 在利用高次代数多项式进行等距节点插值时，往往会在区间两端出现剧烈的数值振荡现象，这一现象被称为（\qquad ）。\\
+    A. 吉布斯（Gibbs）现象 \qquad B. 龙格（Runge）现象 \qquad C. 混沌（Chaos）现象 \qquad D. 鞍点振荡
+
+    \item 设洗衣机每次漂洗时的注水量可自由分配，在总用水量固定为 $V$ 的前提下，为使洗涤剂最终残留浓度达到极小，各次漂洗的注水量应当满足（\qquad ）。\\
+    A. 逐次递增 \qquad B. 逐次递减 \qquad C. 各次完全相等 \qquad D. 与初始衣物含水量成正比
+\end{enumerate}
+
+\section*{二、 填空题（本大题共 5 小题，每空 3 分，共 15 分）}
+\begin{enumerate}[label=\arabic*.]
+    \item 凸多面体的面数 $F$、顶点数 $V$ 和棱边数 $E$ 之间满足著名的欧拉多面体公式，即 \underline{\hspace{3cm}}。
+    \item 传染病动力学 SIR 模型中，易感者比例为 $s(t)$，感染率系数为 $\beta$，日移出率（康复率）为 $\gamma$。传染病得以蔓延暴发的阈值条件是初始易感者比例 $s_0 >$ \underline{\hspace{3cm}}。
+    \item 经典经济订购批量（EOQ）模型中，若年需求总量为 $D$，每次订购固定成本为 $K$，单位维持库存年成本为 $h$，则最优订购批量 $Q^* =$ \underline{\hspace{3cm}}。
+    \item 蒲丰（Buffon）投针实验中，若平行线间距为 $a$，针长为 $l$（$l \le a$），则投针与平行线相交的概率为 \underline{\hspace{3cm}}。
+    \item 模拟退火算法（SA）在从当前状态转移到新状态时，对于目标函数值变差的劣解，按照 \underline{\hspace{3cm}} 准则以概率接受。
+\end{enumerate}
+
+\section*{三、 简答与机理分析题（本大题共 2 小题，每小题 10 分，共 20 分）}
+\subsection*{1. （10 分）双层玻璃窗节能机理}
+试建立一维稳态热传导模型，定量解释为什么两层厚度为 $d$ 的玻璃夹一层厚度为 $l$ 的静止空气，其保暖效果远优于一层厚度为 $2d$ 的单层厚玻璃。
+
+\vspace{5cm}
+
+\subsection*{2. （10 分）层次分析法（AHP）一致性检验标准与处理方案}
+写出判断矩阵一致性指标 $CI$ 与一致性比率 $CR$ 的数学定义式；说明一致性检验通过的临界数值；若检验未通过，应采取何种针对性修正措施？
+
+\vspace{5cm}
+
+\section*{四、 综合建模推导大题（25 分）}
+\textbf{题目（铅球最佳投掷角度与极值模型）}：\\
+设运动员投掷铅球时的出手高度为 $h$（米），出手初速度大小为 $v_0$（米/秒），出手仰角为 $\alpha$（与水平面夹角，$\alpha \in (0, \pi/2)$）。忽略空气阻力，重力加速度取 $g$。
+\begin{enumerate}[label=(\arabic*)]
+    \item 建立铅球在空中的飞行运动学方程，推导落地水平飞行距离 $s$ 关于出手仰角 $\alpha$ 的函数解析式；（10 分）
+    \item 证明使得飞行距离 $s$ 达到最大的最佳出手仰角 $\alpha^*$ 满足：
+    \[ \tan \alpha^* = \frac{v_0}{\sqrt{v_0^2 + 2gh}} \]
+    并由此说明为什么实际推铅球时最佳出手角总是严格小于 $45^\circ$。（15 分）
+\end{enumerate}
+
+\newpage
+\section*{五、 运筹与优化设计大题（25 分）}
+\textbf{题目（生产排产与原料切割优化）}：\\
+某造纸厂生产一种固定宽度为 190cm 的大卷原料纸筒。现需按合同向三家客户提供规格分别为 80cm、50cm、35cm 的成品纸筒，订购需求量分别为 90 卷、120 卷、200 卷。
+\begin{enumerate}[label=(\arabic*)]
+    \item 列出所有合理的一维下料切割模式（即每卷原料纸筒切割后剩余余料小于 35cm 的切割组合），并列出模式与成品规格的关系表格；（10 分）
+    \item 建立以“消耗大卷原料纸筒总数最少”为目标的整数线性规划（ILP）数学模型，清晰写出决策变量、目标函数及全部约束条件；（10 分）
+    \item 简述如何利用 MATLAB 或 Python 对该整数规划模型进行求解。（5 分）
+\end{enumerate}
+
+\end{document}

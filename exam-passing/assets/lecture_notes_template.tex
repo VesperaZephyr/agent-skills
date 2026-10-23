@@ -1,0 +1,93 @@
+% !TeX program = xelatex
+\documentclass[11pt,a4paper,UTF8]{ctexrep}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\kaishu 数学建模期末冲刺复习讲义}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[C]{\thepage}
+
+\tcbset{
+    sharp corners,
+    colback=white,
+    boxrule=0.8pt,
+    leftrule=3pt
+}
+
+\newtcolorbox{coretheorem}[1]{
+    colframe=blue!70!black,
+    title=\textbf{#1},
+    coltitle=white,
+    colbacktitle=blue!70!black
+}
+
+\newtcolorbox{modelbox}[1]{
+    colframe=teal!70!black,
+    title=\textbf{#1},
+    coltitle=white,
+    colbacktitle=teal!70!black
+}
+
+\newtcolorbox{pitfallbox}[1]{
+    colframe=red!70!black,
+    title=\textbf{#1},
+    coltitle=white,
+    colbacktitle=red!70!black
+}
+
+\title{\Huge\textbf{数学建模期末复习与考点精讲手册}\\[0.5cm]
+\Large 基于祁永强《数学建模》与课件深度提炼}
+\author{\textbf{授课助教 / 讲义编写组}}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\chapter{经典初等与微分动力学模型}
+
+\section{机理分析与连续微积分模型}
+
+\begin{modelbox}{核心模型：双层玻璃窗保温机理}
+设两层玻璃厚度均为 $d$，导热系数为 $k_1$；中间静止空气层厚度为 $l$，导热系数为 $k_2$。
+由一维稳态热传导傅里叶定律：
+\begin{equation}
+    Q = \frac{\Delta T}{R_{\text{total}}}, \quad R_{\text{total}} = \frac{2d}{k_1} + \frac{l}{k_2}
+\end{equation}
+因空气导热系数极小（$k_1/k_2 \approx 16 \sim 32$），中间空气层贡献了绝大部分热阻，流失热量较单层玻璃大幅减少。
+\end{modelbox}
+
+\begin{pitfallbox}{易错警示：微分方程相平面分析陷阱}
+在分析传染病 SIR 模型或兰彻斯特平方律时，切忌直接对时间变量 $t$ 积分求显式解（通常是超越方程或不可积）。应当通过消去时间参量微元：
+\begin{equation}
+    \frac{\mathrm{d}i}{\mathrm{d}s} = \frac{\beta s i - \gamma i}{-\beta s i} = -1 + \frac{\gamma}{\beta s}
+\end{equation}
+求出第一积分（相轨线解析关系式），再结合初始边界值确定临界阈值与渐近行为。
+\end{pitfallbox}
+
+\chapter{运筹规划与多目标决策}
+
+\section{层次分析法（AHP）答题标准范式}
+
+\begin{coretheorem}{AHP 考点清单与一致性检验判据}
+\begin{enumerate}
+    \item \textbf{判断矩阵构造}：$A = (a_{ij})_{n \times n}$ 满足 $a_{ji} = 1/a_{ij}, a_{ii} = 1$。
+    \item \textbf{最大特征根与特征向量近似计算}：和法或根法归一化。
+    \item \textbf{一致性指标}：$CI = \frac{\lambda_{\max} - n}{n - 1}$。
+    \item \textbf{一致性比率}：$CR = \frac{CI}{RI}$。当 $CR < 0.10$ 时接受一致性，否则必须调整矩阵。
+\end{enumerate}
+\end{coretheorem}
+
+\end{document}

@@ -1,0 +1,100 @@
+% !TeX program = xelatex
+\documentclass[11pt,a4paper,UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    citecolor=blue!80!black,
+    urlcolor=blue!80!black
+}
+
+\lstset{
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{purple},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    xleftmargin=2em,
+    framexleftmargin=1.5em
+}
+
+\title{\LARGE\textbf{数学建模平时作业}}
+\author{\large 姓名：\underline{\hspace{3.5cm}} \qquad 学号：\underline{\hspace{3.5cm}}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\textbf{评分标准：问题重述(15\%) + 模型假设(15\%) + 建模与推导(35\%) + 求解与代码(25\%) + 分析评价(10\%)}
+\end{center}
+\vspace{0.5cm}
+
+\section*{第 1 题}
+
+\begin{tcolorbox}[title=\textbf{题目内容},colback=blue!5!white,colframe=blue!75!black,arc=2mm]
+（在此填入教材或作业题目描述）
+\end{tcolorbox}
+
+\subsection*{一、 问题重述与机理分析}
+针对实际背景，提炼核心物理量与决策目标。说明输入数据、因变量与自变量之间的基本依赖关系。
+
+\subsection*{二、 模型假设与符号说明}
+\begin{enumerate}[label=(\arabic*)]
+    \item 假设系统处于稳态，忽略外界微弱扰动；
+    \item 假设参数在考察周期内保持常数。
+\end{enumerate}
+
+\begin{table}[htbp]
+\centering
+\caption{核心参数与变量符号说明}
+\vspace{1mm}
+\begin{tabular}{cclc}
+\toprule
+符号 & 物理/经济含义 & 变量类型 & 单位 \\
+\midrule
+$t$ & 运行时间 & 自变量 & $\mathrm{s}$ \\
+$x(t)$ & 系统核心状态量 & 状态变量 & $\mathrm{m}$ \\
+$u(t)$ & 外部控制输入 & 决策变量 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{三、 数学模型的建立与严密推导}
+根据守恒定律或微积分极值原理，建立数学方程：
+\begin{equation}
+    \frac{\mathrm{d}x}{\mathrm{d}t} = f(x, u, t), \quad x(0) = x_0
+\end{equation}
+
+目标函数与边界约束条件为：
+\begin{equation}
+    \max_{u \in \mathcal{U}} \quad J = \int_0^T L(x(t), u(t)) \, \mathrm{d}t
+\end{equation}
+
+\subsection*{四、 模型求解与计算代码}
+给出解析推导解或数值算法步骤。若附带 MATLAB/Python 求解代码：
+\begin{lstlisting}[language=Python]
+# 数学建模求解脚本示例
+import numpy as np
+
+def solve_model():
+    pass
+\end{lstlisting}
+
+\subsection*{五、 计算结果分析、灵敏度分析与模型评价}
+对求解得到的数值结果进行现实合理解释，讨论核心参数微扰对输出解的影响（灵敏度检验），指出模型的适用边界与改进方向。
+
+\end{document}

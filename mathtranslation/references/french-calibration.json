@@ -1,0 +1,248 @@
+[
+  {
+    "id": "fr-001",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 2,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 2
+    },
+    "french": "cette écriture est unique à l'ordre près",
+    "reference_zh": "这种表示除因子顺序外是唯一的.",
+    "checks": [
+      "保留唯一性",
+      "保留不计顺序的限制"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "整数唯一分解定理末句，因子次序可变。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-002",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 2,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 2
+    },
+    "french": "les nombres premiers distincts 2 à 2",
+    "reference_zh": "两两不同的素数",
+    "checks": [
+      "两两",
+      "素数，不是任意不可约元"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "整数唯一分解定理中修饰素数 pi。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-003",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 3,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 3
+    },
+    "french": "quitte à numéroter on peut supposer",
+    "reference_zh": "适当重编号后，可以假设……",
+    "checks": [
+      "操作为重编号",
+      "不额外增加数学假设"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "唯一分解证明开头，重新给 p′i 编号使 p1=p′1。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-004",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 33,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 33
+    },
+    "french": "un polynôme unitaire",
+    "reference_zh": "一个首一多项式",
+    "checks": [
+      "unitaire依多项式语境译首一"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "物理33页欧几里得除法命题：Soit f ∈ A[X] un polynôme unitaire (et donc non nul).",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-005",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 10,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 10
+    },
+    "french": "une C-algèbre de type fini",
+    "reference_zh": "一个有限生成的复代数",
+    "checks": [
+      "非有限维",
+      "此处C为复数域"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "O(V) 是由有限个元素生成的 C-代数；此处 C 为复数域。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-006",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 9,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 9
+    },
+    "french": "non nul et non inversible",
+    "reference_zh": "非零且不可逆",
+    "checks": [
+      "保留非零",
+      "保留不可逆",
+      "合取"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "代数整数环例子中对 z 的两个并列限制。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-007",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 9,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 9
+    },
+    "french": "si et seulement si",
+    "reference_zh": "当且仅当",
+    "checks": [
+      "双向等价，不是仅当/如果"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "素数表示为 a²+ab+b² 与模 p 方程有解的等价断言。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-008",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 7,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 7
+    },
+    "french": "à condition de voir que",
+    "reference_zh": "条件是验证……",
+    "checks": [
+      "保留待验证条件",
+      "voir que 在这里为核实/验证，非增加证明义务",
+      "短语后省略部分须由上下文提供，不把条件当成已证事实"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "context": "需要验证两个主理想无公共素理想因子，才能使用 Dedekind 分解结论。",
+    "source_review": {
+      "status": "verified-pdf-text",
+      "method": "原 PDF 文字层逐页定位；连字控制字符按词形恢复。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "对短语及所列上下文核对意义；不是训练后性能评测。"
+    }
+  },
+  {
+    "id": "fr-009",
+    "category": "source-error-trap",
+    "source": {
+      "author": "Jean-François Dat",
+      "work": "Algèbre et théorie de Galois",
+      "year": "2015-2016",
+      "physical_page": 10,
+      "file": "Cours de M1 fondamental Algèbre et théorie de Galois [Lecture notes] (Jean-François Dat) (z-library.sk, 1lib.sk, z-lib.sk).pdf",
+      "printed_page": 10
+    },
+    "context": "多项式映射 φ: V→V′ 所诱导的函数代数拉回；f′∈O(V′)。",
+    "french": "Si ϕ : V → V′ est une application polynômiale, il découle de ces définitions que la composition des fonctions f′ ↦ ϕ ◦ f induit un morphisme de C-algèbres ϕ*: O(V′) → O(V), f′ ↦ ϕ̃ ◦ f.",
+    "reference_zh": "若 φ: V→V′ 是多项式映射，则由这些定义可知，函数的复合 f′↦φ∘f 诱导一个 C-代数同态 φ*: O(V′)→O(V)，f′↦φ̃∘f。〔译注：原文两处复合的顺序及函数符号存在疑误。按给定的定义域和值域，拉回应将 f′ 送到 f′∘φ；上文与公式中的原式在此保留。〕",
+    "checks": [
+      "保留原文两处不同的可见原式 f′↦φ∘f 与 f′↦φ̃∘f",
+      "不得静默替换成正确拉回公式",
+      "明确以译注指出复合顺序及符号疑误",
+      "译注中解释 f′∘φ 的定义域为 V，值域为 C"
+    ],
+    "status": "reviewed-source-and-semantics",
+    "source_review": {
+      "status": "verified-pdf-text-and-render",
+      "method": "物理/印刷10页原PDF文字层与页面渲染直接核实两处原式。"
+    },
+    "semantic_review": {
+      "status": "passed-independent-semantic-review",
+      "scope": "由 φ:V→V′ 与 f′:V′→C 核对复合类型；不是性能评测。"
+    }
+  }
+]
