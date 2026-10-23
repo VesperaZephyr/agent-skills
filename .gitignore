@@ -17,3 +17,20 @@ __pycache__/
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# 暂不上传 GitHub、仅本地保留的 skill 类别（2026-10-23 用户要求先不上传）
+# —— Office 文档类 ——
+pptx/
+minimax-docx/
+minimax-xlsx/
+fast-docx/
+fast-pptx/
+fast-xlsx/
+markitdown-skill/
+# —— 系统 / 工具 / 其他类 ——
+astrbot-plugin-deploy-verify/
+exam-passing/
+web-access/
+windows-orphan-app-entry-cleanup/
+windows-shell-extension-hang-diagnosis/
+skill-router/
