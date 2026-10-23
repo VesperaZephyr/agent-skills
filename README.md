@@ -1,44 +1,100 @@
 # agent-skills
 
-本人（VesperaZephyr）在 WorkBuddy 中使用的自定义 Agent 技能集合。
+一组面向「数学书处理」的 **Agent 技能（skills）**，覆盖数学专著的 LaTeX 高保真重排、中文翻译与保真度审计，以及各类 PDF 的文字提取与精确书签处理。
 
-> **本仓库当前仅发布「数学书 LaTeX」与「PDF 处理」两类。** Office 文档、系统/工具/其他类仅本地保留，暂不入库（见 `.gitignore`）。
->
-> 这些 skill 配合 WorkBuddy（`~/.workbuddy/skills/`）使用；每个子目录是一个独立 skill，含 `SKILL.md`（入口与触发词）、`references/`（参考素材）与 `scripts/`（可执行脚本）。
+每个技能是一个独立目录，内部遵循通用的 skill 约定：
 
-## 目录（已发布）
+- `SKILL.md` —— 入口文件。顶部的 `name` / `description` 决定技能**何时被自动触发**，正文是工作流与纪律红线。
+- `references/` —— 参考素材（术语表、坑位表、原书对照策略、构建验证说明等）。
+- `scripts/` —— 可复现的辅助脚本（核对、抽取、审计、批量处理等）。
 
-### 数学书 LaTeX（重排 / 翻译 / 审计）
+**这些技能与具体的 Agent 运行环境无关**——只要该 Agent 支持「`SKILL.md` + `references/` + `scripts/`」这种技能加载机制（WorkBuddy、Codex、Claude 等），即可直接加载使用，不绑定任何厂商。
 
-| Skill | 用途 |
+## 如何使用
+
+把需要的技能目录整个复制到目标 Agent 的技能目录下即可：
+
+| Agent | 技能目录位置 |
 |---|---|
-| `latex-book-retypeset` | 主控：高保真 LaTeX 数学书重排（re-typeset）工作流 |
-| `mathtranslation` | 主控：数学书中文翻译与排版 |
-| `latex-eq-numbering-audit` | 审计：公式编号一致性与锚点 |
-| `latex-display-layout-audit` | 审计：行间公式排版与断行 |
-| `latex-footnote-fidelity-audit` | 审计：脚注保真度 |
-| `latex-ocr-math-defect-audit` | 审计：OCR 数学缺陷（fnaudit / mathaudit） |
-| `latex-array-diagram-audit` | 审计：矩阵 / 图表保真度 |
-| `latex-bookmark-anchor-audit` | 审计：PDF 书签锚点 |
-| `latex-translation-fidelity-audit` | 审计：翻译保真度（配合 mathtranslation） |
+| WorkBuddy | `~/.workbuddy/skills/<skill-name>/` |
+| 其它支持技能的 Agent | 其各自的 skills 路径 |
 
-### PDF 处理
+加载后，Agent 会依据 `SKILL.md` 的 `description` 自动判断何时调用；也可以在对话里显式说「使用 `<skill-name>`」。
 
-| Skill | 用途 |
-|---|---|
-| `pdf` | 读取 / 摘要 / 检索 / 理解 PDF（本地 CLI） |
-| `pdf-image-text-extractor` | 从图片或 PDF 中识别并提取文字 |
-| `pdf-scanned-ocr-bookmark` | 为扫描版 PDF 添加可搜索隐藏文本 + 书签 |
-| `math-pdf-bookmark` | 为数学书 PDF 添加精确可点击书签 |
+> 注意：本仓库只收录已发布的技能。部分本地保留、暂未发布的技能（如 Office 文档类、系统工具类）不在本仓库内，请勿引用。
 
-## 仅本地保留、未发布到本仓库的类别
+## 技能清单
 
-以下类别当前**仅保存在本地** `~/.workbuddy/skills/`，**未推送**到本仓库（已在 `.gitignore` 中忽略；后续如需发布，取消对应忽略项并 `git add` 即可）：
+### 一、数学书 LaTeX（重排 / 翻译 / 审计）
 
-- **Office 文档**：`pptx` / `minimax-docx` / `minimax-xlsx` / `fast-docx` / `fast-pptx` / `fast-xlsx` / `markitdown-skill`
-- **系统 / 工具 / 其他**：`astrbot-plugin-deploy-verify` / `exam-passing` / `web-access` / `windows-orphan-app-entry-cleanup` / `windows-shell-extension-hang-diagnosis` / `skill-router`
+用于对数学专著进行高保真重排与中文翻译，并配套一系列「对照原书逐页审计」的专项技能。两个主控技能（重排、翻译）之下挂了多个审计子技能，整体构成一个闭环工作流。
 
-## 说明
+#### `latex-book-retypeset` · 主控 · 重排（re-typeset，不翻译）
+沉淀数学书**重排**（把扫描版 / PDF 版专著还原为可编译 LaTeX 源码）的工程方法论与坑位库。覆盖四类原书：
+- Springer GTM 类西文书（共享计数器、原生 TikZ、CRLF 无 BOM、xelatex 构建）；
+- 中文数学书（xeCJK + Fandol，TikZ 参数曲线、缺字回退、密集图标签）；
+- 分章页码西文专著（`\chapcode` 分章页码、手工编号陈述环境、biblatex 编号锁定）；
+- 单卷连续页码、小节裸编号专著。
 
-- 本仓库是 `~/.workbuddy/skills` 中**已发布部分**的镜像，不含 WorkBuddy 内部迁移标记与编译缓存（见 `.gitignore`）。
-- 各 skill 的 `SKILL.md` 顶部 `name` / `description` 决定其被自动触发的场景。
+**何时用**：用户说「重排某书」「把 PDF 排成 LaTeX」「补交叉引用」「修 overfull」「公式编号错位」「OCR 乱码」。
+
+#### `mathtranslation` · 主控 · 中文翻译
+统一的数学书中文 LaTeX **翻译 / 审校**技能，把四条流程合并于一处：
+1. 翻译与审校（以原书 PDF 为内容权威）；
+2. `xelatex + biber + texindy` 编译并用渲染 PDF 做可视化验证；
+3. 把 `定理 3.4` / `(2.3)` / `见 3.25` 等硬编码引用转成 `\ref` / `\eqref` / `\hyperpage` 可点击链接；
+4. 旧翻译模板迁移到 `mathtranslation.cls` v3.1。
+
+**何时用**：翻译数学书 / 论文 / 讲义，或复核、修复现有译稿。
+
+#### `latex-eq-numbering-audit` · 审计 · 公式编号
+对照原书**逐节核对**重排书的公式编号是否与印刷版一致，并直接修复：标签与渲染号矛盾、编号公式被压成行内、`\tag{(i)(ii)}` 罗马数字误成阿拉伯数字、章首小节未重置计数器等。采用自编译 `.aux`、OCR、原书文本层多源交叉投票。
+
+#### `latex-display-layout-audit` · 审计 · 行间公式版面
+对照原书修正行间公式的怪异排版，**且不改动任何公式编号**：过拆（1–2 行被拆成 5–7 行）、假对齐（`align` 里用 `&\quad` 做悬挂缩进）、嵌套显示环境、`\text{}` 内空格连字符、连续单行堆叠导致的松散断裂。
+
+#### `latex-footnote-fidelity-audit` · 审计 · 脚注保真
+确保 OCR 记录的**每一个脚注都真正落到 PDF 上**：修复各种扫描器怪异脚注记号（`$^3$`、`{}^{2}`、`...^{7}`、Unicode 上标等）、脚注正文缺失、脚注带位置异常，以及因脚注丢失而连带消失的索引条目。
+
+#### `latex-ocr-math-defect-audit` · 审计 · OCR 数学缺陷
+发现并修复 OCR 层在抵达 LaTeX 之前就已悄悄破坏的数学，且证明无遗漏：积分被吞进指数、积分域下标丢失、集合构造括号错位、微分跑到数学环境外、整词被当成数学排——尤其常发生在**脚注内的公式**。
+
+#### `latex-array-diagram-audit` · 审计 · 图表 / 交换图
+绘制与审校交换图、态射图、正合列网格（用 `tikzcd`），包括藏在 `array` / `matrix` / 自定义宏里的图。逐项核对节点、边、方向、单射钩、标签、零行与渲染；可在无视觉审校条件下区分「已验证事实」与「未决视觉细节」。
+
+#### `latex-bookmark-anchor-audit` · 审计 · 书签 / 目录锚点
+修复 LaTeX 文档的书签与目录超链**点错位置**：核心是星号标题（`\section*{...}`）不产生 hyperref 锚点、`\phantomsection` 顺序陷阱导致目标整体偏移一页、`.toc` 里借用的锚点等，并配 PyMuPDF 验证循环。
+
+#### `latex-translation-fidelity-audit` · 审计 · 翻译保真度
+对中文翻译稿做保真度审查，分三步走（由快到慢、由高收益到低）：
+0. **结构性**（最高收益）：相对原书目录的整段缺失、裸交叉引用、`习题` 标题完整性；
+1. **模式扫描**：算子宏（Frob / Nm）、哥特字母、残留英文、数字 / 度数误译；
+2. **跨源逐段比对**：原书 PDF ↔ OCR markdown ↔ 翻译 `.tex`，含脆弱 `$` 平衡与 CRLF / heredoc 陷阱。
+
+### 二、PDF 处理
+
+#### `pdf` · 通用 PDF 读写 / 渲染 / 验证
+读取、创建、检查、渲染并验证 PDF（含可填表单 AcroForm）。用 Poppler 渲染 + `reportlab` / `pdfplumber` / `pypdf` 生成与抽取。强调**先看渲染图再动手**，并在交付前验证最终排版。
+
+**何时用**：需要读 / 审 PDF、程序化生成排版可靠的 PDF、填写或校验交互表单。
+
+#### `pdf-image-text-extractor` · 图片 / PDF 文字提取（OCR）
+从图片或 PDF 识别并提取文字，零额外依赖方案：扫描版 PDF 自动渲染为图片交 AI 视觉识别（无需 tesseract / rapidocr）、表格用 PyMuPDF 内置 `find_tables` 结构化抽取、支持整目录批量处理与 Markdown 输出。
+
+**何时用**：从图片 / PDF 提取文字、扫描件 OCR、提取 PDF 表格、批量处理文件夹。
+
+#### `pdf-scanned-ocr-bookmark` · 扫描件 OCR + 书签
+为**纯扫描（无文字层）PDF** 加可搜索隐藏文本层（RapidOCR / PP-OCRv6，离线），并据识别文本重建忠实的目录书签树。全程命令行、可脚本化批量处理（Foxit / Adobe 内置 OCR 是 GUI、无法批量脚本化）。
+
+**何时用**：PDF 无文字层需 OCR + 书签，或要批量 OCR 一摞扫描件并加目录。
+
+#### `math-pdf-bookmark` · 数学 PDF 批量精确书签
+为大量数学 PDF **批量添加精确可点击书签**（跳到标题的 y 坐标而非页顶，这是最难的正确性约束）。两路分流：有文字层者从 span 几何解析目录；纯扫描者先 OCR（批量加隐藏层，单本重做走外部 dump）。可设 PDF 页码标签使阅读器页码等于印刷 folio；已验证 1000+ 本（数论 / 拓扑 / 代数 / 分析）。
+
+**何时用**：「给某文件夹 PDF 加书签 / 加目录」「书签没做好，重做」。
+
+---
+
+## 许可
+
+本仓库技能多为个人工程沉淀，仅供学习与自用。如用于他处，请遵循各技能目录内（若有）的附加说明。
