@@ -1,0 +1,10 @@
+# 文本文件统一以 LF 换行，保证跨平台一致，避免 CRLF 转换噪音
+* text=auto eol=lf
+
+# 明确按文本处理，避免被误判为二进制
+*.md    text
+*.py    text
+*.json  text
+*.xsd   text
+*.txt   text
+*.tex   text
