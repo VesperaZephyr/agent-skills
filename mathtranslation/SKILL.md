@@ -127,7 +127,11 @@ Preserve necessary mathematical dependencies in each handoff.
 For French mathematical lectures, papers, or books, read
 [references/french-mathematics.md](references/french-mathematics.md) before
 substantial translation. Check French logical constructions and context-specific
-terminology against the adopted Chinese defaults. Use
+terminology against the adopted Chinese defaults. Inventory front matter and
+cross-page boundaries from the source; distinguish an author’s résumé or
+préface from a newly written translator’s preface. For multi-volume projects,
+reconcile terms by mathematical sense and preserve any unresolved source issue
+as such. Use
 [references/french-calibration.json](references/french-calibration.json) for
 source-located practice and error analysis; reviewed examples are not evidence
 of model weight training or performance on unseen sources.

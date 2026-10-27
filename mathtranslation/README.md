@@ -25,7 +25,7 @@
 | 术语治理 | 已确定译名表（含人名对照）+ 疑点与命名边界 | `references/confirmed-terminology.md`、`references/terminology-exceptions.md` |
 | 交换图 | 一律 `tikz-cd` 重绘，含逐边规格与独立复核 | `references/diagram-practice.md` |
 | 插图 | 矢量优先、TikZ 重绘、最终页可读性判据 | `references/illustrations.md`、`references/figure-capture.md` |
-| 法语文献 | 法语逻辑构造与语境译名校准 | `references/french-mathematics.md`、`references/french-calibration.json` |
+| 法语文献 | 法语逻辑构造、前言/简历边界（résumé/préface 与译者新写前言的区分）、多卷术语对账 | `references/french-mathematics.md`、`references/french-calibration.json` |
 | 独立审阅 | 译者/审阅者上下文隔离，避免自审闭环 | `references/independent-review.md` |
 
 ---
@@ -112,7 +112,8 @@ git clone https://github.com/VesperaZephyr/agent-skills.git
 | 6. 交叉引用收敛 | 盘点 → 分类 → 转换 → 验证锚点 | `references/hardref.md`、`references/hardref-completeness.md` |
 | 7. 完工审查 | 对照清单逐项确认，区分"已审/已修/已验证" | `references/review-checklist.md`、`references/forensic-review.md` |
 
-法语文献在第 3、4 阶段前先读 `references/french-mathematics.md`。
+法语文献在第 3、4 阶段前先读 `references/french-mathematics.md`：先盘点前言、简历、原作者
+préface 与译者新写前言的边界，多卷项目按数学含义对账术语并保留未决项。
 插图与交换图在动笔绘图前读 `references/diagram-practice.md` /
 `references/illustrations.md` / `references/figure-capture.md`。
 
