@@ -8,22 +8,25 @@ bad in one of four ways:
       top of the page instead of the heading line;
   (2) missing entries     -- far fewer items than the printed Contents has;
   (3) broken hierarchy    -- everything at level 1, or level jumps;
-  (4) wrong page numbers  -- no /PageLabels, so the reader's page number
-      disagrees with the printed folio;
+  (4) absent page labels -- informational only; absence does not establish
+      that labels are wrong or that they should be changed;
   (5) dirty titles        -- the item still carries the Contents dot-leader and
       page number ("§3 Prime Ends .... 55"), a literal escape, mojibake, an
       embedded NUL/control character, or raw LaTeX source;
 Titles in family (5) nearly always mean the dest points at the TOC line rather
 than the body heading, so those books need a real rebuild, not a title cleanup.
-This script reports all four so you can build a REWORK list instead of
-trusting the old "A-ok = skip" classification.
+This is a triage tool, not a completeness or accuracy test. It does not
+compare the printed contents or inspect heading images. Flags are clues, not
+proof that a book needs rewriting. With explicit user instruction, the
+--skip-latex-native option skips outlines matching a conservative hyperref check.
 
 Usage:
     python bm_quality.py [ROOT]           # table, worst first
     python bm_quality.py ROOT --csv out   # same, machine readable
+    python bm_quality.py ROOT --skip-latex-native  # only if user requests it
 Set ROOT at the top if you copy this into a folder's _build/.
 """
-import os, re, sys, glob
+import os, re, sys, glob, csv as csv_module
 from collections import Counter
 import fitz
 
@@ -66,6 +69,30 @@ CTRL_RE = re.compile(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]')
 # `^{` / `_` ALONE are not evidence -- a hand-written Unicode-math title such as
 # '23.2 ∫_0^{2π} Q(sin θ, cos θ) dθ 型积分' is intentional and readable.
 TEX_RE = re.compile(r'\$|\\[a-zA-Z]')
+PRIVATE_RE = re.compile(r'[\ue000-\uf8ff\U000f0000-\U000ffffd\U00100000-\U0010fffd]')
+NUMBER_RE = re.compile(r'^\s*(?:§\s*)?(\d+(?:\s*[.．]\s*\d+)+)')
+
+
+def numbering_warnings(toc):
+    """Detect numbered sections whose numeric depth conflicts with the tree.
+
+    Compare only prefixes that actually occur as bookmarks. A book may omit
+    parents or use unconventional numbering, so this is evidence for review.
+    """
+    seen = {}
+    warnings = 0
+    for level, title, *_ in toc:
+        match = NUMBER_RE.match(str(title))
+        if not match:
+            continue
+        parts = re.split(r'\s*[.．]\s*', match.group(1))
+        for length in range(2, len(parts)):
+            parent = tuple(parts[:length])
+            if parent in seen and level <= seen[parent]:
+                warnings += 1
+                break
+        seen[tuple(parts)] = level
+    return warnings
 
 
 def title_dirt(t):
@@ -129,15 +156,29 @@ def audit(path):
     r = {'file': path, 'bm': 0, 'pages': 0, 'top': 0, 'nodest': 0,
          'oor': 0, 'nonmono': 0, 'lv': '-', 'flat': 0, 'labels': 0,
          'dirty': 0, 'leader': 0, 'escape': 0, 'moji': 0, 'ctrl': 0, 'tex': 0,
+         'private': 0, 'number_hierarchy': 0, 'sparse': 0, 'fixed_y': 0, 'latex_native': 0,
          'notes': ''}
     try:
         doc = fitz.open(path)
     except Exception as ex:
         r['notes'] = 'UNOPENABLE ' + repr(ex)[:40]
         return r
-    r['pages'] = doc.page_count
-    toc = doc.get_toc(simple=False)
+    try:
+        r['pages'] = doc.page_count
+        toc = doc.get_toc(simple=False)
+    except Exception as ex:
+        r['notes'] = 'UNOPENABLE ' + repr(ex)[:120]
+        doc.close()
+        return r
     r['bm'] = len(toc)
+    creator = (doc.metadata or {}).get('creator') or ''
+    # Metadata alone is insufficient: a later rewrite can replace the outline.
+    # Require every outline entry to retain a hyperref-style named destination.
+    named = [e[3].get('nameddest', '') if isinstance(e[3], dict) else '' for e in toc]
+    if 'hyperref' in creator.lower() and named and all(
+            re.match(r'^(?:chapter|section|subsection|subsubsection|part|appendix)\*?\.', n)
+            for n in named):
+        r['latex_native'] = 1
     rng = label_ranges(doc)
     r['labels'] = len(rng)
     if toc:
@@ -149,6 +190,11 @@ def audit(path):
             r['moji'] += 1 if mj else 0
             r['ctrl'] += 1 if ct else 0
             r['tex'] += 1 if tx else 0
+            r['private'] += 1 if PRIVATE_RE.search(str(e[1])) else 0
+        r['number_hierarchy'] = numbering_warnings(toc)
+        # A low bookmark density is a prioritization clue, never proof: some
+        # books deliberately have a shallow or very short printed contents.
+        r['sparse'] = int(doc.page_count >= 100 and len(toc) < max(20, doc.page_count * .04))
         lv = sorted({e[0] for e in toc})
         r['lv'] = '%d..%d' % (lv[0], lv[-1])
         n1 = sum(1 for e in toc if e[0] == 1)
@@ -178,6 +224,8 @@ def audit(path):
             yv, nc = cnt.most_common(1)[0]
             pages_at = len({e[2] for e in toc
                             if dest_y(e) is not None and round(dest_y(e), 2) == yv})
+            if nc >= max(5, 0.2 * len(toc)) and pages_at >= 3:
+                r['fixed_y'] = nc
             if nc >= max(5, 0.2 * len(toc)) and pages_at >= 3 and yv <= 5.0:
                 if nc > r['top'] + r['nodest']:
                     r['notes'] += ' fixed-dest y=%.2fx%d;' % (yv, nc)
@@ -186,12 +234,14 @@ def audit(path):
     return r
 
 
-def verdict(r):
-    """REWORK if the bookmarks really are bad; 'add-labels' is only optional
-    polish; a small number of non-monotonic items is normal (front matter,
-    index entries) so only flag it when it is systematic."""
+def verdict(r, skip_latex_native=False):
+    """Return triage clues, never a claim of completeness or correctness."""
+    if r['notes'].startswith('UNOPENABLE'):
+        return 'UNOPENABLE'
     if r['bm'] == 0:
         return 'EMPTY'
+    if r['latex_native'] and skip_latex_native:
+        return 'latex-native-skip'
     bad = []
     if r['top'] + r['nodest'] > max(1, r['bm'] * 0.2):
         bad.append('page-top')
@@ -203,31 +253,35 @@ def verdict(r):
         bad.append('nonmono')
     if r['dirty'] > max(2, r['bm'] * 0.03):
         bad.append('dirty-title')
-    if bad:
-        return ','.join(bad)
-    if r['labels'] == 0:
-        return 'add-labels'
-    return 'OK'
+    if r['private']:
+        bad.append('private-use-title')
+    if r['sparse']:
+        bad.append('sparse')
+    if r['number_hierarchy']:
+        bad.append('number-hierarchy')
+    if r['fixed_y']:
+        bad.append('repeated-y')
+    return ','.join(bad) if bad else 'needs-review'
 
 
 def main():
     root = sys.argv[1] if len(sys.argv) > 1 and not sys.argv[1].startswith('--') else ROOT
-    csv = None
+    csv_path = None
     if '--csv' in sys.argv:
-        csv = sys.argv[sys.argv.index('--csv') + 1]
+        csv_path = sys.argv[sys.argv.index('--csv') + 1]
     files = sorted(glob.glob(os.path.join(root, '**', '*.pdf'), recursive=True))
     rows = [audit(f) for f in files]
     for r in rows:
-        r['v'] = verdict(r)
+        r['v'] = verdict(r, skip_latex_native='--skip-latex-native' in sys.argv)
 
     def sev(r):
-        if r['v'] == 'OK':
+        if r['v'] == 'latex-native-skip':
+            return -1
+        if r['v'] == 'needs-review':
             return 0
-        if r['v'] == 'add-labels':
-            return 1
         if r['v'] == 'EMPTY':
             return 2
-        return 3                      # real rework, highest priority
+        return 3                      # flagged for priority review, not proof
     rows.sort(key=lambda r: (-sev(r), -(r['top'] + r['nodest']), -r['bm']))
     hdr = "%-4s %-4s %-6s %-4s %-4s %-4s %-5s %-8s %-7s %-10s %s"
     print(hdr % ('bm', 'top', 'pages', 'oor', 'nmon', 'flat', 'dirty', 'levels', 'labels', 'verdict', 'file'))
@@ -237,14 +291,15 @@ def main():
                      r['v'], os.path.basename(r['file'])[:60]))
     tot = len(rows)
     rework = [r for r in rows if sev(r) == 3]
-    lbl = [r for r in rows if r['v'] == 'add-labels']
     empty = [r for r in rows if r['v'] == 'EMPTY']
-    ok = [r for r in rows if r['v'] == 'OK']
-    print("\nPDFs: %d | REWORK: %d | add page-labels only: %d | EMPTY: %d | OK: %d"
-          % (tot, len(rework), len(lbl), len(empty), len(ok)))
+    review = [r for r in rows if r['v'] == 'needs-review']
+    native = [r for r in rows if r['v'] == 'latex-native-skip']
+    print("\nPDFs: %d | priority review: %d | EMPTY: %d | other review: %d | LaTeX native skip: %d"
+          % (tot, len(rework), len(empty), len(review), len(native)))
+    print('LaTeX native skip applies only with --skip-latex-native. Other files require contents and destination review; flags are only clues.')
     print("page-top / no-dest items total: %d" %
           sum(r['top'] + r['nodest'] for r in rows))
-    print("rework list (worst first):")
+    print("priority review list (flags are not proof of defects):")
     for r in rework:
         print("   %-9s %s" % (r['v'], r['file']))
     # Title dirt is invisible in every viewer, so name the exact family per book:
@@ -257,17 +312,18 @@ def main():
             print("   bm=%-4d dirty=%-3d leader=%-3d esc=%-2d moji=%-2d ctrl=%-3d tex=%-2d  %s"
                   % (r['bm'], r['dirty'], r['leader'], r['escape'], r['moji'],
                      r['ctrl'], r['tex'], os.path.basename(r['file'])[:60]))
-    if csv:
-        with open(csv, 'w', encoding='utf-8-sig') as fh:
-            fh.write('file,bm,top,oor,nonmono,flat,dirty,leader,escape,moji,'
-                     'ctrl,tex,levels,labels,verdict\n')
+    if csv_path:
+        with open(csv_path, 'w', encoding='utf-8-sig', newline='') as fh:
+            writer = csv_module.writer(fh)
+            writer.writerow(['file','bm','pages','top','oor','nonmono','flat','dirty','leader','escape','moji',
+                             'ctrl','tex','private','number_hierarchy','sparse','fixed_y','latex_native','levels','labels','verdict','notes'])
             for r in rows:
-                fh.write('"%s",%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s,%d,%s\n' % (
-                    r['file'], r['bm'], r['top'] + r['nodest'], r['oor'],
+                writer.writerow((r['file'], r['bm'], r['pages'], r['top'] + r['nodest'], r['oor'],
                     r['nonmono'], r['flat'], r['dirty'], r['leader'],
                     r['escape'], r['moji'], r['ctrl'], r['tex'],
-                    r['lv'], r['labels'], r['v']))
-        print('csv ->', csv)
+                    r['private'], r['number_hierarchy'], r['sparse'], r['fixed_y'], r['latex_native'],
+                    r['lv'], r['labels'], r['v'], r['notes']))
+        print('csv ->', csv_path)
 
 
 if __name__ == '__main__':

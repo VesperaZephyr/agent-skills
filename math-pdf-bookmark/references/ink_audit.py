@@ -119,6 +119,9 @@ X1 = float(sys.argv[sys.argv.index('--x1') + 1]) if '--x1' in sys.argv else 505.
 # Latin ALL-CAPS headings legitimately reach 320 pt -- pass --maxhead 340 there.
 MAXHEAD = float(sys.argv[sys.argv.index('--maxhead') + 1]) if '--maxhead' in sys.argv else 265.0
 TILEX1 = float(sys.argv[sys.argv.index('--tilex1') + 1]) if '--tilex1' in sys.argv else 330.0
+TILEHEIGHT = float(sys.argv[sys.argv.index('--tileheight') + 1]) if '--tileheight' in sys.argv else 70.0
+if TILEHEIGHT <= 18:
+    raise SystemExit('--tileheight must be greater than 18 pt to include the landing and heading.')
 EVERY = int(float(sys.argv[sys.argv.index('--every') + 1])) if '--every' in sys.argv else 6
 #                     ^ contact-sheet sampling: every Nth entry + all L1 + all BAD.
 #                     `--every 1` = 逐条看图（书只有几十条时这才是"写完必须看图"的正解）。
@@ -210,6 +213,18 @@ if '--items' in sys.argv:                    # 审"打算写入"的树，而不�
         p, y, lvl = int(p), float(y), int(lvl)
         toc.append([lvl, title, p, {'kind': 1, 'page': p - 1,
                                     'to': fitz.Point(72.0, y)}])
+# Refuse silently clipped windows: every target page may have different geometry.
+for entry in toc:
+    pnum = entry[2]
+    if pnum < 1 or pnum > d.page_count:
+        raise SystemExit(f"Invalid bookmark page: {pnum}")
+    rect = d[pnum - 1].rect
+    if not (0 <= X0 < X1 <= rect.width and X0 + 2 < TILEX1 <= rect.width):
+        raise SystemExit(
+            f"Audit window outside page {pnum} (width {rect.width:.2f} pt): "
+            f"x0={X0}, x1={X1}, tilex1={TILEX1}. "
+            "Set --x0, --x1 and --tilex1 for the target pages."
+        )
 out = ["%s  pages=%d bookmarks=%d%s  crop=%s media=%s"
        % (SRC, d.page_count, len(toc), " (PROPOSED tree, not yet written)" if PROPOSED else "",
           d[0].cropbox, d[0].mediabox),
@@ -278,7 +293,7 @@ for i in sel:
     lvl, title, p, landing = recs[i][1], recs[i][2], recs[i][3], recs[i][4]
     top = max(4.0, landing - 18)
     pix = d[p - 1].get_pixmap(matrix=fitz.Matrix(1 / SC, 1 / SC),
-                              clip=fitz.Rect(X0 + 2, top, TILEX1, top + 70))
+                              clip=fitz.Rect(X0 + 2, top, TILEX1, top + TILEHEIGHT))
     im = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
     dr = ImageDraw.Draw(im)
     ln = max(2, int((landing - top) / SC))
@@ -288,8 +303,10 @@ d.close()
 per = ROWS * COLS
 ns = (len(tiles) + per - 1) // per
 for s in range(ns):
-    w = COLS * (tiles[0][0].width + PAD) + PAD
-    hp = CAP + tiles[0][0].height + PAD
+    tile_w = max(im.width for im, _ in tiles)
+    tile_h = max(im.height for im, _ in tiles)
+    w = COLS * (tile_w + PAD) + PAD
+    hp = CAP + tile_h + PAD
     sheet = Image.new("RGB", (w, ROWS * hp + 22), "white")
     dr = ImageDraw.Draw(sheet)
     dr.text((PAD, 6), "ink audit %d/%d  red line = bookmark landing" % (s + 1, ns),
@@ -299,7 +316,7 @@ for s in range(ns):
         if idx >= len(tiles):
             break
         im, cap = tiles[idx]
-        cx = PAD + (k % COLS) * (im.width + PAD)
+        cx = PAD + (k % COLS) * (tile_w + PAD)
         cy = 22 + (k // COLS) * hp
         dr.text((cx + 2, cy), cap, fill=(0, 0, 140))
         sheet.paste(im, (cx, cy + CAP))
