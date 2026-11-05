@@ -1,10 +1,12 @@
+"""Validate fields.json geometry and text fit in physical PDF points."""
+
 from dataclasses import dataclass
 import json
+import math
+import re
 import sys
 
-
-# Script to check that the `fields.json` file that Claude creates when analyzing PDFs
-# does not have overlapping bounding boxes. See forms.md.
+from form_utils import positive_number, text_layout
 
 
 @dataclass
@@ -14,57 +16,109 @@ class RectAndField:
     field: dict
 
 
-# Returns a list of messages that are printed to stdout for Claude to read.
-def get_bounding_box_messages(fields_json_stream) -> list[str]:
+def validate_fields_data(data):
     messages = []
-    fields = json.load(fields_json_stream)
-    messages.append(f"Read {len(fields['form_fields'])} fields")
+    if not isinstance(data, dict) or not isinstance(data.get("form_fields"), list):
+        return ["FAILURE: form_fields must be a list"]
+    messages.append(f"Read {len(data['form_fields'])} fields")
+    if not isinstance(data.get("pages"), list) or not data["pages"]:
+        return messages + ["FAILURE: pages must include image_width, image_height, pdf_width and pdf_height"]
 
-    def rects_intersect(r1, r2):
-        disjoint_horizontal = r1[0] >= r2[2] or r1[2] <= r2[0]
-        disjoint_vertical = r1[1] >= r2[3] or r1[3] <= r2[1]
-        return not (disjoint_horizontal or disjoint_vertical)
+    def fail(message):
+        messages.append("FAILURE: " + message)
 
-    rects_and_fields = []
-    for f in fields["form_fields"]:
-        rects_and_fields.append(RectAndField(f["label_bounding_box"], "label", f))
-        rects_and_fields.append(RectAndField(f["entry_bounding_box"], "entry", f))
+    pages = {}
+    for page in data["pages"]:
+        if not isinstance(page, dict):
+            fail("Each page must be an object")
+            continue
+        number = page.get("page_number")
+        if type(number) is not int or number < 1 or number in pages:
+            fail("page_number must be a unique positive integer")
+            continue
+        if not all(positive_number(page.get(k)) for k in ("image_width", "image_height", "pdf_width", "pdf_height")):
+            fail(f"Page {number} must have positive image dimensions in pixels and PDF dimensions in points")
+            continue
+        pages[number] = page
 
-    has_error = False
-    for i, ri in enumerate(rects_and_fields):
-        # This is O(N^2); we can optimize if it becomes a problem.
-        for j in range(i + 1, len(rects_and_fields)):
-            rj = rects_and_fields[j]
-            if ri.field["page_number"] == rj.field["page_number"] and rects_intersect(ri.rect, rj.rect):
-                has_error = True
-                if ri.field is rj.field:
-                    messages.append(f"FAILURE: intersection between label and entry bounding boxes for `{ri.field['description']}` ({ri.rect}, {rj.rect})")
+    rects = []
+    for index, field in enumerate(data["form_fields"]):
+        if not isinstance(field, dict):
+            fail(f"Field {index + 1} must be an object")
+            continue
+        description = field.get("description", f"Field {index + 1}")
+        number = field.get("page_number")
+        if type(number) is not int or number not in pages:
+            fail(f"Unknown page_number for `{description}`")
+            continue
+        page = pages[number]
+        valid_boxes = {}
+        for kind in ("label", "entry"):
+            rect = field.get(f"{kind}_bounding_box")
+            valid = (
+                isinstance(rect, list) and len(rect) == 4
+                and all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in rect)
+            )
+            if not valid or not (0 <= rect[0] < rect[2] <= page["image_width"] and 0 <= rect[1] < rect[3] <= page["image_height"]):
+                fail(f"Invalid or out-of-bounds {kind} bounding box for `{description}`")
+                continue
+            valid_boxes[kind] = rect
+            rects.append(RectAndField(rect, kind, field))
+
+        if "entry_text" in field:
+            entry = field["entry_text"]
+            if not isinstance(entry, dict):
+                fail(f"entry_text must be an object for `{description}`")
+                continue
+            color = entry.get("font_color", "000000")
+            if not isinstance(color, str) or not re.fullmatch(r"[0-9a-fA-F]{6}", color):
+                fail(f"Invalid font_color for `{description}`; use RRGGBB")
+            try:
+                _, _, _, _, width, height = text_layout(entry)
+            except (ValueError, OSError, KeyError) as error:
+                fail(f"Invalid text for `{description}`: {error}")
+                continue
+            if "entry" in valid_boxes:
+                rect = valid_boxes["entry"]
+                box_width = (rect[2] - rect[0]) * page["pdf_width"] / page["image_width"]
+                box_height = (rect[3] - rect[1]) * page["pdf_height"] / page["image_height"]
+                if box_height + 1e-6 < height:
+                    fail(f"entry bounding box height ({box_height:.2f} pt) for `{description}` is too short for the text content ({height:.2f} pt)")
+                if box_width + 1e-6 < width:
+                    fail(f"entry bounding box width ({box_width:.2f} pt) for `{description}` is too narrow for the text content ({width:.2f} pt)")
+
+    for i, first in enumerate(rects):
+        for second in rects[i + 1:]:
+            if first.field["page_number"] != second.field["page_number"]:
+                continue
+            a, b = first.rect, second.rect
+            if a[0] < b[2] and a[2] > b[0] and a[1] < b[3] and a[3] > b[1]:
+                description = first.field.get("description", "field")
+                if first.field is second.field:
+                    fail(f"intersection between label and entry bounding boxes for `{description}` ({a}, {b})")
                 else:
-                    messages.append(f"FAILURE: intersection between {ri.rect_type} bounding box for `{ri.field['description']}` ({ri.rect}) and {rj.rect_type} bounding box for `{rj.field['description']}` ({rj.rect})")
-                if len(messages) >= 20:
-                    messages.append("Aborting further checks; fix bounding boxes and try again")
-                    return messages
-        if ri.rect_type == "entry":
-            if "entry_text" in ri.field:
-                font_size = ri.field["entry_text"].get("font_size", 14)
-                entry_height = ri.rect[3] - ri.rect[1]
-                if entry_height < font_size:
-                    has_error = True
-                    messages.append(f"FAILURE: entry bounding box height ({entry_height}) for `{ri.field['description']}` is too short for the text content (font size: {font_size}). Increase the box height or decrease the font size.")
-                    if len(messages) >= 20:
-                        messages.append("Aborting further checks; fix bounding boxes and try again")
-                        return messages
+                    fail(f"intersection between {first.rect_type} bounding box for `{description}` ({a}) and {second.rect_type} bounding box ({b})")
+            if len(messages) >= 20:
+                return messages[:20] + ["Aborting further checks; fix bounding boxes and try again"]
 
-    if not has_error:
+    if not any(message.startswith("FAILURE:") for message in messages):
         messages.append("SUCCESS: All bounding boxes are valid")
     return messages
+
+
+def get_bounding_box_messages(fields_json_stream):
+    return validate_fields_data(json.load(fields_json_stream))
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print("Usage: check_bounding_boxes.py [fields.json]")
         sys.exit(1)
-    # Input file should be in the `fields.json` format described in forms.md.
-    with open(sys.argv[1]) as f:
-        messages = get_bounding_box_messages(f)
-    for msg in messages:
-        print(msg)
+    try:
+        with open(sys.argv[1], encoding="utf-8") as stream:
+            messages = get_bounding_box_messages(stream)
+    except (OSError, ValueError) as error:
+        messages = [f"FAILURE: {error}"]
+    for message in messages:
+        print(message)
+    sys.exit(1 if any(message.startswith("FAILURE:") for message in messages) else 0)

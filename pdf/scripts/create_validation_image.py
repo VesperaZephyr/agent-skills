@@ -1,5 +1,6 @@
 import json
 import sys
+from pathlib import Path
 
 from PIL import Image, ImageDraw
 
@@ -13,7 +14,12 @@ def create_validation_image(page_number, fields_json_path, input_path, output_pa
     with open(fields_json_path, 'r') as f:
         data = json.load(f)
 
-        img = Image.open(input_path)
+        page = next((page for page in data["pages"] if page["page_number"] == page_number), None)
+        if page is None:
+            raise ValueError(f"Unknown page number {page_number}")
+        img = Image.open(input_path).convert("RGB")
+        if img.size != (page["image_width"], page["image_height"]):
+            raise ValueError("Image dimensions do not match fields.json")
         draw = ImageDraw.Draw(img)
         num_boxes = 0
         
@@ -26,7 +32,9 @@ def create_validation_image(page_number, fields_json_path, input_path, output_pa
                 draw.rectangle(label_box, outline='blue', width=2)
                 num_boxes += 2
         
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         img.save(output_path)
+        img.close()
         print(f"Created validation image at {output_path} with {num_boxes} bounding boxes")
 
 

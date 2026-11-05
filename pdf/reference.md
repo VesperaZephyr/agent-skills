@@ -39,7 +39,8 @@ import pypdfium2 as pdfium
 
 pdf = pdfium.PdfDocument("document.pdf")
 for i, page in enumerate(pdf):
-    text = page.get_text()
+    with page.get_textpage() as textpage:
+        text = textpage.get_text_bounded()
     print(f"Page {i+1} text length: {len(text)} chars")
 ```
 
@@ -306,7 +307,7 @@ pdfimages -all document.pdf images/img
 qpdf --split-pages=3 input.pdf output_group_%02d.pdf
 
 # Extract specific pages with complex ranges
-qpdf input.pdf --pages input.pdf 1,3-5,8,10-end -- extracted.pdf
+qpdf input.pdf --pages input.pdf 1,3-5,8,10-z -- extracted.pdf
 
 # Merge specific pages from multiple PDFs
 qpdf --empty --pages doc1.pdf 1-3 doc2.pdf 5-7 doc3.pdf 2,4 -- combined.pdf
@@ -318,14 +319,17 @@ qpdf --empty --pages doc1.pdf 1-3 doc2.pdf 5-7 doc3.pdf 2,4 -- combined.pdf
 qpdf --linearize input.pdf optimized.pdf
 
 # Remove unused objects and compress
-qpdf --optimize-level=all input.pdf compressed.pdf
+qpdf --object-streams=generate --recompress-flate --compression-level=9 input.pdf compressed.pdf
 
 # Attempt to repair corrupted PDF structure
 qpdf --check input.pdf
-qpdf --fix-qdf damaged.pdf repaired.pdf
+# Rewrite the PDF to recover repairable structural errors, then validate it.
+qpdf damaged.pdf repaired.pdf
+qpdf --check repaired.pdf
+# fix-qdf is a separate program for manually edited QDF files, not a qpdf flag.
 
 # Show detailed PDF structure for debugging
-qpdf --show-all-pages input.pdf > structure.txt
+qpdf --show-pages input.pdf > structure.txt
 ```
 
 #### Advanced Encryption
@@ -478,8 +482,9 @@ def batch_process_pdfs(input_dir, operation='merge'):
         for pdf_file in pdf_files:
             try:
                 reader = PdfReader(pdf_file)
-                for page in reader.pages:
-                    writer.add_page(page)
+                if reader.get_fields():
+                    reader.add_form_topname(f"document_{len(writer.pages) + 1}")
+                writer.append(reader)
                 logger.info(f"Processed: {pdf_file}")
             except Exception as e:
                 logger.error(f"Failed to process {pdf_file}: {e}")
@@ -520,7 +525,7 @@ page.mediabox.bottom = 50
 page.mediabox.right = 550
 page.mediabox.top = 750
 
-writer.add_page(page)
+writer.append(reader, pages=[0])
 with open("cropped.pdf", "wb") as output:
     writer.write(output)
 ```
@@ -557,7 +562,7 @@ def process_large_pdf(pdf_path, chunk_size=10):
         writer = PdfWriter()
         
         for i in range(start_idx, end_idx):
-            writer.add_page(reader.pages[i])
+            writer.append(reader, pages=[i])
         
         # Process chunk
         with open(f"chunk_{start_idx//chunk_size}.pdf", "wb") as output:

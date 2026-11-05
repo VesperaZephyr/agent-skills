@@ -4,11 +4,16 @@ import io
 from check_bounding_boxes import get_bounding_box_messages
 
 
-# Currently this is not run automatically in CI; it's just for documentation and manual checking.
+# Run with: python -m unittest discover -s pdf/scripts -p '*_test.py'
 class TestGetBoundingBoxMessages(unittest.TestCase):
     
     def create_json_stream(self, data):
         """Helper to create a JSON stream from data"""
+        data.setdefault("pages", [
+            {"page_number": number, "image_width": 1000, "image_height": 1000,
+             "pdf_width": 1000, "pdf_height": 1000}
+            for number in sorted({field["page_number"] for field in data["form_fields"]})
+        ])
         return io.StringIO(json.dumps(data))
     
     def test_no_intersections(self):

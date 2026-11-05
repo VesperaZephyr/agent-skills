@@ -47,7 +47,8 @@ math-pdf-bookmark/
     ├── size_census.py / toc_zoom.py     字号普查 / 目录放大
     ├── routeP_schiff.py / routeP_cn_lihong.py   ROUTE P 模板（Schiff / 李红）
     ├── missdiag.py / render_range.py / verify_r.py / sheet.py   缺漏诊断/范围渲染/校验/表格
-    └── winocr.ps1               WinRT OCR 回退
+    ├── winocr.ps1               WinRT OCR 回退
+    └── *.md 说明文档            bookmark-tools-guide / detailed-pipeline / detailed-rules / scanned-bookmark-guide / scanned-ocr-pipeline / routes-chinese-and-scan / routes-english-and-fast / verification-and-cases / ode-lessons / pde-lessons
 ```
 
 > 注意：`SKILL.md` 正文提到的 `diag.py` / `build_t1.py` / `verify.py` / `recover_empties.py`

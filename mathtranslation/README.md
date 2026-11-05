@@ -143,13 +143,17 @@ mathtranslation/
 │   ├── independent-review.md        译者/审阅者上下文隔离与交接
 │   ├── confirmed-terminology.md     已确定译名（含人名对照，约 2200 行）
 │   ├── terminology-exceptions.md    术语疑点与命名边界
+│   ├── terminology-review.md        术语译文一致性复查
 │   ├── build-verify.md              五步构建 + 渲染级验证完整配方
 │   ├── hardref.md                   硬编码引用 → 可点击（cls 路径）
 │   ├── hardref-completeness.md      引用完整性：防「编译通过但普遍漏链」
+│   ├── index-audit.md               索引条目一致性 / 页码回填审计
 │   ├── cls-v33-upgrade.md           旧模板 → cls v3.3 迁移与回归审计
 │   ├── diagram-practice.md          交换图规格、练习与独立复核
 │   ├── illustrations.md             数学插图：来源保真与最终页可读性
 │   ├── figure-capture.md            PDF 裁切 / 截图 / TikZ 重绘实操
+│   ├── figure-audit.md              插图逐幅对账审计
+│   ├── screenshot-audit.md          截图 / 插图逐幅审校指南
 │   ├── french-mathematics.md        法语数学文献翻译与校准
 │   └── french-calibration.json      法语校准样例（源定位、可回归）
 ├── scripts/
@@ -158,9 +162,12 @@ mathtranslation/
 │   ├── audit_bare_references.py     裸编号引用盘点（只盘点，不改写）
 │   ├── convert_hardrefs.py          cls 路径硬引用转换（dry-run / --apply）
 │   ├── convert_bare_refs.py         book 类裸编号转换（dry-run / --go）
-│   └── capture_pdf_region.py        PDF 区域导出 PDF+PNG+来源信息
+│   ├── capture_pdf_region.py        PDF 区域导出 PDF+PNG+来源信息
+│   ├── audit_related_indexes.py     关联索引条目审计
+│   └── index_records.py             索引记录检查
 └── tests/
-    └── test_audit_latex.py          审计脚本单元测试
+    ├── test_audit_latex.py          审计脚本单元测试
+    └── test_index_records.py        索引记录检查测试
 ```
 
 ---
@@ -175,6 +182,8 @@ mathtranslation/
 | `scripts/convert_hardrefs.py` | cls 路径硬引用转换 | 默认 dry-run，`--apply` 写盘 |
 | `scripts/convert_bare_refs.py` | book 类裸编号转换 | 默认 dry-run，`--go` 写盘 |
 | `scripts/capture_pdf_region.py` | PDF 区域导出 + 来源信息 | 直接产出 PDF / PNG |
+| `scripts/audit_related_indexes.py` | 关联索引条目审计 | 只读 |
+| `scripts/index_records.py` | 索引记录检查 | 只读 |
 
 ### `audit_latex.py` — 确定性审计
 

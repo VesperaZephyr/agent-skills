@@ -43,7 +43,8 @@ latex-book-retypeset/
 │   ├── verification.md          构建命令、验收清单、CRLF/BOM 检查
 │   ├── parallel-retypeset.md    有界并行与页级 OCR 来源
 │   ├── narrow-ams-retypeset.md  窄栏 ams 环境排版
-│   └── recalled-exams.md        中文回忆版试卷合集
+│   ├── recalled-exams.md        中文回忆版试卷合集
+│   └── handwritten-notes-retypeset.md  手写笔记重排专项
 └── scripts/
     ├── audit_text_refs.py        硬编码引用扫描器（只读清单）
     ├── audit_bare_xrefs.py       屏蔽已链接文本后的裸引用枚举

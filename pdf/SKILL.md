@@ -1,158 +1,317 @@
 ---
-name: "pdf"
-description: "Read, create, inspect, render, and verify PDF files where visual layout matters, including fillable AcroForms. Use Poppler rendering plus Python tools such as reportlab, pdfplumber, and pypdf for generation and extraction."
+name: pdf
+version: 1.0.1
+display_name: PDF 文档处理
+display_name_en: PDF Document Processing
+description: Comprehensive PDF manipulation toolkit for extracting text and tables, creating new PDFs, merging/splitting documents, and handling forms. When Claude needs to fill in a PDF form or programmatically process, generate, or analyze PDF documents at scale.
+description_zh: PDF 文档处理工具，支持文本与表格提取、PDF 创建、合并拆分、表单填写及批量分析。
+description_en: Process PDF documents by extracting text and tables, creating, merging, splitting, filling forms, and performing batch analysis.
+license: Proprietary. LICENSE.txt has complete terms
 ---
 
-# PDF Skill
+# PDF Processing Guide
 
-## When To Use
+## Overview
 
-- Read or review PDF content where layout and visuals matter.
-- Create PDFs programmatically with reliable formatting.
-- Fill and validate interactive PDF forms.
-- Validate final rendering before delivery.
+This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see reference.md. If you need to fill out a PDF form, read forms.md and follow its instructions.
 
-## Tools + Contract Requirements
+## Setup and verification
 
-Immediately before the first create/edit authoring command, run `mark_artifact_operation_started.mjs` successfully exactly once using the command below. Do not run it for read-only work. For edits, replace `create` with `edit`; adjust the expected count and output format to match the requested outputs.
+Run commands from this skill directory, or use absolute script paths.
+Install Python dependencies with `python -m pip install -r requirements.txt`.
+PDF rendering also requires Poppler (`brew install poppler` on macOS, or
+`apt-get install poppler-utils` on Debian/Ubuntu).
+The bundled form scripts require pypdf 6.21.1 or newer within major version 6;
+they do not patch library internals.
 
-```bash
-node container_tools/mark_artifact_operation_started.mjs --operation-kind create --expected-output-count 1 --output-format pdf
-```
+After creating or filling a PDF, render the output and inspect the affected
+pages for missing text, clipping, incorrect selections and alignment. Re-read
+interactive field values as well. A successful write alone is not verification.
+For non-interactive forms, use `pages.json` from the image converter to obtain
+the displayed page dimensions needed by `fields.json`.
 
-## Workflow
+For regression tests, install `requirements-dev.txt` and run
+`python -m unittest discover -s scripts -p '*_test.py'`.
 
-1. Prefer visual review: render PDF pages to PNGs and inspect them.
-   - Use `pdftoppm` from the bundled runtime or system Poppler when available.
-   - If unavailable, install Poppler or ask the user to review the output locally.
-2. Use `reportlab` to generate PDFs when creating new documents.
-3. Use `pdfplumber` or `pypdf` for text extraction and quick checks; do not rely on text extraction for layout fidelity.
-4. After each meaningful update, re-render pages and verify alignment, spacing, and legibility.
-
-## Fill And Validate AcroForms
-
-Visual review alone is not a correctness check for a fillable PDF. A page `/Widget` annotation can render a value from its appearance stream while the canonical `/AcroForm/Fields` tree is missing or contains a stale value.
-
-1. Keep the result interactive by default; set `flatten=True` only when the user explicitly requests a completed, static form. Preserve the source PDF, and do not flatten a signed PDF without an explicit workflow decision.
-2. Inspect both representations before filling: enumerate fields from `reader.get_fields()` and `/Widget` annotations from every page's `/Annots`, following `/Parent` and `/Kids`. If a widget and a canonical field have the same name but are distinct objects with no `/Parent` relationship, do not call `reattach_fields()` blindly: it can create a second top-level field with the same name. Report the ambiguity or produce a static result.
-3. Recover genuinely orphaned widgets, fill all pages, and write the result with `pypdf`:
+## Quick Start
 
 ```python
 from pypdf import PdfReader, PdfWriter
-from pypdf.generic import NameObject
 
-reader = PdfReader(input_pdf)
+# Read a PDF
+reader = PdfReader("document.pdf")
+print(f"Pages: {len(reader.pages)}")
+
+# Extract text
+text = ""
+for page in reader.pages:
+    text += page.extract_text()
+```
+
+## Python Libraries
+
+### pypdf - Basic Operations
+
+#### Merge PDFs
+```python
+from pypdf import PdfWriter, PdfReader
+
 writer = PdfWriter()
-writer.clone_document_from_reader(reader)
+for pdf_file in ["doc1.pdf", "doc2.pdf", "doc3.pdf"]:
+    reader = PdfReader(pdf_file)
+    # Separate identically named fields from different source documents.
+    if reader.get_fields():
+        reader.add_form_topname(f"document_{len(writer.pages) + 1}")
+    writer.append(reader)
 
-# Restores widgets that are missing from /AcroForm/Fields.
-writer.reattach_fields()
-fields = writer.get_fields() or {}
-missing = set(expected_values) - set(fields)
-if missing:
-    raise ValueError(f"Form fields not found after repair: {sorted(missing)}")
-
-values_to_write = dict(expected_values)
-if flatten:
-    # Paint every existing value before removing every widget.
-    values_to_write = {
-        name: field.get("/V", "/Off" if field.get("/FT") == "/Btn" else "")
-        for name, field in fields.items()
-    }
-    values_to_write.update(expected_values)
-
-writer.update_page_form_field_values(
-    None, values_to_write, auto_regenerate=False, flatten=flatten
-)
-
-if flatten:
-    # pypdf's flatten=True paints appearances but does not remove widgets.
-    writer.remove_annotations(subtypes="/Widget")
-    writer.root_object.pop(NameObject("/AcroForm"), None)
-
-with open(output_pdf, "wb") as stream:
-    writer.write(stream)
+with open("merged.pdf", "wb") as output:
+    writer.write(output)
 ```
 
-4. Reopen the written PDF before delivery. For an interactive result, require every expected field to be present in `get_fields()` with the expected `/V`, enumerate page widgets again, and confirm their effective `/V` (the widget value or inherited `/Parent` value) agrees. Confirm each updated widget has a non-empty `/AP` `/N` appearance and render the final pages to catch stale or clipped appearances. Do not rely on `/NeedAppearances` or a successful PNG render as proof that logical field data was updated.
-5. For a flattened result, require zero `/Widget` annotations and no remaining `/AcroForm` field tree after reopening, then render the final pages. Keep an editable copy when the user may need to revise the form.
+#### Split PDF
+```python
+reader = PdfReader("input.pdf")
+for i, page in enumerate(reader.pages):
+    writer = PdfWriter()
+    writer.append(reader, pages=[i])
+    with open(f"page_{i+1}.pdf", "wb") as output:
+        writer.write(output)
+```
 
-## Temp And Output Conventions
+#### Extract Metadata
+```python
+reader = PdfReader("document.pdf")
+meta = reader.metadata
+print(f"Title: {meta.title}")
+print(f"Author: {meta.author}")
+print(f"Subject: {meta.subject}")
+print(f"Creator: {meta.creator}")
+```
 
-- Use `tmp/pdfs/` for intermediate files; delete them when done.
-- Write final artifacts under `output/pdf/` when working in this repo.
-- Keep filenames stable and descriptive.
+#### Rotate Pages
+```python
+reader = PdfReader("input.pdf")
+writer = PdfWriter()
 
-## Dependencies
+writer.append(reader)
+writer.pages[0].rotate(90)  # Rotate page 1 clockwise; retain other pages and forms
 
-Prefer the Codex bundled workspace/runtime dependencies when available. The primary runtime is expected to include:
+with open("rotated.pdf", "wb") as output:
+    writer.write(output)
+```
 
-- Python packages: `reportlab`, `pdfplumber`, `pypdf`
-- Rendering tools: `pdftoppm` and `pdfinfo` from Poppler
+### pdfplumber - Text and Table Extraction
 
-If a dependency is missing, install only what is needed.
+#### Extract Text with Layout
+```python
+import pdfplumber
 
-Python packages:
+with pdfplumber.open("document.pdf") as pdf:
+    for page in pdf.pages:
+        text = page.extract_text()
+        print(text)
+```
 
+#### Extract Tables
+```python
+with pdfplumber.open("document.pdf") as pdf:
+    for i, page in enumerate(pdf.pages):
+        tables = page.extract_tables()
+        for j, table in enumerate(tables):
+            print(f"Table {j+1} on page {i+1}:")
+            for row in table:
+                print(row)
+```
+
+#### Advanced Table Extraction
+```python
+import pandas as pd
+
+with pdfplumber.open("document.pdf") as pdf:
+    all_tables = []
+    for page in pdf.pages:
+        tables = page.extract_tables()
+        for table in tables:
+            if table:  # Check if table is not empty
+                df = pd.DataFrame(table[1:], columns=table[0])
+                all_tables.append(df)
+
+# Combine all tables
+if all_tables:
+    combined_df = pd.concat(all_tables, ignore_index=True)
+    combined_df.to_excel("extracted_tables.xlsx", index=False)
+```
+
+### reportlab - Create PDFs
+
+#### Basic PDF Creation
+```python
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
+c = canvas.Canvas("hello.pdf", pagesize=letter)
+width, height = letter
+
+# Add text
+c.drawString(100, height - 100, "Hello World!")
+c.drawString(100, height - 120, "This is a PDF created with reportlab")
+
+# Add a line
+c.line(100, height - 140, 400, height - 140)
+
+# Save
+c.save()
+```
+
+#### Create PDF with Multiple Pages
+```python
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.lib.styles import getSampleStyleSheet
+
+doc = SimpleDocTemplate("report.pdf", pagesize=letter)
+styles = getSampleStyleSheet()
+story = []
+
+# Add content
+title = Paragraph("Report Title", styles['Title'])
+story.append(title)
+story.append(Spacer(1, 12))
+
+body = Paragraph("This is the body of the report. " * 20, styles['Normal'])
+story.append(body)
+story.append(PageBreak())
+
+# Page 2
+story.append(Paragraph("Page 2", styles['Heading1']))
+story.append(Paragraph("Content for page 2", styles['Normal']))
+
+# Build PDF
+doc.build(story)
+```
+
+## Command-Line Tools
+
+### pdftotext (poppler-utils)
 ```bash
-uv pip install reportlab pdfplumber pypdf
+# Extract text
+pdftotext input.pdf output.txt
+
+# Extract text preserving layout
+pdftotext -layout input.pdf output.txt
+
+# Extract specific pages
+pdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5
 ```
 
-If `uv` is unavailable:
-
+### qpdf
 ```bash
-python3 -m pip install reportlab pdfplumber pypdf
+# Merge PDFs
+qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf
+
+# Split pages
+qpdf input.pdf --pages . 1-5 -- pages1-5.pdf
+qpdf input.pdf --pages . 6-10 -- pages6-10.pdf
+
+# Rotate pages
+qpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees
+
+# Remove password
+qpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf
 ```
 
-System tools for rendering:
-
+### pdftk (if available)
 ```bash
-# macOS (Homebrew)
-brew install poppler
+# Merge
+pdftk file1.pdf file2.pdf cat output merged.pdf
 
-# Ubuntu/Debian
-sudo apt-get install -y poppler-utils
+# Split
+pdftk input.pdf burst
+
+# Rotate
+pdftk input.pdf rotate 1east output rotated.pdf
 ```
 
-If installation is not possible in this environment, tell the user which dependency is missing and how to install it locally.
+## Common Tasks
 
-## Environment
+### Extract Text from Scanned PDFs
+```python
+# Requires: pip install pytesseract pdf2image
+import pytesseract
+from pdf2image import convert_from_path
 
-No required environment variables.
+# Convert PDF to images
+images = convert_from_path('scanned.pdf')
 
-## Rendering Command
+# OCR each page
+text = ""
+for i, image in enumerate(images):
+    text += f"Page {i+1}:\n"
+    text += pytesseract.image_to_string(image)
+    text += "\n\n"
 
+print(text)
+```
+
+### Add Watermark
+```python
+from pypdf import PdfReader, PdfWriter
+
+# Create watermark (or load existing)
+watermark = PdfReader("watermark.pdf").pages[0]
+
+# Apply to all pages
+reader = PdfReader("document.pdf")
+writer = PdfWriter()
+
+for page in reader.pages:
+    page.merge_page(watermark)
+writer.append(reader)
+
+with open("watermarked.pdf", "wb") as output:
+    writer.write(output)
+```
+
+### Extract Images
 ```bash
-pdftoppm -png "$INPUT_PDF" "$OUTPUT_PREFIX"
+# Using pdfimages (poppler-utils)
+pdfimages -j input.pdf output_prefix
+
+# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
 ```
 
-## Quality Expectations
+### Password Protection
+```python
+from pypdf import PdfReader, PdfWriter
 
-- Maintain polished visual design: consistent typography, spacing, margins, and section hierarchy.
-- Avoid rendering issues: clipped text, overlapping elements, broken tables, black squares, or unreadable glyphs.
-- Charts, tables, and images must be sharp, aligned, and clearly labeled.
-- Use ASCII hyphens only. Avoid U+2011 and other Unicode dashes.
-- Citations and references must be human-readable; never leave tool tokens or placeholder strings.
+reader = PdfReader("input.pdf")
+writer = PdfWriter()
 
-## Final Checks
+writer.append(reader)
 
-- Do not deliver until the latest PNG inspection shows zero visual or formatting defects.
-- Confirm headers, footers, page numbering, and section transitions look polished.
-- Keep intermediate files organized or remove them after final approval.
+# Add password
+writer.encrypt("userpassword", "ownerpassword")
 
-## Final response
+with open("encrypted.pdf", "wb") as output:
+    writer.write(output)
+```
 
-### Final response citations
+## Quick Reference
 
-Place `:codex-file-citation{...}` inline in prose, not in a trailing list. Use `purpose="source"` for Q&amp;A/no-op and `purpose="output"` for create/edit.
+| Task | Best Tool | Command/Code |
+|------|-----------|--------------|
+| Merge PDFs | pypdf | `writer.append(reader)`; namespace duplicate form names |
+| Split PDFs | pypdf | One page per file |
+| Extract text | pdfplumber | `page.extract_text()` |
+| Extract tables | pdfplumber | `page.extract_tables()` |
+| Create PDFs | reportlab | Canvas or Platypus |
+| Command line merge | qpdf | `qpdf --empty --pages ...` |
+| OCR scanned PDFs | pytesseract | Convert to image first |
+| Fill PDF forms | pdf-lib or pypdf (see forms.md) | See forms.md |
 
-- [HARD REQUIREMENT] Create/edit: cite each final PDF exactly once with a plain output citation. Summarize representative changes; do not cite every page or add a separate filename, path, or Markdown link. Example: `Created :codex-file-citation{path="/abs/path/report.pdf" purpose="output"}, with the completed analysis and appendix.`
-- Q&amp;A/no-op: do not edit or re-export. Inspect the complete relevant pages, preserve material headings, table/figure labels, footnotes, sources, and sample sizes, and cite each source PDF once with a plain source citation.
+## Next Steps
 
-PDF citations currently support only plain file citations. Do not add `artifact_kind`, `page_number`, or other locators. Never cite rendered PNGs, scratch files, builders, or QA intermediates unless asked.
-
-### Final response suggested followups
-
-- After successfully creating, editing, or analyzing an artifact, finish your final response with 3 useful next actions tailored to the artifact and the user's goal. Completing the requested work is not a reason to skip these actions: they help the user continue from the result. Do not perform the actions unless the user chooses one.
-- Each action must be a distinct, concrete request the user could send next. Do not repeat completed work or invent filler. Omit the list if the user declines suggestions, the requested work fails, or no genuinely useful next action remains.
-- Present each action as an unescaped Markdown list item using this exact syntax: `- :codex-followup[Short action]{prompt="Complete request for that action"}`.
+- For advanced pypdfium2 usage, see reference.md
+- For JavaScript libraries (pdf-lib), see reference.md
+- If you need to fill out a PDF form, follow the instructions in forms.md
+- For troubleshooting guides, see reference.md
