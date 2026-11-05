@@ -7,6 +7,9 @@ also follow the existing diagram audit skill. Do not recreate a mathematical
 figure with image generation: exact mathematical relationships require
 deterministic geometry and a published-source comparison.
 
+For a book-wide source-vs-translation figure audit (dual inventories, full-page
+pair rendering, reviewer dispatch, scripted repair and re-render verification),
+read [figure-audit.md](figure-audit.md).
 For executable capture commands, coordinate conventions and TikZ implementation,
 read [figure-capture.md](figure-capture.md). For clean-context figure review,
 read [independent-review.md](independent-review.md).

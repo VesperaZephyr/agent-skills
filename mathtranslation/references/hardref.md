@@ -24,22 +24,30 @@ script-driven pass instead of error-prone manual editing.
 
 ## Counter model (critical, non-obvious)
 
-1. `mathtranslation.cls` wraps `ctexart`. Theorem-like environments (`theorem`, `proposition`,
-   `lemma`, `corollary`, `definition`, `remark`, `example`, `problem`) are declared with a
-   **shared** counter via a compatibility layer such as
-   `\newtheorem{proposition}[theorem]{命题}`.
-2. The displayed number is `\thetheorem = \arabic{subsection}.\arabic{theorem}`, i.e.
-   "**subsection.theorem**". The theorem counter **resets at each subsection**
-   (numberwithin-style), so within a subsection it is a local sequence 1,2,3...
-3. **Counters carry across `\input` files.** A chapter split into `part06a1.tex`,
-   `part06a2.tex`, `part06b.tex` continues the same subsection/theorem counters. Simulating
-   numbering for `part06b.tex` in isolation is WRONG — always simulate the full chapter chain
-   loaded in `main.tex` order. The appended paper (`partgf1`+`partgf2`) is one continuous
-   document (equation/subsection/theorem reset once before `partgf1`, then continuous).
-4. `\mtsubsec{...}` subheadings also increment the shared theorem counter and display
-   "subsection.theorem", sharing the sequence with theorems. `\mtsubsecn` does NOT increment.
-5. Equation numbers are sequentially global in the main book (1..N) and reset+continuous across
-   the appended paper. Use a global (non-GF) or combined-GF equation index accordingly.
+> **Class lineage.** The maintained `mathtranslation.cls` (v3.1+, current) **wraps `ctexbook`**,
+> not `ctexart`. Its theorem-like environments (`theorem`, `proposition`, `lemma`, `corollary`,
+> `definition`, `remark`, `example`, `problem`) are each declared with their **own** counter via
+> `\newtheorem{theorem}{定理}[section]` etc., so the displayed number is "**section.item**"
+> (e.g. `定理 1.2`) and each environment resets at every `\section`. Equations are numbered
+> per-chapter (`chapter.equation`) by the book-class default. Always inspect the *supplied*
+> `mathtranslation.cls` for the authoritative model. The bullets below record the **legacy
+> ctexart-template** convention used by older projects.
+
+1. (Legacy ctexart template) Theorem-like environments share **one** counter via a compatibility
+   layer such as `\newtheorem{proposition}[theorem]{命题}`. The displayed number is
+   `\thetheorem = \arabic{subsection}.\arabic{theorem}`, i.e. "**subsection.theorem**", and the
+   theorem counter **resets at each subsection**.
+2. **Counters carry across `\input` files.** A chapter split into `part06a1.tex`,
+   `part06a2.tex`, `part06b.tex` continues the same counters. Simulating numbering for
+   `part06b.tex` in isolation is WRONG — always simulate the full chapter chain loaded in
+   `main.tex` order. The appended paper (`partgf1`+`partgf2`) is one continuous document
+   (counters reset once before `partgf1`, then continuous).
+3. (Legacy ctexart template) `\mtsubsec{...}` subheadings also increment the shared theorem
+   counter and display "subsection.theorem", sharing the sequence with theorems. `\mtsubsecn`
+   does NOT increment.
+4. (Legacy ctexart template) Equation numbers are sequentially global in the main book (1..N) and
+   reset+continuous across the appended paper. In the current ctexbook class, equations are
+   per-chapter by default — adjust the global/combined index to the project's actual model.
 
 ## Safe mapping rule
 
@@ -85,7 +93,9 @@ resolves. Visually the rendered text is unchanged (e.g. `命题 1.6` → `\propr
 ## Limitations / known false-positives
 
 The `mathtranslations` audit profile also emits two benign WARNINGs that should be ignored:
-- "expected a ctexart document class declaration" — `mathtranslation` wraps `ctexart`.
+- "expected a ctexart document class declaration" — legacy audit assumption; the maintained
+  `mathtranslation.cls` (v3.1+) actually wraps `ctexbook`, so this warning is a false positive
+  for current projects.
 - "\printterminology is not the final document content" — `\printterminology` is the final
   content before `\end{document}`.
 
@@ -228,13 +238,15 @@ starts with `\index`), keep CRLF (`open(...,'wb')` after normalizing to `\r\n`),
 ## Pitfall: redefining theorem environments in an article-style child doc
 
 When building a *standalone article* on top of `mathtranslation.cls` (e.g. extracting the
-appendix paper from a book, `\documentclass{mathtranslation}` + own `\maketitle`), the class
-already declares `theorem/definition/lemma/corollary/proposition/remark/example/problem` with
-`[subsection]` counters. To re-declare them with your own numbering:
+appendix paper from a book, `\documentclass{mathtranslation}` + own `\maketitle`) and
+re-declaring theorem environments, inspect the supplied class for the actual counter reset level.
+The maintained v3.x class declares separate theorem-like counters reset by `\section`; older
+project copies can differ. The failure mechanism below applies to counters that remain registered
+in the class's reset list; adjust the list name to the inspected class if it differs.
 
 - DO `\let\theorem\relax\let\endtheorem\relax` (undefine env commands only).
-- DO NOT `\let\c@theorem\relax` (do NOT kill the counters!). The cls registered these
-  counters in its `\cl@subsection` reset list; killing them makes every later `\section`
+- DO NOT `\let\c@theorem\relax` (do NOT kill the counters!). The current cls registers these
+  counters in its `\cl@section` reset list; killing them makes every later `\section`
   fail with `LaTeX Error: No counter 'definition' defined.` (error text is mis-attributed
   to the `\section` line — very confusing).
 - Instead keep the class counters alive, create fresh shared counters

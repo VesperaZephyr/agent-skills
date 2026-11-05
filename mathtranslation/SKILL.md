@@ -1,6 +1,6 @@
 ---
 name: mathtranslation
-description: Translate mathematical books, papers, notes, and existing LaTeX projects into rigorous Chinese LaTeX, review/repair an existing translation, compile and visually verify the result (xelatex + biber + texindy, Windows/WorkBuddy), convert hard-coded references into clickable cross-references, and migrate a translation from the old mathtranslation template onto mathtranslation.cls v3.1. Use when source fidelity, mathematical correctness, terminology consistency, cross-references, citations, compilation, and PDF-level proofreading matter. Do not use for ordinary non-mathematical translation.
+description: Translate mathematical books, papers, notes, and existing LaTeX projects into rigorous Chinese LaTeX, review/repair an existing translation, compile and visually verify the result (xelatex + biber + texindy, Windows/WorkBuddy), convert hard-coded references into clickable cross-references, and migrate a translation from the old mathtranslation template onto mathtranslation.cls v3.3. Use when source fidelity, mathematical correctness, terminology consistency, cross-references, citations, compilation, and PDF-level proofreading matter. Do not use for ordinary non-mathematical translation.
 ---
 
 # MathTranslation
@@ -18,9 +18,9 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
    索引页码等纯文本引用转成 `\ref` / `\eqref` / `\hyperpage` 链接。见
    [references/hardref.md](references/hardref.md) 与 `scripts/convert_hardrefs.py`、
    `scripts/convert_bare_refs.py`。
-4. **模板迁移到 mathtranslation.cls v3.1** —— 把旧的 ctexart 单文件模板迁移到
-   基于 ctexbook 的 `mathtranslation.cls` v3.1，并做回归审计。见
-   [references/cls-v31-upgrade.md](references/cls-v31-upgrade.md)。
+4. **模板迁移到 mathtranslation.cls v3.3** —— 把旧的 ctexart 单文件模板迁移到
+   基于 ctexbook 的 `mathtranslation.cls` v3.3（ctexbook 体系自 v3.1 引入，当前 v3.3），并做回归审计。见
+   [references/cls-v33-upgrade.md](references/cls-v33-upgrade.md)。
 
 四条流程共享同一套纪律：**以原书 PDF 为内容权威、不擅自改写、编号从渲染 PDF
 实抽、0 错误 / 0 未定义 / 0 缺字符 / 0 新增 overfull 为红线**。翻译工程的
@@ -151,6 +151,15 @@ of model weight training or performance on unseen sources.
   with the `tikz-cd` package and `tikzcd` environment. Do not replace them with
   screenshots or raster images. Preserve every node, label, arrow direction,
   arrow style, and commutative relationship from the source.
+- For sustained diagram review or repair batches, also read
+  [continuous review and repair regression](../latex-array-diagram-audit/references/continuous-review.md).
+  Distinguish repeated occurrences of the same object, element chases and object-level
+  diagrams, zero endpoints and continuation marks, and source figures replaced by
+  equivalent formulas. Preserve logical labels such as uniqueness and a proposed
+  lift's question mark. Freeze the PDF for parallel readers, integrate edits serially,
+  and close each repair against its final rendered page; inherited-context regression
+  checks are not independent blind review. If the companion reference is unavailable,
+  retain these checks in the local diagram ledger rather than claiming full coverage.
 - Before drawing or independently reviewing diagrams, read
   [references/diagram-practice.md](references/diagram-practice.md) for source-first
   edge specifications and calibration cases. These are practice/regression tasks,
@@ -185,6 +194,20 @@ of model weight training or performance on unseen sources.
   crop, representation, label readability, and final-page placement separately.
   Build independent source and compiled-translation inventories and a per-figure
   ledger; equal counts do not establish correct correspondence.
+- For source-derived screenshots or scans in mathematical illustrations, also read
+  [references/screenshot-audit.md](references/screenshot-audit.md): inspect the
+  source page, original asset, and final page separately, including every crop edge,
+  dense marks, effective size, and version-bound evidence.
+- For a book-wide source-vs-translation figure audit (逐幅对账), follow
+  [references/figure-audit.md](references/figure-audit.md): verify the source
+  PDF's identity first, build dual inventories, render full-page side-by-side
+  pairs for the first pass (caption-anchored crops get polluted by math rules),
+  zoom at 200dpi for arrowheads, label overlap and z-order fills, dispatch
+  size-capped fresh-context reviewers with calibrated samples, re-verify every
+  high-impact claim in the TikZ source (arrow direction is deterministic:
+  `(a)--(b)` has its head at b), repair via persisted script files (never inline
+  shell heredocs with backslashes — `\f` silently becomes formfeed), then
+  rebuild and re-render each repaired figure for visual confirmation.
 - For concrete PDF screenshot/crop operations and TikZ redraws, read
   [references/figure-capture.md](references/figure-capture.md). Use
   `scripts/capture_pdf_region.py` to export a physical page or reviewed bounding
@@ -286,8 +309,9 @@ Key rules:
 - **Convert only when there is a UNIQUE candidate label** satisfying the correct
   chapter/appendix scope + exact printed number (from AUX field 1) + matching object type.
   Derive the number→label map from `main.aux`, never hand-write it.
-- For `mathtranslation.cls` (wraps ctexart): theorem counter is "subsection.theorem",
-  shared across `\input` files — simulate the full chapter chain, never a single file.
+- For the current `mathtranslation.cls` (ctexbook-based, v3.1+): each theorem-like environment
+  has its **own** counter numbered per-section as "section.item" (e.g. `定理 1.2`), reset at each
+  `\section`, and carried across `\input` files — simulate the full chapter chain, never a single file.
 - For book classes (AJbook.cls / ctexbook): theorem-like envs share ONE counter
   printed "section.item"; labels are `<type>:<chap><sec>.<item>`. Resolve by
   (chapter, number) from `main.aux`, never by guessing the type.
@@ -302,23 +326,24 @@ Key rules:
   `page.1` collision by wrapping the cover in
   `\hypersetup{pageanchor=false}` … `\hypersetup{pageanchor=true}`.
 
-## Migrate a translation to mathtranslation.cls v3.1
+## Migrate a translation to mathtranslation.cls v3.3
 
-When an old ctexart-based template must move to `mathtranslation.cls` v3.1
-(ctexbook-based, kvoptions), a naive `\documentclass` swap compiles yet silently
+When an old ctexart-based template must move to `mathtranslation.cls` v3.3
+(ctexbook-based, kvoptions; the ctexbook line was introduced at v3.1 and is
+current at v3.3), a naive `\documentclass` swap compiles yet silently
 mangles numbering. The safe, auditable recipe — three-layer heading remap,
 continuous equation numbering, the two theorem-counter traps (`\@addtoreset`
-survival, shared-counter register), the `\printterminology` unnumbered-chapter
-override, and the pymupdf regression audit — lives in
-[references/cls-v31-upgrade.md](references/cls-v31-upgrade.md).
+survival, shared-counter register), and the pymupdf regression audit — lives in
+[references/cls-v33-upgrade.md](references/cls-v33-upgrade.md).
 
 Key steps: shift every heading down one level (`\section`→`\chapter`,
 `\subsection`→`\section`, …); restore continuous equation numbering with
 `\@removefromreset{equation}{chapter}`; rebuild theorem aliases pointing their
 counters at the shared `\c@theorem` register; clear residual
 `\@addtoreset{X}{section}` hooks precisely (never wipe the whole `\cl@section`
-list); override `\printterminology` to a starred chapter when there is no
-`\appendix`.
+list). As of v3.2, `\makebibliography` and `\printterminology` already enter
+`\backmatter` and emit unnumbered `\chapter*`, so no manual starred-chapter
+override is needed.
 
 ## Verify (translation-level)
 
@@ -344,6 +369,26 @@ validation in the report.
    `定理 X.Y`, `图 X.Y`); a clean build can still ship wrong numbers.
 3. Perform three separate passes: Chinese language and terminology;
    mathematics and structural fidelity; compilation and visual layout.
+   For the dedicated terminology-consistency pass — or for a standalone
+   术语一致性 audit of a finished translation — follow the full procedure in
+   [references/terminology-review.md](references/terminology-review.md):
+   build the intended glossary from the translation's own artifacts first,
+   sweep variant families with per-file counts, audit the index (CN↔EN gloss
+   pairing, pinyin keys, index-body mismatches), dispatch size-capped fresh
+   context chapter readers with an exclusions list, personally re-verify every
+   high-impact finding, classify defects as A-type (one EN concept, several CN
+   renderings → unify) vs B-type (one CN word, two EN senses → split), repair
+   after every terminology change, trace related index entries and their printed
+   page/link targets as described in the terminology review; use
+   `scripts/audit_related_indexes.py` to locate candidates, not to certify meaning;
+   repair via a persisted `(file, old, new, expected_count)` script, sweep for stale
+   old-term residuals and adjudicate each in context, then rebuild and assert
+   old terms = 0 / new terms present in the extracted PDF text.
+   For a comprehensive index review, duplicate headwords, misplaced symbol markers,
+   or structural index repairs, also read
+   [references/index-audit.md](references/index-audit.md): compare source-index
+   hierarchy, audit sort/display paths, preflight all edits before writing,
+   and close each repair through the generated index and final PDF targets.
 4. Run `scripts/audit_latex.py <project-or-tex-file>` for deterministic checks.
    Add `--profile mathtranslations` for projects based on the
    `mathtranslation.cls` template, and use `--strict` when warnings should fail
@@ -376,9 +421,16 @@ Summarize:
 - `references/latex-quality.md` — TeX editing / OCR / reference-repair quality rules.
 - `references/mathtranslations-template.md` — `mathtranslation.cls` v3.x template guide.
 - `references/review-checklist.md` — pre-completion review checklist.
+- `references/terminology-review.md` — terminology-consistency audit and repair
+  procedure (variant-family sweep, index audit, parallel chapter readers,
+  scripted repair, PDF-level regression); calibrated on GTM 304.
+- `references/figure-audit.md` — book-wide source-vs-translation figure audit
+  pipeline (source-PDF identity check, full-page pair rendering, zoom protocol,
+  reviewer dispatch with calibrated samples, source-level claim verification,
+  scripted repair, re-render verification); calibrated on GTM 304.
 - `references/build-verify.md` — full compile + visual-verification recipe (Windows/WorkBuddy).
 - `references/hardref.md` — hard-coded reference → clickable cross-reference procedure.
-- `references/cls-v31-upgrade.md` — old-template → `mathtranslation.cls` v3.1 migration.
+- `references/cls-v33-upgrade.md` — old-template → `mathtranslation.cls` v3.3 migration.
 - `scripts/audit_latex.py` — deterministic LaTeX audit (labels, refs, resources, …).
 - `scripts/build_and_check.py` — 5-step build driver + verdict (build-verify).
 - `scripts/convert_hardrefs.py` — mathtranslation.cls hard-ref converter (dry-run/`--apply`).
@@ -387,3 +439,7 @@ Summarize:
 - `assets/mathtranslations-translation-template.tex` — legacy ctexart template.
 - `assets/logo.pdf` — cover logo.
 - `agents/openai.yaml` — optional OpenAI/Codex interface metadata.
+
+## 可复用交换图审阅工具
+
+精确替换、备份与重编译前后页面回归，见[工具用法](../latex-array-diagram-audit/references/reusable-tools.md)。使用 `apply_exact_repairs.py` 校验当前文件哈希及替换次数，使用 `compare_pdf_pages.py` 保存显式页码对照证据；渲染结果不会自动认证目视审阅完成。

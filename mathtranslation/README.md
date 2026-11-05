@@ -21,7 +21,7 @@
 | 审校与修复 | 中文、数学、编译版面三路分离校对；全稿证据驱动复核 | `references/review-checklist.md`、`references/forensic-review.md` |
 | 编译与可视化验证 | `xelatex + biber + texindy` 五步构建，并从渲染 PDF 证明正确 | `references/build-verify.md`、`scripts/build_and_check.py` |
 | 交叉引用 | `定理 3.4` / `(2.3)` / `见 3.25` / 索引页码 → `\ref` / `\eqref` / `\hyperpage` | `references/hardref.md`、`references/hardref-completeness.md` |
-| 模板迁移 | 旧 ctexart 单文件模板 → `mathtranslation.cls` v3.1（ctexbook） | `references/cls-v31-upgrade.md` |
+| 模板迁移 | 旧 ctexart 单文件模板 → `mathtranslation.cls` v3.3（ctexbook） | `references/cls-v33-upgrade.md` |
 | 术语治理 | 已确定译名表（含人名对照）+ 疑点与命名边界 | `references/confirmed-terminology.md`、`references/terminology-exceptions.md` |
 | 交换图 | 一律 `tikz-cd` 重绘，含逐边规格与独立复核 | `references/diagram-practice.md` |
 | 插图 | 矢量优先、TikZ 重绘、最终页可读性判据 | `references/illustrations.md`、`references/figure-capture.md` |
@@ -146,7 +146,7 @@ mathtranslation/
 │   ├── build-verify.md              五步构建 + 渲染级验证完整配方
 │   ├── hardref.md                   硬编码引用 → 可点击（cls 路径）
 │   ├── hardref-completeness.md      引用完整性：防「编译通过但普遍漏链」
-│   ├── cls-v31-upgrade.md           旧模板 → cls v3.1 迁移与回归审计
+│   ├── cls-v33-upgrade.md           旧模板 → cls v3.3 迁移与回归审计
 │   ├── diagram-practice.md          交换图规格、练习与独立复核
 │   ├── illustrations.md             数学插图：来源保真与最终页可读性
 │   ├── figure-capture.md            PDF 裁切 / 截图 / TikZ 重绘实操

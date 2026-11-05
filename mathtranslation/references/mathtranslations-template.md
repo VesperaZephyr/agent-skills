@@ -61,8 +61,8 @@ the machinery:
 \makecontents             % table of contents
 \mainmatter               % Arabic numerals; the book body
 \appendix                 % switches chapter counters to letters A, B, C, ...
-\makebibliography         % emits \chapter{参考文献} + prints biblatex entries
-\printterminology         % emits \chapter{术语索引}; call once, last
+\makebibliography         % v3.2+ : auto \backmatter + 无编号章「参考文献」 + prints biblatex entries
+\printterminology         % v3.2+ : auto \backmatter + 无编号章「术语索引」; call once, last
 ```
 
 Minimal `main.tex` shape:

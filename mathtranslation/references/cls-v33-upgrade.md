@@ -1,16 +1,16 @@
 ---
-name: mathtranslation-cls-v31-upgrade
-description: "Use when migrating a Chinese math-book translation from the OLD mathtranslation template (v1.x, ctexart-based, single-file or thin wrapper) onto the NEW mathtranslation.cls v3.1 (ctexbook-based, kvoptions class options). Covers the three-layer heading remap (Section->Chapter->Subsection), continuous equation numbering on ctexbook, the shared-theorem-counter / \\@addtoreset hook traps, the \\printterminology unnumbered-chapter override, and the pymupdf-based regression audit that proves nothing was lost."
+name: mathtranslation-cls-v33-upgrade
+description: "Use when migrating a Chinese math-book translation from the OLD mathtranslation template (v1.x, ctexart-based, single-file or thin wrapper) onto the NEW mathtranslation.cls v3.3 (ctexbook-based, kvoptions class options; the ctexbook line was introduced at v3.1 and is current at v3.3). Covers the three-layer heading remap (Section->Chapter->Subsection), continuous equation numbering on ctexbook, the shared-theorem-counter / \\@addtoreset hook traps, and the pymupdf-based regression audit that proves nothing was lost. NOTE: as of v3.2, \\makebibliography and \\printterminology already enter \\backmatter and emit unnumbered \\chapter* — the old manual \\printterminology starred-chapter override is no longer needed."
 agent_created: true
 ---
 
-# Migrate a translation to mathtranslation.cls v3.1
+# Migrate a translation to mathtranslation.cls v3.3
 
 ## Purpose
 
 The old `mathtranslation` templates wrap **`ctexart`** with a hand-rolled compatibility layer
 (`\ChapterSectionLabel`, `\sectionbreak{\clearpage}`, `mybibliography`, a `\titleformat{\section}[display]`
-that paints "Chapter N" headings). `mathtranslation.cls` **v3.1** wraps **`ctexbook`** and exposes real
+that paints "Chapter N" headings). `mathtranslation.cls` **v3.3** (the ctexbook-based line introduced at v3.1) wraps **`ctexbook`** and exposes real
 class options via `kvoptions`. The visible layout is intentionally similar, but the *underlying
 counters and hooks are different*, so a naive `\documentclass` swap compiles yet silently mangles
 numbering. This skill is the safe, auditable recipe.
@@ -18,7 +18,7 @@ numbering. This skill is the safe, auditable recipe.
 ## When to use
 
 - A translation uses the old ctexart template and must move to
-  `.../mathtranslations-translation-template/mathtranslation.cls` (v3.1).
+  `.../mathtranslations-translation-template/mathtranslation.cls` (v3.3).
 - The old source uses `\section` for chapters (because old `\section` rendered like a chapter).
 - Symptom that this skill is needed: after the swap, equations become `(n.m)`, theorem numbers
   restart inside chapters, or "术语索引" becomes "第 N 章".
@@ -27,7 +27,7 @@ numbering. This skill is the safe, auditable recipe.
 
 1. Confirm the reference class: `md5`(or normalized content) of the target `mathtranslation.cls`.
    **Compare with line endings normalized** (`b.replace(b'\r\n', b'\n')`) — a raw md5 mismatch is
-   usually just CRLF vs LF (699 lines ⇒ 699-byte delta), NOT a content difference.
+   usually just CRLF vs LF (757 lines ⇒ 757-byte delta), NOT a content difference.
 2. Grep the old project for the old-template fingerprints:
    `\ChapterSectionLabel`, `\sectionbreak`, `mybibliography`, `\chapter` absent, `ctexart`.
 
@@ -41,7 +41,7 @@ Replace the old `\documentclass[UTF8,11pt,fontset=none]{ctexart}` (+ inlined def
 ```
 
 - `Biblatex=false` ⇒ the class falls back to **bibtex**; use it when the body has literal
-  `\bibitem`s and no `.bib`. v3.1 has **no `mybibliography`** environment — use `thebibliography`
+  `\bibitem`s and no `.bib`. The cls has **no `mybibliography`** environment — use `thebibliography`
   (the class already patches the heading / TOC entry / bookmark / header for it).
 - Keep per-project extras the class lacks, e.g. `\usepackage{esint}`.
 
@@ -118,8 +118,15 @@ introduces a *new* bug. On TeX Live 2026 `\@removefromreset` performs a precise 
 
 ## Step 5 — Unnumbered 术语索引 / 参考文献 chapters
 
-`\printterminology` emits `\chapter{术语索引}`. If the document has **no `\appendix`**, that chapter
-gets numbered and the index appears as "第 N 章". Override the chapter command locally:
+> **v3.2+ (current): this step is no longer needed.** Since v3.2, both
+> `\makebibliography` and `\printterminology` automatically enter `\backmatter` and emit an
+> *unnumbered* `\chapter*` (with TOC entry + header), so the index / references never appear as
+> "第 N 章". Skip this step unless you are stuck on a pre-v3.2 cls or you define your own
+> terminology macro instead of using `\printterminology`.
+
+(Legacy v3.1 recipe — kept only for pre-v3.2 cls.) `\printterminology` emits `\chapter{术语索引}`.
+If the document has **no `\appendix`**, that chapter gets numbered and the index appears as "第 N 章".
+Override the chapter command locally:
 
 ```latex
 \let\MTOrigChapter\chapter
@@ -134,14 +141,14 @@ gets numbered and the index appears as "第 N 章". Override the chapter command
 ## Step 6 — Body skeleton
 
 ```latex
-\makecover            % NOT \maketitle — v3.1 redefines it to the book cover
+\makecover            % NOT \maketitle — the cls redefines \maketitle to the book cover
 \frontmatter
   % 获奖说明 / \chapter*{译者说明} / \tableofcontents
 \mainmatter
   \chapter{...} ...   % content, \input files
-\backmatter
-  \chapter*{参考文献}\nocite{*}\printbibliography[...]
-  \printterminology
+% \backmatter is entered automatically by \makebibliography and \printterminology (v3.2+)
+\makebibliography    % = \backmatter + 无编号章「参考文献」 + \printbibliography
+\printterminology    % = \backmatter + 无编号章「术语索引」
 ```
 
 ## Step 7 — Verify (do not trust "rc=0")
@@ -155,7 +162,7 @@ gets numbered and the index appears as "第 N 章". Override the chapter command
    - Normalize with `re.sub(r'\s+','', text)` and compare **title sequences item-by-item** —
      footnotes get extracted adjacent to body text and create "phantom differences" that vanish
      under whitespace normalization.
-3. Intended visual changes (v3.1 makes `\headfont` a *real* hei font, chapter label layout differs)
+3. Intended visual changes (the ctexbook cls makes `\headfont` a *real* hei font, chapter label layout differs)
    are expected and must not be "fixed".
 
 ## Environment notes (this Windows/WorkBuddy box)

@@ -1,51 +1,64 @@
 ---
 name: latex-array-diagram-audit
-description: Audit and repair mathematical arrow-and-node diagrams against the published source, including diagrams hidden in array/aligned/matrix or macros and existing tikzcd diagrams. Check missing injection hooks, reversed arrows, endpoints, labels, zero rows, and rendering. Use for drawing or reviewing commutative diagrams and when image inspection is unavailable; distinguish verified facts from unresolved visual details.
+description: Audit and repair commutative, morphism, element-chase and complex diagrams against a published source PDF, including diagrams hidden in array/aligned/matrix or macros. Covers node/edge fidelity, readable layout, evidence capture and final-PDF regression; ordinary formula matrices are classified rather than mechanically redrawn.
 metadata:
   agent_created: true
 ---
 
 # 交换图绘制与保真审校
 
-目标是原书与译稿的节点、边、方向及特殊箭头一致。`tikzcd` 能编译、图看起来像矩形、正文数学通顺，都不能证明交换图正确。
+核对原书与译稿的节点出现位置、有向边、头/尾/杆及完整标签，再检查最终书页。编译成功、图形像方框、数学上等价，都不能单独证明保真。
 
-## 绘制与审校的入口
+## 入口与分工
 
-- 新画、修复或迁移交换图、态射图、正合列网格，使用 `tikzcd`，保留原书节点位置、空格位、零行/列、标签和边的类型。不要默认用 `array` 拼图。
-- 审校已有稿时，先列出**全部实际编译源码**的图候选，包括脚注/附录和被调用的图宏；不能只搜 `tikzcd`，也不能把 `array` 全部归入“公式”而跳过。
-- 运行 `scripts/inventory_diagrams.py <compiled-files...> --output inventory.json`。该脚本列出环境及宏候选，只做定位，不自动认证方向或将所有 `array` 改成图。逐项分类：真正的图、公式/表格、宏待展开、未决；记录原书对应物理页与译稿位置。
-- 扫描范围包括 `array`、`aligned/alignedat`、`matrix/smallmatrix`、`CD`、`xymatrix`、旧 XY/TikZ 图以及 `tikzcd`；另查箭头字形、`\Big\downarrow`、`\overset`、手工连线和自定义图宏。源码内有节点和映射关系即进入审校，不以环境名作为排除条件。
+- **单图绘制/修复**：先从原书建立节点和边规格，按下节实施；复杂布局读[布局审阅](references/layout-review.md)。
+- **连续审阅/整书终审**：读[覆盖与闭合流程](references/review-workflow.md)，建立源书与构建稿双清单、稳定图ID、独立证据状态，冻结版本后分批推进。
+- **复杂图形陷阱**：重复对象、元素追踪、三维遮挡、端部续线、修改未生效时，读[连续图审细节](references/continuous-review.md)。
+- **取证/执行工具**：读[工具说明](references/reusable-tools.md)，按“盘点→冻结→裁图→精确修复→显式页对回归”选工具，不要求每个单图任务运行全套。
+- **图片显示失败**：先检查路径和查看工具并重试；仍无法查看时读[无视觉核验](references/no-vision-verification.md)，区分源码结构、PDF几何和实际目视，具体细节保留未决。
 
-## 先写边清单，再写箭头
+翻译和重排技能共用本技能的图审规则；生成器、编码和构建约定仍服从当前项目。不把某本书的页码偏移、固定dpi、列距或构建遍数推广为通则。
 
-分别从原书和译稿建立节点网格及有向边表，避免用译稿推测原图后“比对自己”。每条边至少记录：原节点、目标节点、单/双箭头头、单射钩所在端、实/虚线、等号/无头线、标签及其侧别、曲线/平行偏移、证据与结论。行/列交换、遗漏前导/尾随零、漏整行及错误的空节点，都按结构差异处理。
+## 从源图到边表
 
-写 `\arrow[r]` 前确认“当前单元格是什么节点、右边是什么节点”。`u/d/l/r`、`ur/dl`、多步 `rr/dd` 是几何目标，不是从数学直觉猜出的方向。检查 `from`/`to`、命名节点、`leftarrow`/反向端点样式；实际箭头头可能与位置方向相反。复杂图优先显式 `from=1-1,to=2-2`。`hook'` 改钩的侧别，不负责反转映射。
+原书出版版PDF的可见内容是权威，原始TeX/OCR和数学语义辅助定位、发现疑点。先看原书，再独立检查冻结译稿；不能从译稿生成“原图真值”。同名对象按出现位置编号。
 
-## 箭头样式必须真实出现
+逐图核对：
 
-| 原图关系 | 常见写法 | 要检查的细节 |
+|对象|必查内容|
+|---|---|
+|节点|每个出现位置、上下标、空格位、零、完整行列、直和/省略标记；元素点图不能换成对象复形|
+|边|起点与靶点、实际方向、钩尾/双头/等号/无头线、实虚杆、平行/外弧、交叉是否相连|
+|标签|文字和TeX完整结构、负号、0/id/+1、次数/滤过标记、帽号、复合、问号、存在/唯一性、侧别|
+|边界|首末零、上下/左右省略区、最外端斜续接、非节点边界短段；逐一检查每个面板|
+|呈现|局部和全局样式叠加、标签与节点/头/尾碰撞、成品字号、分页、裁切和相邻图|
+
+原书和构建稿分别记录物理页，用临近文字与节点确认身份。AUX陈述页不保证证明中的图就在该页。环境/箭头命中数、相同图数或被分派的范围都不是实际审完数量。
+
+## 选择绘法与确认生效样式
+
+一般节点—态射图优先`tikzcd`，保留源网格、空位、零行列。不要默认用`array`拼图，也不要因环境名把普通公式矩阵强行迁移。实际编译链中的`array/aligned/matrix/CD/xymatrix`、TikZ、自定义宏和环境外箭头都应分类。
+
+`r/l/u/d`是从当前单元格到几何目标的位移；检查`from/to`、反向选项和命名节点，不能用阅读顺序猜方向。复杂图可用显式`from=1-1,to=2-2`，且先确认这些位置真实存在；phantom标记也有起点/靶点，不能引用不存在的单元格。
+
+|原图样式|常见实现|注意|
 |---|---|---|
-| 单射 | `\arrow[r, hook]` | 源端有钩，目标端有箭头头；必要时按原图换 `hook'` |
-| 满射 | `\arrow[r, two heads]` | 目标端确有双头，不能只是普通头 |
-| 等同/双线 | `\arrow[r, equal]` | 双线及无头符合原图，不随意改成双向箭头 |
-| 无头连线 | `\arrow[r, dash]` | 两端均无头；不能因为是包含关系就擅自加箭头 |
-| 有向虚线 | `\arrow[r, dashed]` | 虚线与方向都保留；`dash` 与 `dashed` 不同 |
+|单射|`\arrow[r,hook]`|源端钩、目标端头；`hook'`只换钩侧，不反向|
+|满射|`\arrow[r,two heads]`|双头必须实际渲染|
+|双线等同|`\arrow[r,equal]`|核对是否无头，不擅改为双向箭头|
+|无头线|`\arrow[r,dash]`|不要和`dashed`混淆|
+|有向虚线|`\arrow[r,dashed]`|分别检查杆和箭头头|
 
-原书出现 `\hookrightarrow`，不意味着译稿的普通 `\arrow[r]` 会自动带钩。把 `\hookrightarrow` 写进节点或箭头标签也不能改变边样式。检查局部选项与 `\tikzcdset`、`every arrow/.style`、`arrows={...}`、自定义样式的叠加次序；例如 `hook, rightarrow` 中后者可重置尾端使钩消失。孤立小样与最终书页都要核验，不能只数源码的 `hook` 关键词。
+标签中的`\hookrightarrow`不能改变边样式；后置`rightarrow`、`every arrow`或宏可能覆盖`hook`。在真实项目样式和最终PDF中看见头/尾，才能确认其生效。
 
-## 证据、页码与视觉能力
+规则网格的矩形截取、谱序列示意或三维透视可用原生TikZ，前提是模型确实符合源图。不要强塞`tikzcd`而删掉边界非节点线段；也不要把“无限网格”当成原书默认模型。见[边界与裁切](references/continuous-review.md#边界裁切与原生tikz)。保持可编辑矢量实现，不以位图截图替代应重绘的态射图。
 
-- 原书 PDF 是可见内容的权威；原始 TeX、文字层和 OCR 是辅助证据。语义能排除不合理的映射，不能单独证明原书箭头的方向或样式。
-- AUX 可给出译本陈述的印刷页，**不自动给出原书页，更不保证证明里的图就在该页**。分别标定原书/译稿页码，用图前后文字、节点和陈述定位；不要沿用另一本书的固定偏移。
-- 视觉可用：原图与译图并排查看，整图确认结构，再对钩/双头等微细部位作高分辨率裁剪检查。保存物理页、裁剪框和逐边结论。
-- 视觉不可用或显示调用失败：阅读 [references/no-vision-verification.md](references/no-vision-verification.md)，继续源码网格/边清单、文本跨度和 PDF 几何核验；细节不能确认时保留未决。工具失败或返回过滤信息本身不证明模型没有视觉能力。
+## 最终验收
 
-## 验收
+1. 源书实际图与编译链候选已对应、分类；明确遗漏图、额外显化和未展开宏的处理。
+2. 节点、边和完整标签逐项有源书证据；表达差异、源书疑误和线型未决分开登记。
+3. 修复已串行合稿，并按项目构建流程成功生成最后PDF；无图相关错误、缺字、新增溢出或未解析引用。
+4. 所有修复图及重排影响的邻图完成最终页检查。旧结论仅经确认页对/像素衔接沿用，变化页重定位并实际打开。
+5. 报告绑定最终PDF哈希、页数和逐图证据，集中汇总全部未决。无待审范围或待验修复方可说“审阅完成”；有原图信息限制时不能说所有细节无疑。
 
-1. 全量候选已分类，残留 `array` 等真正的图已迁移或有明确、授权的保留理由；普通公式矩阵不乱改。
-2. 每条边均有原书证据；节点、方向、标签与样式逐项对应，宏/全局样式没有绕过检查。
-3. 按项目现有构建流程重编译，确认无图相关错误及新溢出，最终页无碰撞、截断、漏钩/双头；检查图引用和编号保持正确。
-4. 报告分别说明结构核验、PDF 几何核验、直接目视核验的范围。未决方向/钩不能写成“交换图全部通过”；不能识图时尤其不能把编译成功当视觉通过。
-
-保留源码编码、行尾、现有类和宏约定；同文件编辑串行并校验替换次数。验证图可先孤立编译，但最终必须在原项目样式中验证。保留验收证据，不在交付前无差别删除裁剪图和清单。
+导出图片不自动代表看过，600dpi不增加低清扫描的原始细节，图面一致不等于再次独立审阅。保留失败证据、备份及中断位置，避免下一轮从聊天猜测状态。

@@ -79,13 +79,21 @@ metadata:
 
 ## 交换图与箭头保真审校
 
-本节专指由节点和态射组成的交换图、正合列网格、拉回/推出图等；普通几何插图、曲线图和公式矩阵仍按各自规则处理。绘制或审校时使用 `tikzcd`，不要默认用 `array` 拼箭头图。发现旧稿时不能只搜 `tikzcd`：运行配套审计技能的 `scripts/inventory_diagrams.py`，覆盖所有实际参与构建的源文件、输入文件、脚注/附录和宏定义；候选逐项分类为交换图、公式/表格、待展开宏或未决。`array/aligned/matrix/CD/xymatrix` 中的箭头图同样纳入，普通矩阵不因含矩阵环境而机械迁移。
+节点—态射图、元素追踪、正合列和复形网格统一按
+[交换图审计技能](../latex-array-diagram-audit/SKILL.md)执行；普通几何插图和公式矩阵仍分别分类。
+该技能集中维护双清单、逐边规格、完整标签、头/尾/杆样式、放大取证及最终页验收。
+一般图用`tikzcd`，经原图确认的矩形截取格图/透视示意可用原生TikZ，不强制套同一绘法。
 
-逐图分别从原书 PDF 与重排稿建立节点网格和边清单，再逐边比较：起点、终点、箭头头端、单射钩端、双头/等号/无头线、实虚线、标签及侧别、空节点与零行列。`r/l/u/d` 是几何位移，不能代替对映射方向的判断；检查显式 `from/to`、反向箭头选项、命名节点及实际展开后的宏。单射必须在最终 PDF 中确实显示钩，满射显示双头。`hook'` 只换钩所在侧，不会反转箭头；标签中的 `\hookrightarrow` 也不会改变边样式。检查局部选项与 `\tikzcdset`、`every arrow/.style`、自定义宏的叠加顺序，后续 `rightarrow` 等设置可能抹掉前面的 `hook`。编译成功及源码里出现 `hook` 都不能代替端部核对。
+连续或整书审阅读[覆盖与闭合流程](../latex-array-diagram-audit/references/review-workflow.md)，
+执行命令见[共用工具](../latex-array-diagram-audit/references/reusable-tools.md)。
+本工程若由生成器落盘，精确修复目标应为生成器，再assemble及构建；不把此约定推广到直接维护TeX的项目。
+冻结成功PDF供只读审阅，主持者串行合稿/构建；重排后刷新物理页和裁框，旧结论需经明确页对衔接。
 
-以原书出版版图像确定节点和箭头的可见事实；原始 TeX、OCR、数学语义只作辅助证据。分别映射原书和重排稿物理页，不用定理/证明的页码直接推定图所在页。先看整图结构，再放大检查钩、双头、箭头端点及裁切；同时检查孤立小样和最终书页。
-
-若无法直接查看图像，先确认本地图片路径和查看工具，再重试一次；路径/工具错误不等同于模型没有视觉能力。仍无法目视时，按配套技能的[无视觉核验流程](../latex-array-diagram-audit/references/no-vision-verification.md)：从源码按顶层 `&`/`\\` 展开网格（保留空节点并处理嵌套宏），核对边方向和生效样式；在已确认的 PDF 裁剪区域检查文字跨度与矢量路径/字形，区分源码拓扑、PDF 几何和直接目视三类证据。PDF 没提取到箭头头笔画不能证明原图没有箭头。保留无法确认的具体图、边、行号、原书页/裁剪位置；这些细节必须标为未决，不能用编译通过或 OCR 的 `→` 代替视觉验收。
+配套技能不可用时，仍从原书与重排稿分别列节点出现位置和边表，盘点真实构建链及宏，
+核对端点、头/尾/杆、上下标和逻辑标签；保留零行列、省略区与续接。
+实际打开原书整图和最终书页，记录哈希及具体未决；无法目视时参考
+[无视觉核验](../latex-array-diagram-audit/references/no-vision-verification.md)或记录同等结构/几何证据，
+不以编译或OCR文字代替视觉验收。
 
 ## 关键坑位速查
 
@@ -222,6 +230,7 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 - `references/cjk-retypeset.md` — **中文书专项**（TikZ 曲线 / 缺字回退 / CJKglue 松排 / 标签重叠 / extref 回填 / memory exhausted / biber 书目 / 单一落盘出口）
 - `references/chapcode-retypeset.md` — **分章页码专著专项**（`\chapcode` 页码机制 / `\pagestyle{empty}` 泄漏 / 四类页眉约定 / 手工编号陈述 / biblatex sortkey 锁定 / 目录页码超链接）
 - `references/samuel-style-retypeset.md` — **单卷裸编号专著专项**（按关键词/按节重启编号、`\folio` 只锁分部起点、页眉节号区间、外部文献章号排除、`bib:n` 与 `exer:` 锚点、列表条目引用、`.aux` 配平解析、链接颜色像素验收）
+- `references/handwritten-notes-retypeset.md` — **手写笔记重排专项**（扫描 PDF 误报加密 / 手写交换图 OCR 压碎须逐图重画 / 手写 OCR 字符级误识 / 物理页偏移实测 / 手工编号陈述锚点 / 可选参数位置 / plain 页眉 / 记号统一表）
 - `references/crossref.md` — 交叉引用七轮补全策略 + 习题重建算法 + 保留纯文本清单
 - `references/verification.md` — 构建命令、验收清单、CRLF/BOM 检查
 - `scripts/audit_text_refs.py` — 硬编码引用扫描器
@@ -240,3 +249,9 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 ## 有界并行与页级 OCR 来源
 
 全书任务需要缩小单个代理上下文时，参阅[有界子代理、OCR页级来源与索引映射](references/parallel-retypeset.md)。包含文件所有权、代理中断交接、修订表查重、数学字体与陈述范围、PDF 哈希绑定验收，以及 Ahlfors 底稿中跨页段落搬移、分卷局部页号重启、一块多图、索引语义分组终审、疑点定案、脚注跨页复核和编辑性校勘留痕的已验证方法。
+
+## 索引专项审阅与回归
+
+全面索引审阅、术语修改或正文重排后，读取[共用索引审阅流程](../mathtranslation/references/index-audit.md)。分别核对主/符号索引的原书完整层级、排序键与显示词、交叉参见、标记位置、最终可见页码和链接目标。条目数、无重复词头或链接存在均不能证明内容覆盖。
+
+共用mathtranslation的`scripts/index_records.py`盘点结构冲突候选，并比较同轮合并.idx完整记录和页码收敛；`audit_related_indexes.py`定位术语关联项。先整批预检精确修改并备份，再按项目构建刷新索引，逐条关闭最终PDF和正文落点证据。生成器项目改生成器，直接维护TeX的项目改真实源文件；具体命令、限制和返回码见上述流程。

@@ -117,6 +117,13 @@ This checklist alone is not evidence that the passes occurred.
 - [ ] Table of Contents (TOC) Roman chapter numeral boxes are wide enough (e.g. 2.6em) to prevent overlapping chapter titles.
 - [ ] Cover anchor trap eliminated: `\makecover` / `\makegtmcover` disables `pageanchor` during titlepage rendering so `page.1` anchors directly to Chapter 1, not the cover.
 - [ ] Index and List of Symbols folios are clickable via `\hyperpage{P}` or `\pageref` and validated via automated link audit script against destination pages.
+- [ ] For comprehensive index review, [index-audit.md](index-audit.md) was followed:
+  source hierarchy and both subject/symbol coverage were reconciled; duplicate
+  display paths, inconsistent sort keys, person/concept confusion and placeholder
+  markers were adjudicated. Each changed entry has a source location and final
+  page/target status; count changes and unresolved scope are recorded.
+- [ ] Bulk index edits passed all match-count and boundary checks before writing;
+  backups and non-index prose comparisons support that no chapter text was lost.
 - [ ] `biblatex` is loaded only by the class — `main.tex` does not contain a
   manual `\usepackage{biblatex}` (would cause an option clash).
 - [ ] MathTranslations long-proof links and environments are paired.
