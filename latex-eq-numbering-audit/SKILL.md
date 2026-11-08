@@ -9,6 +9,7 @@ description: >
   chapter's opening section does not restart the counter, or when the original used
   roman-numeral equation tags (i)(ii)(iii) that came out as arabic.
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # LaTeX equation-numbering audit against the original book

@@ -14,6 +14,7 @@ description_zh: 零依赖提取PDF与图片文字，扫描件交AI视觉识别�
 description_en: Extract text from PDFs and images with zero extra dependencies; scanned pages use AI vision, plus table and batch support.
 category: productivity
 author: RedFoxHub
+license: CC-BY-4.0
 ---
 # PDF和图片文字提取
 

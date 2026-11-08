@@ -1,0 +1,224 @@
+% !TeX program = xelatex
+% 期末复习讲义通用骨架模板 (与科目无关)
+% 使用前先阅读 references/lecture_notes_spec.md; 下文方括号中的内容均为占位说明, 不是讲义正文.
+% 规范要点: 目录即考纲, 直陈叙述体推导 (references/lecture_notes_voice.md), 教材原题配完整解答,
+% 结论编号沉淀, 提示框默认不用, 末章按「必背公式与结论手册」收口 (期末复习默认章名). 题目编排见规范 §1.1.
+\documentclass[11pt,a4paper]{article}
+\usepackage{ctex}
+\usepackage[a4paper,margin=22mm,headheight=15pt]{geometry}
+\usepackage{fontspec}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm,enumerate,indentfirst}
+\usepackage{booktabs,tabularx,xcolor,fancyhdr,hyperref}
+\usepackage[most]{tcolorbox}
+\usepackage{aliascnt}
+\usepackage[nameinlink,capitalize]{cleveref}
+
+\definecolor{primary}{RGB}{59,56,236}
+\definecolor{secondary}{RGB}{160,40,30}
+\definecolor{boxbg}{RGB}{246,249,253}
+\definecolor{tipbg}{RGB}{253,248,245}
+\definecolor{thmback}{HTML}{EFF4FB}
+\definecolor{thmframe}{HTML}{2C5AA0}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    citecolor=primary,
+    urlcolor=primary
+}
+\setlength{\parskip}{5pt plus 2pt minus 1pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{primary}{\small\textbf{[课程名]期末复习}}}
+% 连续排版 (voice §7) 下 \leftmark 会提前显示下一章名; \topmark 实测取不到值, 故用固定文本.
+\fancyhead[R]{\small [课程名]期末复习讲义}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.5pt}
+
+\tcbset{
+  theoremstyle/.style={
+    enhanced, breakable,
+    colback=thmback, colframe=thmframe,
+    boxrule=0pt, leftrule=3.5pt,
+    arc=1.5pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    drop fuzzy shadow,
+  },
+  examplestyle/.style={
+    % 题干盒只装题面 (解答在盒外), 最长题干也远短于一页; 去掉 breakable 可避免
+    % (1)(2) 问被拆到两页. 定理 / 命题盒保留 breakable, 因为证明很长.
+    enhanced,
+    colback=white, colframe=orange!75!black,
+    boxrule=1pt, arc=6pt,
+    borderline west={3pt}{0pt}{orange!75!black},
+    left=10pt, right=10pt, top=8pt, bottom=8pt,
+  }
+}
+
+% 定理类环境共享编号 (按 章.节.序 连续), 但必须用 aliascnt 为每类环境建立别名计数器,
+% 否则 cleveref 只看到 definition 一个计数器, 所有 \cref 都会误显示为「定义」.
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[section]
+\newaliascnt{theorem}{definition}
+\newtheorem{theorem}[theorem]{定理}
+\aliascntresetthe{theorem}
+\newaliascnt{corollary}{definition}
+\newtheorem{corollary}[corollary]{推论}
+\aliascntresetthe{corollary}
+% 可复用的结构关系 / 判据写成编号结论, 正文 \cref 引用, 不在每处重新解释 (voice §5).
+\newaliascnt{conclusion}{definition}
+\newtheorem{conclusion}[conclusion]{结论}
+\aliascntresetthe{conclusion}
+\newaliascnt{example}{definition}
+\newtheorem{example}[example]{例}
+\aliascntresetthe{example}
+\newaliascnt{exercise}{definition}
+\newtheorem{exercise}[exercise]{练习}
+\aliascntresetthe{exercise}
+\crefname{equation}{式}{式}
+\Crefname{equation}{式}{式}
+\crefname{definition}{定义}{定义}
+\crefname{theorem}{定理}{定理}
+\crefname{corollary}{推论}{推论}
+\crefname{conclusion}{结论}{结论}
+\crefname{example}{例}{例}
+\crefname{exercise}{练习}{练习}
+\theoremstyle{remark}
+\newtheorem*{remark}{注}
+\tcolorboxenvironment{definition}{theoremstyle}
+\tcolorboxenvironment{theorem}{theoremstyle}
+\tcolorboxenvironment{corollary}{theoremstyle}
+\tcolorboxenvironment{conclusion}{theoremstyle}
+\tcolorboxenvironment{example}{examplestyle}
+\tcolorboxenvironment{exercise}{examplestyle}
+\tcolorboxenvironment{remark}{theoremstyle}
+
+\makeatletter
+\renewenvironment{proof}[1][\proofname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep=6pt plus 6pt\relax
+  \trivlist
+  \item[\hskip\labelsep\bfseries\color{primary}#1\@addpunct{.}]\ignorespaces
+}{%
+  \popQED\endtrivlist\@endpefalse
+}
+\newenvironment{solution}[1][\solutionname]{\par
+  \pushQED{\qed}%
+  \normalfont \topsep=6pt plus 6pt\relax
+  \trivlist
+  \item[\hskip\labelsep\bfseries\color{primary}#1\@addpunct{.}]\ignorespaces
+}{%
+  \popQED\endtrivlist\@endpefalse
+}
+\makeatother
+\renewcommand{\proofname}{证明}
+\newcommand{\solutionname}{解}
+
+\numberwithin{equation}{section}
+
+% 提示框默认不用 (voice §6): 可复用结构关系优先写成编号 conclusion 并 \cref 引用.
+% 确需使用时, 淡蓝知识卡只讲数学结构, 机理直觉与前提限制; 两个参数.
+\newcommand{\takeaway}[2]{%
+  \vspace{6pt}\noindent\colorbox{boxbg}{%
+    \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+      \vspace{4pt}\textbf{\color{primary}#1:}\hspace{0.5em}#2\vspace{4pt}%
+    }%
+  }\vspace{6pt}%
+}
+% 淡橙考点框默认不用; 确需使用时只讲结构, 不写「适用条件与前提」式复述; 一个参数, 调用时不要传第二个参数.
+\newcommand{\examtip}[1]{%
+  \vspace{6pt}\noindent\colorbox{tipbg}{%
+    \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
+      \vspace{4pt}\textbf{\color{secondary}适用条件与关键前提:}\hspace{0.5em}#1\vspace{4pt}%
+    }%
+  }\vspace{6pt}%
+}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\mathop{}\!\mathrm{d}}
+\newcommand{\e}{\mathrm{e}}
+
+\title{\Huge\bfseries\color{primary} [课程名]期末复习}
+\author{[编写者]}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{[考点或方法名, 例如: 某类问题的标准解法]}
+
+设 $L$ 为定义在区域 $\Omega$ 上的线性算子, $B$ 为边界映射, 考虑
+\begin{equation}\label{eq:model}
+L u = f, \qquad B u\big|_{\partial\Omega} = g,
+\end{equation}
+其中 $f$ 为已知数据, $g$ 为边界数据, $L$ 可逆, $u$ 具有使各式有意义的光滑性.
+
+\begin{definition}[概念名]
+[用完整句定义 \textbf{概念名}, 中英文术语并列, 并说明各符号的语义与适用范围.]
+\end{definition}
+
+\begin{theorem}[定理名]
+\label{thm:unique}
+在 \cref{eq:model} 的条件下, 该问题的解至多有一个.
+\end{theorem}
+\begin{proof}
+设 $u_1, u_2$ 为两个解, 令 $w = u_1 - u_2$. 由 \cref{eq:model} 中 $L$ 与 $B$ 的线性性, $w$ 满足对应的齐次问题. 因此 $L w = 0$ 且 $B w|_{\partial\Omega} = 0$. 由所设的可逆性条件得 $w \equiv 0$, 故 $u_1 \equiv u_2$.
+\end{proof}
+
+% 长计算用 Step 1/2/3 分步 (voice §5), 每步写数学动作, 不写「先检查 / 要注意」式指令.
+\textbf{标准求解步骤}
+\begin{enumerate}
+    \item 由 [条件] 判定可用的结论.
+    \item 依 [依据] 构造 [对象].
+    \item 利用线性性叠加, 得 [一般形式].
+    \item 代入 [已知数据] 定出待定量.
+\end{enumerate}
+
+% 提示框默认不用 (voice §6). 可复用的结构关系优先写成编号结论并在正文 \cref 引用一次:
+% \begin{conclusion}\label{concl:homogeneous}
+% 若 $L$ 与 $B$ 线性, 则两解之差满足齐次问题, 唯一性归结为齐次问题只有零解.
+% \end{conclusion}
+% 后续解答写「由 \cref{concl:homogeneous}」, 不重新解释; 前提失效的情形在该结论陈述里写一次.
+
+\begin{example}[教材习题 X.Y]
+[此处粘贴教材原题, 保留原题表述与数据.]
+\end{example}
+\begin{solution}
+由 [前提] 得 [中间结果], 代入式 \eqref{eq:model} 后 [推导依据] 给出 [中间式]. 因此 [结论], 最终结果为
+\[
+\boxed{u = \text{[最终结果]}}
+\]
+\end{solution}
+
+\begin{exercise}[教材习题 X.Z]
+教材原题, 仍须标注来源.
+\end{exercise}
+\begin{solution}
+给出与例题同等规格的完整解答: 计算可复现, 依据由编号结论或公式引用可追溯, 结论明确; 承重论证不跳步, 同型重复与标准变形可一句带过; 末尾不写点评与复验 (voice §3, §4).
+\end{solution}
+
+% 规范 §1.1: 同一构造 / 定理 / 估计的题, 只换参数的, 放在同一个以方法命名的 \subsection 内相邻位置;
+% 导语讲清共同构造与参数差别, 并补一道只换参数的变式练习 (含完整 solution).
+% 按考点重复上面的「节」: 每节都要有来源与前提, 完整推导, 方法步骤, 原题与解答.
+
+\section{必背公式与结论手册}
+公式的适用范围由推导时所用的条件决定; $L$ 或 $B$ 的条件改变时, 相应结论需由原推导重新判定.
+
+\subsection{[主题一]}
+\begin{enumerate}
+    \item \textbf{[适用条件 A]}. 在条件 A 下, 有
+    \[
+    \boxed{L u = f}
+    \]
+    \item \textbf{[适用条件 B]}. 若 [条件变化], 则上式相应改为 [修正式]; 原因见第 [X] 节的推导.
+\end{enumerate}
+
+\subsection{常用关系与恒等式}
+\begin{enumerate}
+    \item \textbf{[关系名]}: [恒等式及其成立条件].
+    \item \textbf{[反例或退化情形]}: [条件失效时结论如何变化].
+\end{enumerate}
+
+\end{document}

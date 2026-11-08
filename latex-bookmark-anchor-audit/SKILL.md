@@ -12,6 +12,7 @@ description: >
   detect a borrowed anchor in `.toc`, the PyMuPDF verification loop, and the
   idempotent normalisation script for mixed legacy spellings.
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # Audit & repair PDF bookmark / TOC anchors

@@ -9,6 +9,7 @@ description: >-
   能否批量 OCR 再加书签"). Do NOT rely on Foxit/Adobe built-in OCR — it is
   GUI-only and cannot be scripted.
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # Scanned PDF -> OCR text layer -> faithful bookmarks

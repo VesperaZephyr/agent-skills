@@ -10,6 +10,7 @@ description: >
   math; or when you must decide whether the OCR dump or the printed page is the
   authority (spoiler: the page image).
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # OCR-inherited math defect audit for a re-typeset LaTeX book

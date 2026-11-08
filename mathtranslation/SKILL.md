@@ -1,6 +1,7 @@
 ---
 name: mathtranslation
 description: Translate mathematical books, papers, notes, and existing LaTeX projects into rigorous Chinese LaTeX, review/repair an existing translation, compile and visually verify the result (xelatex + biber + texindy, Windows/WorkBuddy), convert hard-coded references into clickable cross-references, and migrate a translation from the old mathtranslation template onto mathtranslation.cls v3.3. Use when source fidelity, mathematical correctness, terminology consistency, cross-references, citations, compilation, and PDF-level proofreading matter. Do not use for ordinary non-mathematical translation.
+license: MIT
 ---
 
 # MathTranslation

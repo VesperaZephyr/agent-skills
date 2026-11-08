@@ -1,6 +1,7 @@
 ---
 name: math-pdf-bookmark
 description: Add, audit, or repair precise bookmarks in mathematics PDFs, including searchable documents and scanned books. Use when asked to add a table of contents or fix missing, inaccurate, or poorly structured PDF bookmarks.
+license: CC-BY-4.0
 ---
 
 # 数学 PDF 书签

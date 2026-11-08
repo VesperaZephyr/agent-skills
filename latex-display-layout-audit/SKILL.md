@@ -2,6 +2,7 @@
 name: latex-display-layout-audit
 description: Audit display-math layout in a re-typeset LaTeX math book against the ORIGINAL book PDF, then repair anomalies — over-wrapped formulas, "fake alignment" blocks (align misused for hanging indent), display envs nested in display envs, and spaced hyphens inside \text{} — WITHOUT changing any equation number. Use when a user shows a badly laid-out formula page and says "compare with the original" / "原书对比" / "奇奇怪怪的排版".
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # 重排书显示公式版面审计（对照原书 PDF）

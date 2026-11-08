@@ -1,0 +1,98 @@
+% !TeX program = xelatex
+\documentclass[11pt,a4paper,UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+\usepackage{amsmath,amssymb,amsfonts,amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!80!black,
+    citecolor=blue!80!black,
+    urlcolor=blue!80!black
+}
+
+\lstset{
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{purple},
+    frame=single,
+    breaklines=true,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    xleftmargin=2em,
+    framexleftmargin=1.5em
+}
+
+% 科目中立模板: 把 [课程名] 换成实际课程, 评分标准按该课程要求填写.
+\title{\LARGE\textbf{[课程名]平时作业}}
+\author{\large 姓名：\underline{\hspace{3.5cm}} \qquad 学号：\underline{\hspace{3.5cm}}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\textbf{评分标准：[按课程要求填写, 例如推导 / 证明 / 计算 / 讨论各项分值]}
+\end{center}
+\vspace{0.5cm}
+
+\section*{第 1 题}
+
+\begin{tcolorbox}[title=\textbf{题目内容},colback=blue!5!white,colframe=blue!75!black,arc=2mm]
+（在此填入教材或作业题目描述）
+\end{tcolorbox}
+
+\subsection*{一、 题目复述与已知条件}
+用简练的数学语言写清已知量, 求解目标与所依附的定义 / 定理; 不照抄大段背景叙述.
+
+\subsection*{二、 前提与符号约定}
+列明本题用到的假设, 适用条件, 边界与退化情形. 符号较多时用三线表统一定义.
+\begin{enumerate}[label=(\arabic*)]
+    \item 假设 [条件], 在此条件下 [定理 / 公式] 成立;
+    \item 排除 [退化情形], 或单独讨论该情形.
+\end{enumerate}
+
+\begin{table}[htbp]
+\centering
+\caption{符号说明}
+\vspace{1mm}
+\begin{tabular}{cclc}
+\toprule
+符号 & 含义 & 类型 & 单位 / 取值范围 \\
+\midrule
+$x$ & 未知量 & 变量 & --- \\
+$n$ & 规模参数 & 已知常数 & $\mathbb{N}$ \\
+$\lambda$ & 待定系数 & 参数 & $\mathbb{R}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection*{三、 逐步推导与证明}
+每一步写出所依据的定义, 定理或公式, 定理带条件, 不跳步.
+\begin{equation}
+    \label{eq:key}
+    [\text{在此写出本题的关键等式或推导链条}]
+\end{equation}
+
+\subsection*{四、 求解与计算}
+给出完整解析推导; 课程确需数值计算时附可运行代码与结果, 否则删去本段代码框.
+\begin{lstlisting}[language=Python]
+# 求解脚本示例
+import numpy as np
+
+def solve():
+    pass
+\end{lstlisting}
+
+\subsection*{五、 结果检验与讨论}
+用特例, 边界情形, 量纲或数值复核检验结论; 说明适用范围与失效情形, 需要时讨论关键参数变化对结果的影响.
+
+\end{document}

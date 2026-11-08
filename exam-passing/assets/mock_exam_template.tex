@@ -1,0 +1,88 @@
+% !TeX program = xelatex
+\documentclass[11pt,a4paper,UTF8]{ctexart}
+\usepackage{geometry}
+\geometry{left=2cm,right=2cm,top=2.2cm,bottom=2.2cm}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{titlesec}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+
+% 科目中立的空白卷面骨架: 课程名, 题型, 题量, 分值与题目内容全部按该课程考纲填写.
+% 命题前先编「知识点 x 题型 x 分值 x 难度」双向细目表; 参考答案与分步骤评分细则另册交付.
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\large\textbf{[课程名]期末考试模拟试卷}}
+\fancyfoot[C]{第 \thepage\ 页\quad 共 \pageref{LastPage}\ 页}
+
+\begin{document}
+
+\begin{center}
+\textbf{课程代码：\underline{\hspace{2.5cm}} \qquad 考试形式：[闭卷 / 开卷] \qquad 考试时长：[120] 分钟} \\[0.2cm]
+学院：\underline{\hspace{2.5cm}} 专业班级：\underline{\hspace{2.5cm}} 姓名：\underline{\hspace{2.5cm}} 学号：\underline{\hspace{2.5cm}}
+\end{center}
+
+\vspace{0.3cm}
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\textbf{题号} & \textbf{一} & \textbf{二} & \textbf{三} & \textbf{四} & \textbf{五} & \textbf{总分} \\
+\hline
+\textbf{满分} & [ ] & [ ] & [ ] & [ ] & [ ] & [100] \\
+\hline
+\textbf{得分} & & & & & & \\
+\hline
+\textbf{评卷人} & & & & & & \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{一、 [题型名称]（共 [N] 题, 每题 [x] 分, 共 [X] 分）}
+\begin{enumerate}[label=\arabic*.]
+    \item （在此填入题干与作答要求）\\
+    A. [选项] \qquad B. [选项] \qquad C. [选项] \qquad D. [选项]
+
+    \item （在此填入题干与作答要求）\\
+    A. [选项] \qquad B. [选项] \qquad C. [选项] \qquad D. [选项]
+\end{enumerate}
+
+\section*{二、 [题型名称]（共 [N] 空, 每空 [x] 分, 共 [X] 分）}
+\begin{enumerate}[label=\arabic*.]
+    \item （在此填入题干） \underline{\hspace{3cm}}.
+    \item （在此填入题干） \underline{\hspace{3cm}}.
+\end{enumerate}
+
+\section*{三、 [题型名称]（共 [N] 题, 共 [X] 分）}
+\subsection*{1. （[分值] 分）[题目名称]}
+（在此填入题干, 写明要求给出推导, 证明或简述的依据.）
+
+\vspace{5cm}
+
+\subsection*{2. （[分值] 分）[题目名称]}
+（在此填入题干, 写明要求给出推导, 证明或简述的依据.）
+
+\vspace{5cm}
+
+\section*{四、 [综合题名称]（[分值] 分）}
+\textbf{题目}：（在此填入题设, 已知量, 求解目标与必要的符号约定.）\\
+\begin{enumerate}[label=(\arabic*)]
+    \item [第一问要求];（[分值] 分）
+    \item [第二问要求];（[分值] 分）
+    \item [结果检验或讨论要求].（[分值] 分）
+\end{enumerate}
+
+\newpage
+\section*{五、 [综合题名称]（[分值] 分）}
+\textbf{题目}：（在此填入题设, 已知量, 求解目标与必要的符号约定.）\\
+\begin{enumerate}[label=(\arabic*)]
+    \item [第一问要求];（[分值] 分）
+    \item [第二问要求];（[分值] 分）
+    \item [结果检验或讨论要求].（[分值] 分）
+\end{enumerate}
+
+% 另册交付: 逐题完整参考答案 + 分步骤评分细则; 交付前核对各题分值合计与双向细目表一致.
+
+\end{document}

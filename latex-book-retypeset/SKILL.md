@@ -3,6 +3,7 @@ name: latex-book-retypeset
 description: 为高保真 LaTeX 数学书重排（re-typeset，非翻译）沉淀工程方法论与坑位时使用本技能：适用于四类原书——① Springer GTM 类西文书（共享 gtmitem 计数器、原生 TikZ、CRLF 无 BOM、xelatex 构建）：PDF 双层 OCR 乱码、编号公式共享计数器错位、Claim 按章编号、overfull 修复、交叉引用补全；② 中文数学书（xeCJK + Fandol + 自建 cls，如徐森林《数学分析》）：TikZ 参数曲线 plot[domain] 解析失败须转 plot[smooth] coordinates、Fandol 缺生僻字须加 SimSun 回退字族、纯 CJK 行 overfull 须用局部 xeCJKsetup{CJKglue} 均匀松排（\hspace 与 fil 皆无效）、密集图标签重叠、\extref 回填、biber 中文书目；③ 分章页码西文专著（自建 cls，如 Serre《Abelian l-Adic Representations》）：\chapcode 分章页码 I-1/II-42/B-5/Index-3、手工编号陈述环境、biblatex sortkey 锁定原书 [1]-[88]、\pagestyle{empty} 泄漏致续页页眉与页码全书丢失、biblatex \addtocategory 末键尾空格吞条、目录页码超链接（\hyperref 到条目 label）；④ 单卷连续页码、小节内裸编号专著（自建 cls，如 Samuel《Algebraic Theory of Numbers》）：陈述/公式按节重启印裸号，Supplement 连续编号；只锁分部起点的 \folio 页码对齐；双模式页眉带 §§ c.s1–c.s2 区间；外部文献 Chapter 号须排除；参考文献 [n] 锚点与正文 \hyperref[bib:n]；习题 \exitem 按章 label（Review Problems 用 R 前缀）；列表条目 (1)(2) 锚点；\hyperref 颜色可能被后置 \hypersetup 覆盖，须像素采样验收；.aux 的 \newlabel 解析与裸引用扫描都必须花括号配对。涵盖硬性纪律、坑位表、交叉引用策略、验收门槛与终检脚本。不适用于 mathtranslation 类纯翻译项目。
 metadata:
   agent_created: true
+license: CC-BY-4.0
 ---
 
 # LaTeX 数学书重排（Re-typeset）工程技能

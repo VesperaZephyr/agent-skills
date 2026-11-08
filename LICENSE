@@ -1,8 +1,19 @@
 This repository is licensed under the Creative Commons Attribution 4.0
-International License (CC BY 4.0), except where otherwise noted. Some
-individual skills carry their own license file (for example, the
-`mathtranslation` and `minimax-docx` skills use the MIT License); those
-directories are governed by their own LICENSE / NOTICE files.
+International License (CC BY 4.0), except where otherwise noted.
+
+Every skill directory declares its license in the `license` field of its
+SKILL.md frontmatter. Two directories are exceptions to the repository-wide
+CC BY 4.0 grant:
+
+  * mathtranslation/  - MIT License. See mathtranslation/LICENSE and
+    mathtranslation/NOTICE.md; the translation template and logo were
+    authorized for MIT distribution by the MathTranslations founder.
+
+  * pdf/              - Proprietary. The skill states its own terms in its
+    SKILL.md frontmatter. It is redistributed as received and is not
+    relicensed by this repository.
+
+All other skill directories are CC BY 4.0.
 
 Copyright (c) 2026 agent-skills contributors
 

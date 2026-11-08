@@ -9,6 +9,7 @@ description: >
   when a note body is missing, when a footnote band sits above the usual page threshold,
   or when an index entry disappeared because the \index{} mark lived inside a lost note.
 agent_created: true
+license: CC-BY-4.0
 ---
 
 # Footnote fidelity audit for OCR-based LaTeX re-typesetting
