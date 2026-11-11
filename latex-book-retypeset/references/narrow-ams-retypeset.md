@@ -1,3 +1,5 @@
+> 以下是特定项目的经验与实例；版式、编号、构建步骤和验收目标应依据当前原书及工程确定。示例代码须在实际项目中测试。
+
 # 极限窄版心数学专著专项（Katz & Mazur / AMS 路线）
 
 实战来源：Nicholas M. Katz & Barry Mazur, *Arithmetic Moduli of Elliptic Curves* (Annals of Mathematics Studies No. 108, Princeton University Press, 1985)。全书重排成品 **518 页**（14 章 + 前言 + 校样附注 Notes Added in Proof + 52 篇参考文献 References）。在极限窄版心（100.5 mm）下达成 **0 Errors, 0 Overfull \hbox (0.0pt), 0 Undefined refs, 0 Undefined citations** 全绿灯工业级验收标准。
@@ -60,10 +62,10 @@ AMS 系列与普林斯顿专著的一大显著特征是**极限窄版心**：
 
 ## 4. TikZ / TikZ-cd 容器红线与图形避坑
 
-1. **绝对禁令：禁止在 `tikzcd` 外层套 `\resizebox`**：
+1. **注意 `tikzcd` 外层缩放的 catcode 问题**：
    - 根因：`tikzcd` 环境内使用 `&` 作为列分隔符，TeX 会在展开 `\resizebox` 的参数时将 `&` 的 catcode 固定为 12（other）或 4（alignment tab），导致 `tikzcd` 无法重置 catcode，报出致命错误 `Single ampersand used with wrong catcode`。
    - 正解：通过内部参数 `column sep`、`row sep` 与 `font` 进行版面紧凑化。
-2. **绝对禁令：禁止在 `tikzcd` 单元格内嵌套 `tikzpicture`**：
+2. **注意 `tikzcd` 单元格内嵌套图形的兼容性**：
    - 根因：路径构建上下文冲突，引发 `Giving up on this path` 崩溃。
    - 正解：单元格内的小双箭头、小符号改用纯数学构造，例如双箭头宏：
      ```latex
@@ -117,4 +119,4 @@ assert len(undef_cits) == 0, "Undefined citations detected"
 assert len(overfulls) == 0, "Overfull \\hbox detected"
 ```
 
-凡改动 `.cls` 宏定义或目录结构后，必须执行 `rm -f main.toc` 再跑 4-Pass 构建，杜绝旧格式导致第一遍崩溃。
+目录格式发生不兼容变化时，可先备份并清理相应生成文件，再重新构建；不要无条件删除 `.toc`。

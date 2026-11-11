@@ -1,5 +1,43 @@
 # 有界子代理与页级 OCR 底稿
 
+## 重排开工时建立来源映射
+
+在重排和 OCR 清理开始时建立轻量的来源台账，后面边生成边补全，不等到审校阶段再从成品逆向
+恢复对应关系。先冻结指定版次、源 PDF 哈希、勘误政策、物理页/书页换算、处理范围与真实构建入口；
+把 PDF 文本/OCR 只当定位材料，正文和图面以选定版次原页为准。
+
+以稳定的源单元 ID 连接原书和新稿。通用字段可用
+`unit_id | source_physical_page/region | printed_page | kind | source_id | generator_or_tex_label | output_pdf_page | status | evidence`。
+至少逐章记录段落、公式、陈述/证明、习题、脚注、表格、普通插图、交换图、引用及索引标记的数量或
+清单；页界和章节边界也要有覆盖状态。只有逐句审阅任务才需要把每句话单独列为一行。一个 OCR 块
+可能含多个对象，一个对象也可能跨页或分拆为多个块，不能拿块数代替内容单元数。
+
+索引在排版前就保留原书完整父子路径、原印刷页码和正文锚点；将排序键、显示词和译文术语分开，
+尽量在对应内容处写入索引标记。新稿页码由最终 PDF 生成，不能把原书页码直接搬过去。每个批次把
+台账行标成 `待对照 / 已对照 / 已修 / 最终 PDF 已验 / 待决`，并绑定当时的源版次与输出 PDF 哈希。
+若后续重排改变分页，只刷新受影响单元的输出页码、页图和链接证据；若源文或 TeX 有变化，则重做
+相应语义对照。这样能保留仍有效的证据，也能明确哪些旧结论需要重验。
+
+### 可复用台账工具
+
+`mathtranslation/scripts/review_ledger.py` 可初始化逐物理页覆盖表和内容单元表，并记录不可变的 PDF
+快照。示例（将 `<skill-root>` 替换为安装目录）：
+
+```powershell
+python <skill-root>\scripts\review_ledger.py init --source source.pdf --translation review-T0.pdf --ledger-dir _review\source-map --edition "1st printing" --build-entrypoint "python build.py"
+python <skill-root>\scripts\review_ledger.py mark-page --ledger-dir _review\source-map --page 42 --source-inventory-status inventoried --translation-inventory-status inventoried --challenge-status reviewed
+python <skill-root>\scripts\review_ledger.py add-unit --ledger-dir _review\source-map --unit-id ch2-p42-thm-3 --source-page 42 --kind theorem --source-identifier "Theorem 3" --translation-tex-file chapters\ch2.tex
+python <skill-root>\scripts\review_ledger.py mark-unit --ledger-dir _review\source-map --unit-id ch2-p42-thm-3 --semantic-status matched --pdf-status verified --translation-anchor thm:2.3 --output-physical-page 58 --evidence-path _review\evidence\ch2-thm-3.png
+python <skill-root>\scripts\review_ledger.py snapshot --ledger-dir _review\source-map --name T1 --translation review-T1.pdf --input-revision 8f2c...
+python <skill-root>\scripts\review_ledger.py report --ledger-dir _review\source-map --output _review\source-map\status.md
+```
+
+The helper requires Python 3.10+ and uses PyMuPDF to count pages; pass `--source-page-count` and
+`--translation-page-count` when it is unavailable. Keep each PDF snapshot at a
+stable path. A later snapshot makes prior PDF checks visible as stale while
+leaving semantic status separate. Use the report as a work queue, not as proof
+that every source unit was inventoried or correctly translated.
+
 ## 普通连续页码教材的编号分流
 
 Ahlfors 第三版不是 GTM 共享计数器，也不使用 Serre 的分章页码：书页连续，

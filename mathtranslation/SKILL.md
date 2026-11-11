@@ -1,7 +1,6 @@
 ---
 name: mathtranslation
 description: Translate mathematical books, papers, notes, and existing LaTeX projects into rigorous Chinese LaTeX, review/repair an existing translation, compile and visually verify the result (xelatex + biber + texindy, Windows/WorkBuddy), convert hard-coded references into clickable cross-references, and migrate a translation from the old mathtranslation template onto mathtranslation.cls v3.3. Use when source fidelity, mathematical correctness, terminology consistency, cross-references, citations, compilation, and PDF-level proofreading matter. Do not use for ordinary non-mathematical translation.
-license: MIT
 ---
 
 # MathTranslation
@@ -434,6 +433,8 @@ Summarize:
 - `references/cls-v33-upgrade.md` — old-template → `mathtranslation.cls` v3.3 migration.
 - `scripts/audit_latex.py` — deterministic LaTeX audit (labels, refs, resources, …).
 - `scripts/build_and_check.py` — 5-step build driver + verdict (build-verify).
+- `scripts/review_ledger.py` — source-page coverage, content-unit mapping,
+  versioned PDF snapshots, and stale-evidence reporting for book-length reviews.
 - `scripts/convert_hardrefs.py` — mathtranslation.cls hard-ref converter (dry-run/`--apply`).
 - `scripts/convert_bare_refs.py` — book-class bare-ref converter (dry-run/`--go`).
 - `tests/test_audit_latex.py` — unit test for the audit script.

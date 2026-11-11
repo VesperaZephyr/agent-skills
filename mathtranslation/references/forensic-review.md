@@ -4,6 +4,9 @@ Use this procedure when the user asks for a complete sentence-by-sentence or
 diagram-by-diagram review, or when an earlier review has missed substantial
 errors. It is a completion standard, not a fast audit. A compiler, OCR diff,
 checklist tick, or list of discovered errors cannot establish coverage.
+For a long-running review, `../scripts/review_ledger.py` can create the page and
+unit tables and report version-bound evidence states; it records review status
+but does not certify semantic correctness.
 
 ## Fix the scope and source
 
@@ -13,6 +16,22 @@ page ranges. Establish each PDF's printed-to-physical page mapping from visible
 folios. A later printing and its errata may disagree: inspect the relevant
 page images and apply the project's stated authority rule. Do not infer the
 source text from the translation or from OCR alone.
+
+### Bind each review batch to exact versions
+
+For every report, evidence image, repair list, and final-PDF check, record the
+source PDF hash and edition, the frozen translation PDF hash, the TeX/build
+input revision, and the build entry point. Review a named snapshot rather than
+a mutable `main.pdf`. Keep three claims separate: source-unit-to-TeX semantic
+correspondence, printed-to-physical page/layout mapping, and PDF link
+destination.
+
+When a later edit changes pagination, do not carry old page numbers, screenshots,
+or link destinations forward by assumption. Rebuild the page bridge for changed
+and neighboring units and repeat their PDF checks. Earlier semantic findings
+remain reusable only where the relevant source and TeX content are unchanged.
+Mark uncovered page gaps explicitly; a set of completed page-range reports does
+not imply continuous coverage unless every in-scope page is accounted for.
 
 ## Build two inventories independently
 

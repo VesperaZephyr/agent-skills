@@ -3,7 +3,6 @@ name: latex-array-diagram-audit
 description: Audit and repair commutative, morphism, element-chase and complex diagrams against a published source PDF, including diagrams hidden in array/aligned/matrix or macros. Covers node/edge fidelity, readable layout, evidence capture and final-PDF regression; ordinary formula matrices are classified rather than mechanically redrawn.
 metadata:
   agent_created: true
-license: CC-BY-4.0
 ---
 
 # 交换图绘制与保真审校

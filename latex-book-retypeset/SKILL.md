@@ -3,7 +3,6 @@ name: latex-book-retypeset
 description: 为高保真 LaTeX 数学书重排（re-typeset，非翻译）沉淀工程方法论与坑位时使用本技能：适用于四类原书——① Springer GTM 类西文书（共享 gtmitem 计数器、原生 TikZ、CRLF 无 BOM、xelatex 构建）：PDF 双层 OCR 乱码、编号公式共享计数器错位、Claim 按章编号、overfull 修复、交叉引用补全；② 中文数学书（xeCJK + Fandol + 自建 cls，如徐森林《数学分析》）：TikZ 参数曲线 plot[domain] 解析失败须转 plot[smooth] coordinates、Fandol 缺生僻字须加 SimSun 回退字族、纯 CJK 行 overfull 须用局部 xeCJKsetup{CJKglue} 均匀松排（\hspace 与 fil 皆无效）、密集图标签重叠、\extref 回填、biber 中文书目；③ 分章页码西文专著（自建 cls，如 Serre《Abelian l-Adic Representations》）：\chapcode 分章页码 I-1/II-42/B-5/Index-3、手工编号陈述环境、biblatex sortkey 锁定原书 [1]-[88]、\pagestyle{empty} 泄漏致续页页眉与页码全书丢失、biblatex \addtocategory 末键尾空格吞条、目录页码超链接（\hyperref 到条目 label）；④ 单卷连续页码、小节内裸编号专著（自建 cls，如 Samuel《Algebraic Theory of Numbers》）：陈述/公式按节重启印裸号，Supplement 连续编号；只锁分部起点的 \folio 页码对齐；双模式页眉带 §§ c.s1–c.s2 区间；外部文献 Chapter 号须排除；参考文献 [n] 锚点与正文 \hyperref[bib:n]；习题 \exitem 按章 label（Review Problems 用 R 前缀）；列表条目 (1)(2) 锚点；\hyperref 颜色可能被后置 \hypersetup 覆盖，须像素采样验收；.aux 的 \newlabel 解析与裸引用扫描都必须花括号配对。涵盖硬性纪律、坑位表、交叉引用策略、验收门槛与终检脚本。不适用于 mathtranslation 类纯翻译项目。
 metadata:
   agent_created: true
-license: CC-BY-4.0
 ---
 
 # LaTeX 数学书重排（Re-typeset）工程技能
@@ -52,6 +51,15 @@ license: CC-BY-4.0
 ## 原书页码映射
 
 `物理页 = 书页 + offset`（GTM96 offset = 15）。先量出偏移，后续所有「回原书核对」都按物理页定位。
+
+重排开工时同步建立稳定的来源映射台账：记录原书版次/勘误、源 PDF 哈希、书页与物理页偏移、
+范围、构建入口，以及源内容单元到生成器/TeX 标签的对应关系；索引父子层级与原书页码也从此时
+留档。默认按章节和内容类型盘点，用户要求逐句审阅或对象高风险时再细化到句子/单个公式，
+避免为普通任务制造过细台账。每次构建后更新最终 PDF 页码映射；布局变化时只重做受影响单元的
+页图与链接落点，不把旧版 PDF 的位置证据直接沿用。字段建议见
+[开工来源映射流程](references/parallel-retypeset.md#重排开工时建立来源映射)。
+可用共享脚本 `../mathtranslation/scripts/review_ledger.py` 生成覆盖表、内容单元表和版本状态报告；
+它只检查台账与证据新旧，不替代源书对照。
 
 ## 普通数学插图：保真、可读与逐图验收
 
@@ -256,3 +264,6 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 全面索引审阅、术语修改或正文重排后，读取[共用索引审阅流程](../mathtranslation/references/index-audit.md)。分别核对主/符号索引的原书完整层级、排序键与显示词、交叉参见、标记位置、最终可见页码和链接目标。条目数、无重复词头或链接存在均不能证明内容覆盖。
 
 共用mathtranslation的`scripts/index_records.py`盘点结构冲突候选，并比较同轮合并.idx完整记录和页码收敛；`audit_related_indexes.py`定位术语关联项。先整批预检精确修改并备份，再按项目构建刷新索引，逐条关闭最终PDF和正文落点证据。生成器项目改生成器，直接维护TeX的项目改真实源文件；具体命令、限制和返回码见上述流程。
+
+
+窄版心及左置公式编号的专著可参考 [窄版心排版实例](references/narrow-ams-retypeset.md)，其中尺寸和编号仅为案例。需要 XeLaTeX 与 Biber 四步构建时，可在项目目录运行 `python <skill>/scripts/audit_log_4pass.py main.tex`；构建入口、警告容许范围及最终 PDF 验收仍依项目确定。`--allow-overfull` 只报告而不将 overfull hbox 视为失败。

@@ -29,19 +29,9 @@
 latex-array-diagram-audit/
 ├── SKILL.md
 ├── references/
-│   ├── no-vision-verification.md     无视觉能力时的核查流程
-│   ├── continuous-review.md          逐轮连续审查对照要点
-│   ├── layout-review.md              版面/几何级审查清单
-│   ├── reusable-tools.md             可复用审查工具与方法
-│   └── review-workflow.md            审查工作流总览
-├── scripts/
-│   ├── inventory_diagrams.py         盘点真实构建链中的所有图候选
-│   ├── apply_exact_repairs.py        按量测精确落点修复图
-│   ├── compare_pdf_pages.py          PDF 页面对照（基线 vs 修复后）
-│   ├── freeze_review_pdf.py          冻结待审 PDF 供逐页复核
-│   └── generate_clipped_lattice.py   生成裁切晶格图
-└── tests/
-    └── test_review_tools.py          审查工具单元测试
+│   └── no-vision-verification.md     无视觉能力时的核查流程
+└── scripts/
+    └── inventory_diagrams.py         盘点真实构建链中的所有图候选
 ```
 
 ## 安装与调用
