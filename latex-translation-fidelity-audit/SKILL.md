@@ -3,7 +3,6 @@ name: latex-translation-fidelity-audit
 description: "Audit a re-typeset Chinese LaTeX translation of a maths book for fidelity to the original. Covers STRUCTURAL fidelity first (whole missing sections vs the original ToC; bare un-hyperlinked cross-chapter refs like §VI.7.2 / 习题~VI.6.5 / [VI.6.16]; the printed-number-vs-hyperref-anchor trap in .aux; missing or malformed per-section 习题 headings; untranslated section titles; silently dropped glyphs; stale index; FandolFang missing bold-shape fallback) and then LEXICAL/MATH fidelity (operator macros Frob/Nm, fraktur letters, residual untranslated English, digit/degree mistranslations, per-section math-cluster equivalence). Use when a reader has flagged errors, before a final delivery, or during '全面审查' of a math-translation project. Captures the original-PDF ↔ OCR-markdown ↔ translation-.tex comparison strategy, the fragile-$ balance trap (\\erratum{} embeds $), PaddleOCR artifacts, page drift, and the CRLF/heredoc landmines."
 metadata:
   agent_created: true
-license: CC-BY-4.0
 ---
 
 # Translation-fidelity audit for a re-typeset LaTeX math book
