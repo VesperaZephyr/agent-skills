@@ -10,6 +10,9 @@
 |应用已审提案|`apply_exact_repairs.py`|目标哈希、匹配次数、无重叠及备份；不证明数学正确|
 |重编译回归|`compare_pdf_pages.py`|指定页对与DPI下RGB像素一致性、未映射页；不自动配页或授予目视通过|
 |矩形截取的规则网格|`generate_clipped_lattice.py`|选定格模型的可编辑TikZ；模型与原图对应仍须审阅|
+|大章分片矩阵|`count_diagrams_by_section.py`|节→行区间→环境计数的矩阵；只做统计不证明图数|
+|方向缺陷族清单|`scan_diagram_defect_families.py`|F1 \ar[l]/F2 无钩竖边/F3 顶点射出的候选清单；非裁决|
+|字形-杆碰撞检测|`check_label_collisions.py`|word bbox×矢量段 Liang-Barsky 相交，description 白盒豁免；REAL>0 退出码 1|
 
 下例`<audit>`为本技能绝对目录，`<translation>`为已安装的mathtranslation目录；先确认本机路径，不照抄占位符。
 
@@ -84,6 +87,20 @@ python '<audit>/scripts/generate_clipped_lattice.py' --rows 6 --cols 7 --dx 3 --
 生成整数格点的映射`(i,j) -> (i+dx,j-dy)`，在外层格点围成的矩形内裁切连线，再画完整节点。保留进入有限节点的箭头头，向框外的边头在框外不显示；包含非节点边界短段。`--x-cm/--y-cm`调整实际格距，默认.55/.5 cm只是可调整初值，不能当原书比例。
 
 仅适用于经源图验证符合该模型的示意图；不生成对象/标签、不推断任意双复形、不解决三维遮挡。输出拒绝覆盖，默认片段，`--standalone`可编译小样。图不能仅因生成器工作正常而标记源译一致；必须打开小样和最终书页，核对行列、步长、边界和可读性。
+
+## 分片矩阵、缺陷族扫描与碰撞检测（手写千图章沉淀）
+
+```bash
+python '<audit>/scripts/count_diagrams_by_section.py' chapters/ch16.tex --json review/matrix.json
+python '<audit>/scripts/scan_diagram_defect_families.py' chapters/ch16.tex --lines 1872-3167
+python '<audit>/scripts/check_label_collisions.py' main.pdf --pages 641-663 --margin 0.5
+```
+
+`count_diagrams_by_section.py`识别`\notesec`/`\section`/`\subsection`（`--marker`可追加正则），产出千图大章的分片依据——按节边界切≤100图的片再派审阅代理；计数含注释掉的环境，须人工排除。
+
+`scan_diagram_defect_families.py`按三类系统性方向反向缺陷族出候选清单：F1 `\ar[l]`族（挂列反向高危，手写稿主流向右）、F2 无钩竖边（`\ar[u|d]`缺 hook/two heads）、F3 同行`dl+dr`/`ul+ur`顶点放射（泛性质三角顶点=余域时箭头应射入顶点）。只盘点不裁决：`\ar[l]`在从右向左的图完全合法，逐条仍须对照原稿。个案提案之外主动按族扫描——一轮按族修复可达150+幅。
+
+`check_label_collisions.py`对PDF矢量层做word bbox×绘图段Liang-Barsky求交，白色填充盒完全罩住word时记MASKED（description白盒遮蔽，备案供布局披露），否则REAL，退出码1可当验收闸门。word级bbox较粗，`--margin`收紧防边缘误报；曲线取弦近似、3D遮挡不判。它只判「字被杆压」，不代表内容正确；REAL须裁剪放大目验后按C类提案修复。
 
 ## 验证与兼容
 

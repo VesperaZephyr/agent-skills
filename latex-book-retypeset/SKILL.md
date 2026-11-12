@@ -231,6 +231,10 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
   等可选参数，再枚举裸 `Theorem 3` / `(4)` / `[3]` / `exercise 8`，输出 STMT/PAREN/FORM/BIB/EXERC 计数。
 - `scripts/check_link_color.py`：渲染 PDF、对每个 Link 矩形做非白像素直方图，断言链接文字颜色；
   `--expect 0,0,178` 对应 `blue!70!black`，防 `\hypersetup` 后写覆盖。
+- `scripts/unify_punct_halfwidth.py`：全角→半角标点统一（`--report` 先统计、`--apply` 落盘留备份）；
+  默认跳过 verbatim 与 % 注释（`--punctuate-comments` 连注释），映射表可 `--map k=v` 扩充。
+  放在合并后、图审前的独立收编遍。千图大章的分片矩阵/缺陷族扫描/字形杆碰撞检测
+  见交换图审计技能的 reusable-tools.md。
 
 ## Resources
 
@@ -250,6 +254,7 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 - `scripts/audit_internal_links.py` — 全部内部链接目标（`\ref/\eqref/\pageref/\hyperref`）对 aux 核验
 - `scripts/audit_bare_xrefs.py` — 屏蔽已链接文本后的裸引用枚举（STMT/PAREN/FORM/BIB/EXERC）
 - `scripts/check_link_color.py` — PDF Link 矩形像素采样，断言链接颜色（默认 `0,0,178`）
+- `scripts/unify_punct_halfwidth.py` — 全角→半角标点统一（report/apply 两态，默认豁免注释与 verbatim）
 
 ## 中文回忆版试卷合集
 
