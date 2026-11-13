@@ -1,11 +1,11 @@
 # agent-skills
 
-一组面向**数学文档处理**与**课程备考**的 Agent 技能。每个目录是一个独立技能，遵循通用约定
-`SKILL.md` + `references/` + `scripts/`，不绑定任何特定的 Agent 运行时——WorkBuddy、Codex、
+一组面向**数学文档处理**与**课程备考**的 Agent 技能。每个目录是一个独立技能，
+以 `SKILL.md` 为入口，按需附带 `references/`、`scripts/` 和 `assets/`，不绑定任何特定的 Agent 运行时——WorkBuddy、Codex、
 Claude Code 或任何支持该加载机制的 Agent 都能直接用。
 
-这里放的是**方法论 + 可执行工具**，不是提示词合集。每个技能都带着自己的验收门槛、坑位表
-和脚本，且这些内容来自实际交付中踩过的错，不是凭想象罗列的最佳实践。
+这里汇集工作流程、审阅方法与配套工具。部分技能提供可执行脚本，另一些以方法说明为主；
+实际目录、依赖与适用范围请查看各技能的 README 和 `SKILL.md`。
 
 ## 技能清单
 
@@ -16,30 +16,30 @@ Claude Code 或任何支持该加载机制的 Agent 都能直接用。
 
 | 技能 | 做什么 | 典型触发 |
 |---|---|---|
-| **`latex-book-retypeset`** | 数学书**重排**（re-typeset，不翻译）：GTM 类西文书、中文书、分章页码专著、单卷裸编号专著四类原书的工程方法与坑位库 | 「重排这本书」「把 PDF 排成 LaTeX」「修 overfull」「补交叉引用」 |
-| **`mathtranslation`** | 数学书 / 论文 / 讲义的中文 LaTeX **翻译与审校**：以原书 PDF 为内容权威，含批量审校台账、闭包横线核对、编译可视化验证与硬编码引用转链接；附 v3.3 模板工程 | 「翻译这本书」「审校译稿」「修译稿的引用」 |
-| **`latex-eq-numbering-audit`** | 对照原书逐节核对**公式编号**并直接修复：标签与渲染号矛盾、编号公式被压成行内、罗马数字误成阿拉伯数字 | 「公式编号与原书不一致」 |
-| **`latex-display-layout-audit`** | 修正**行间公式的怪异版面**且不动任何编号：过拆、假对齐、嵌套显示环境、连续单行堆叠 | 「公式被拆得太碎」「对齐方式不对」 |
-| **`latex-footnote-fidelity-audit`** | 确保 OCR 记录的**每个脚注都落到 PDF 上**：怪异脚注记号、正文缺失、位置异常、连带丢失的索引条目 | 「脚注丢了」「脚注号不对」 |
-| **`latex-ocr-math-defect-audit`** | 修 OCR 在抵达 LaTeX **之前**就破坏的数学：积分被吞进指数、积分域下标丢失、集合括号错位、微分跑到数学环境外 | 「OCR 把公式弄错了」 |
-| **`latex-array-diagram-audit`** | 绘制与审校交换图、态射图、正合列网格（`tikzcd`），含藏在 `array`/`matrix` 里的图 | 「交换图不对」「画个交换图」 |
-| **`latex-bookmark-anchor-audit`** | 修 LaTeX 文档的**书签与目录超链点错位置**：星号标题无锚点、`\phantomsection` 顺序偏移、`.toc` 借用锚点 | 「书签跳错页」「目录点进去不对」 |
-| **`latex-translation-fidelity-audit`** | 译稿**保真度三段审查**：结构性缺失 → 模式扫描（算子宏、哥特字母、残留英文）→ 原书 PDF ↔ OCR ↔ 译稿逐段比对 | 「检查译文有没有漏译」 |
+| **[`latex-book-retypeset`](latex-book-retypeset/README.md)** | 数学书**重排**（re-typeset，不翻译）：GTM 类西文书、中文书、分章页码专著、单卷裸编号专著四类原书的工程方法与坑位库 | 「重排这本书」「把 PDF 排成 LaTeX」「修 overfull」「补交叉引用」 |
+| **[`mathtranslation`](mathtranslation/README.md)** | 数学书 / 论文 / 讲义的中文 LaTeX **翻译与审校**：以原书 PDF 为内容权威，含批量审校台账、闭包横线核对、编译可视化验证与硬编码引用转链接；附 v3.3 模板工程 | 「翻译这本书」「审校译稿」「修译稿的引用」 |
+| **[`latex-eq-numbering-audit`](latex-eq-numbering-audit/README.md)** | 对照原书逐节核对**公式编号**并直接修复：标签与渲染号矛盾、编号公式被压成行内、罗马数字误成阿拉伯数字 | 「公式编号与原书不一致」 |
+| **[`latex-display-layout-audit`](latex-display-layout-audit/README.md)** | 修正**行间公式的怪异版面**且不动任何编号：过拆、假对齐、嵌套显示环境、连续单行堆叠 | 「公式被拆得太碎」「对齐方式不对」 |
+| **[`latex-footnote-fidelity-audit`](latex-footnote-fidelity-audit/README.md)** | 确保 OCR 记录的**每个脚注都落到 PDF 上**：怪异脚注记号、正文缺失、位置异常、连带丢失的索引条目 | 「脚注丢了」「脚注号不对」 |
+| **[`latex-ocr-math-defect-audit`](latex-ocr-math-defect-audit/README.md)** | 修 OCR 在抵达 LaTeX **之前**就破坏的数学：积分被吞进指数、积分域下标丢失、集合括号错位、微分跑到数学环境外 | 「OCR 把公式弄错了」 |
+| **[`latex-array-diagram-audit`](latex-array-diagram-audit/README.md)** | 绘制与审校交换图、态射图、正合列网格（`tikzcd`），含藏在 `array`/`matrix` 里的图 | 「交换图不对」「画个交换图」 |
+| **[`latex-bookmark-anchor-audit`](latex-bookmark-anchor-audit/README.md)** | 修 LaTeX 文档的**书签与目录超链点错位置**：星号标题无锚点、`\phantomsection` 顺序偏移、`.toc` 借用锚点 | 「书签跳错页」「目录点进去不对」 |
+| **[`latex-translation-fidelity-audit`](latex-translation-fidelity-audit/README.md)** | 译稿**保真度三段审查**：结构性缺失 → 模式扫描（算子宏、哥特字母、残留英文）→ 原书 PDF ↔ OCR ↔ 译稿逐段比对 | 「检查译文有没有漏译」 |
 
 ### 二、PDF 处理
 
 | 技能 | 做什么 | 典型触发 |
 |---|---|---|
-| **`pdf`** | 通用 PDF 读写、渲染与验证，含可填表单（AcroForm）的字段提取与填写 | 「读这个 PDF」「生成一份 PDF」「填表单」 |
-| **`pdf-image-text-extractor`** | 从图片或 PDF 提取文字，**零额外依赖**：扫描页渲染成图交视觉识别，表格用 `find_tables` 结构化 | 「提取这个 PDF 的文字」「识别这张图」 |
-| **`pdf-scanned-ocr-bookmark`** | 给纯扫描（无文字层）PDF 加**可搜索隐藏文本层**（离线 OCR），并据识别文本重建书签树 | 「扫描件不能搜索」「批量 OCR 加目录」 |
-| **`math-pdf-bookmark`** | 批量给数学 PDF 加**精确书签**：跳到标题的 y 坐标而非页顶；有文字层走 span 几何，纯扫描走 OCR | 「给这个文件夹的 PDF 加书签」 |
+| **[`pdf`](pdf/README.md)** | 通用 PDF 读写、渲染与验证，含可填表单（AcroForm）的字段提取与填写 | 「读这个 PDF」「生成一份 PDF」「填表单」 |
+| **[`pdf-image-text-extractor`](pdf-image-text-extractor/README.md)** | 从图片或 PDF 提取文字：扫描页交视觉模型识别，表格用 PyMuPDF 提取；需要 API Key | 「提取这个 PDF 的文字」「识别这张图」 |
+| **[`pdf-scanned-ocr-bookmark`](pdf-scanned-ocr-bookmark/README.md)** | 给纯扫描（无文字层）PDF 加**可搜索隐藏文本层**（离线 OCR），并据识别文本重建书签树 | 「扫描件不能搜索」「批量 OCR 加目录」 |
+| **[`math-pdf-bookmark`](math-pdf-bookmark/README.md)** | 批量给数学 PDF 加**精确书签**：跳到标题的 y 坐标而非页顶；有文字层走 span 几何，纯扫描走 OCR | 「给这个文件夹的 PDF 加书签」 |
 
 ### 三、学业与备考
 
 | 技能 | 做什么 | 典型触发 |
 |---|---|---|
-| **`exam-passing`** | 通用期末考试助教：课件解析 → 平时作业规范作答 → 期末复习讲义体系化编写 → 模拟卷与评分细则；内含跨科目通用的讲义撰写规范与六个纯标准库脚本 | 「写一份期末复习讲义」「验收这份讲义」「出套模拟卷」 |
+| **[`exam-passing`](exam-passing/README.md)** | 通用期末考试助教：课件解析 → 平时作业规范作答 → 期末复习讲义体系化编写 → 模拟卷与评分细则；内含跨科目通用的讲义撰写规范与六个纯标准库脚本 | 「写一份期末复习讲义」「验收这份讲义」「出套模拟卷」 |
 
 `exam-passing` 是本仓库唯一不面向「文档本身」、而面向「课程内容」的技能。它同样不含任何
 具体课程的教材与题库：教材 OCR、作业、真题、课件都由当前项目提供。
@@ -81,8 +81,9 @@ git clone https://github.com/VesperaZephyr/agent-skills.git
 cp -r agent-skills/latex-book-retypeset ~/.workbuddy/skills/
 
 # 只取一个（不下载整仓历史）
-git clone --filter=blob:none --sparse https://github.com/VesperaZephyr/agent-skills.git
-cd agent-skills && git sparse-checkout set exam-passing
+git clone --filter=blob:none --sparse https://github.com/VesperaZephyr/agent-skills.git agent-skills-sparse
+cd agent-skills-sparse
+git sparse-checkout set exam-passing
 ```
 
 | Agent | 技能目录 |
@@ -100,9 +101,9 @@ cd agent-skills && git sparse-checkout set exam-passing
 <skill-name>/
 ├── SKILL.md          入口。frontmatter 的 name / description 决定何时被触发
 ├── README.md         给人读的说明：定位、能力、结构、边界（不参与触发）
-├── references/       方法论文档：规范、流程、坑位表、术语与对照策略
-├── scripts/          可复现的脚本，多数只用 Python 标准库
-└── assets/           模板与骨架（部分技能有）
+├── references/       按需提供的参考文档与工具
+├── scripts/          按需提供的可执行脚本
+└── assets/           按需提供的模板与素材
 ```
 
 其中 `mathtranslation/assets/template-v3.3/` 提供基于 `mathtranslation.cls` v3.3 的示例工程；新译本可复制该目录作为起点。审校功能包括批量登记源文单位、闭包横线核验和冻结版本证据管理。
@@ -129,12 +130,12 @@ cd agent-skills && git sparse-checkout set exam-passing
 | 目录 | 许可 | 说明 |
 |---|---|---|
 | `mathtranslation/` | MIT | 用户维护的 v3.3 类文件随技能分发；logo 授权及来源见该目录 `NOTICE.md` |
-| `pdf/` | Proprietary | 第三方分发的技能包，`SKILL.md` frontmatter 声明为专有许可；本仓库不作为著作权人重新许可 |
+| `pdf/` | Proprietary | 第三方技能声明引用的 `LICENSE.txt` 未随包提供；使用或再分发前应核实条款 |
 
 引用、改编上述两个目录的内容时，请遵循其自身条款。
 
 ## 反馈
 
-各技能的 `README.md` 末尾写了边界与已知限制。发现某个技能在特定场景失效，最有用的反馈是
+各技能的 `README.md` 记录了使用方式和已知限制。发现某个技能在特定场景失效，最有用的反馈是
 带上最小复现：输入文件类型、Agent 运行环境、失败时的日志或渲染页。方法论层面的问题（某条
 规范在别的学科不成立）同样欢迎，但请附上反例。
