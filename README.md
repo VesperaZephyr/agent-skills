@@ -44,6 +44,15 @@ Claude Code 或任何支持该加载机制的 Agent 都能直接用。
 `exam-passing` 是本仓库唯一不面向「文档本身」、而面向「课程内容」的技能。它同样不含任何
 具体课程的教材与题库：教材 OCR、作业、真题、课件都由当前项目提供。
 
+## 如何选择技能
+
+- 重排原书选择 `latex-book-retypeset`；中文翻译或综合审校选择 `mathtranslation`。
+- 已知问题集中在公式编号、公式版面、脚注、OCR 数学、图表、书签或译文保真时，选择对应的专项审计技能。
+- 通用 PDF 操作用 `pdf`；文字与表格提取可用 `pdf-image-text-extractor`；扫描件需建立文字层及书签时可参考 `pdf-scanned-ocr-bookmark`，数学书精确书签可用 `math-pdf-bookmark`。
+- 考试材料与课程讲义使用 `exam-passing`。
+
+技能入口是各目录的 `SKILL.md`，各自的 README 说明实际资源与限制。PDF、TeX 和 OCR 工作通常需要相应的外部工具；`pdf-image-text-extractor` 需要 PyMuPDF、requests 和 RedFox API Key，其扫描页识别还需要支持图像识别的 Agent。`pdf-scanned-ocr-bookmark` 的部分管线脚本须按说明自行准备。
+
 ## 目录
 
 ```text

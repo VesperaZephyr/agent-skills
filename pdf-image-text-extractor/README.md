@@ -9,9 +9,9 @@
 **核心价值**
 
 - **即传即识**：上传图片或 PDF，无需额外操作，自动完成文字识别与提取。
-- **零额外依赖**：扫描识别与表格提取无需安装任何 OCR 引擎或表格库，开箱即用。
+- **无需单独的 OCR 引擎或表格库**：扫描页交由支持图像识别的 Agent 处理，表格由 PyMuPDF 提取；运行仍需要 PyMuPDF 和 requests。
 - **格式保留**：尽量保持原文的段落结构、标题层级，提取结果可直接使用。
-- **完全免费**：仅需免费申请 API Key 用于权限校验，不扣积分。
+- **使用前鉴权**：需要配置 RedFox API Key；费用和服务条款以服务方当前说明为准。
 
 **适用对象**
 
@@ -35,9 +35,10 @@
 
 ---
 
-## 密钥获取与安全说明
+## 依赖、密钥与安全说明
 
-- 本技能需要使用环境变量：`REDFOX_API_KEY`。
+- Python 依赖 `pymupdf>=1.23.0` 和 `requests>=2.28.0`；扫描页识别还需要具备图像识别能力的 Agent。
+- 本技能需要使用环境变量：`REDFOX_API_KEY`；鉴权脚本会访问 RedFox 服务。
 - `REDFOX_API_KEY` 由 [红狐 hub](https://redfox.hk/settings/api-keys?source=workbuddy) (`https://redfox.hk`)提供。
 - 请前往 [红狐 hub](https://redfox.hk?source=workbuddy) 注册账号，获取 `REDFOX_API_KEY`。
 - 配置设备环境变量 `REDFOX_API_KEY` 后使用本技能。

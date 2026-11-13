@@ -13,6 +13,7 @@
 | 绘制交换图 | 先列边清单，再落箭头；优先 `tikzcd` 原生重绘 | `SKILL.md`「先写边清单，再写箭头」 |
 | 逐边保真审计 | 方向、端点、单射钩侧、双头/等号/无头、标签侧、空节点与零行 | `SKILL.md`「箭头样式必须真实出现」 |
 | 隐藏图盘点 | `array`/`aligned`/`matrix`/宏里的图一并纳入候选 | `scripts/inventory_diagrams.py` |
+| 冻结、修复与回归 | 冻结目标 PDF、校验精确替换、比较页面并检查标签碰撞 | `references/reusable-tools.md` |
 | 无视觉校验 | 看图失败时改用源栅格 + 边表 + PDF 文本/矢量证据 | `references/no-vision-verification.md` |
 
 ## 核心纪律
@@ -29,9 +30,13 @@
 latex-array-diagram-audit/
 ├── SKILL.md
 ├── references/
-│   └── no-vision-verification.md     无视觉能力时的核查流程
-└── scripts/
-    └── inventory_diagrams.py         盘点真实构建链中的所有图候选
+│   ├── no-vision-verification.md     无视觉能力时的核查流程
+│   ├── review-workflow.md            审图与修复流程
+│   ├── layout-review.md              版面核对
+│   ├── continuous-review.md          连续审阅
+│   └── reusable-tools.md             工具使用与证据边界
+├── scripts/                          盘点、冻结、修复、回归和碰撞检测工具
+└── tests/                            审图工具测试
 ```
 
 ## 安装与调用
