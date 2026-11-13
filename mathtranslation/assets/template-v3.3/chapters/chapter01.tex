@@ -1,0 +1,221 @@
+% !TeX root = ../main.tex
+
+\chapter{群与同态}
+\section{子群与正规子群}
+
+% 新概念第一次出现时使用：
+% \newterm{唯一键}{中文术语}{English term}
+% 后续再次出现时直接写中文，不再重复楷体和英文.
+
+设 \(G\) 是一个群.
+我们常常希望从 \(G\) 中取出一部分元素，并要求它们在原来的运算下仍然组成一个群.
+
+\begin{definition}\label{def:subgroup}
+若非空子集 \(H\subseteq G\) 在 \(G\) 的运算下本身构成一个群，则称 \(H\) 为 \(G\) 的 \newterm{subgroup}{子群}{subgroup}，记作 \(H\leq G\).
+\end{definition}
+
+判断一个非空子集是不是子群时，并不需要逐条检查所有群公理.
+
+\begin{lemma}\label{lem:subgroup-test}
+设 \(H\) 是 \(G\) 的非空子集.
+若对任意 \(x,y\in H\) 都有 \(xy^{-1}\in H\)，则 \(H\leq G\).
+\end{lemma}
+
+\begin{proof}
+取 \(x\in H\).
+令 \(y=x\)，则 \(e=xx^{-1}\in H\).
+再令 \(x=e\)，可得 \(y^{-1}\in H\).
+最后，对任意 \(x,y\in H\)，由于 \(y^{-1}\in H\)，应用假设得到 \(x(y^{-1})^{-1}=xy\in H\).
+因此 \(H\) 在乘法与取逆下封闭，从而是 \(G\) 的子群.
+\end{proof}
+
+有些子群与整个群的乘法结构特别相容，这些子群正是构造商群所需要的对象.
+
+\begin{definition}\label{def:normal-subgroup}
+若子群 \(N\leq G\) 满足对任意 \(g\in G\) 都有 \(gNg^{-1}=N\)，则称 \(N\) 为 \(G\) 的 \newterm{normal-subgroup}{正规子群}{normal subgroup}，记作 \(N\trianglelefteq G\).
+\end{definition}
+
+\begin{example}\label{ex:abelian-normal}
+若 \(G\) 是交换群，则 \(G\) 的每个子群都是正规子群.
+事实上，对任意 \(g\in G\) 与 \(n\in N\)，都有 \(gng^{-1}=n\).
+\end{example}
+
+\begin{remark}\label{rem:normal}
+子群是否正规依赖于它嵌入整个群的方式.
+同一个抽象群可以在某个群中作为正规子群出现，也可以在另一个群中作为非正规子群出现.
+\end{remark}
+
+% 习题直接放在本小节末尾，不单独建立“习题”小节.
+\begin{exercises}
+    \item 证明任意群 \(G\) 的中心 \(Z(G)\) 都是正规子群.
+    \item 设 \(H,K\leq G\)，证明 \(H\cap K\leq G\).
+\end{exercises}
+
+% ================================================================
+%                     商群与群同态
+% ================================================================
+\section{商群与群同态}
+
+正规子群允许我们把同一个陪集中的元素视为同一个对象.
+
+\begin{definition}\label{def:quotient-group}
+若 \(N\trianglelefteq G\)，则所有陪集
+\begin{align*}
+    G/N=\{gN\mid g\in G\}
+\end{align*}
+在乘法 \((gN)(hN)=ghN\) 下构成的群称为 \newterm{quotient-group}{商群}{quotient group}.
+\end{definition}
+
+接下来考虑两个群之间保持运算的映射.
+
+\begin{definition}\label{def:homomorphism}
+设 \(G\) 与 \(H\) 是群.
+若映射 \(\varphi:G\to H\) 满足
+\begin{align*}
+    \varphi(xy)=\varphi(x)\varphi(y)
+\end{align*}
+对所有 \(x,y\in G\) 都成立，则称 \(\varphi\) 为 \newterm{homomorphism}{群同态}{group homomorphism}.
+\end{definition}
+
+与一个群同态相伴的两个基本对象，是被送到单位元的元素和真正被映到的元素.
+
+\begin{definition}\label{def:kernel-image}
+群同态 \(\varphi:G\to H\) 的 \newterm{kernel}{核}{kernel} 与 \newterm{image}{像}{image} 分别定义为
+\begin{align}
+    \ker\varphi&=\{g\in G\mid \varphi(g)=e_H\},
+    &
+    \operatorname{im}\varphi&=\{\varphi(g)\mid g\in G\}.
+    \label{eq:kernel-image}
+\end{align}
+\end{definition}
+
+核不仅记录同态把哪些元素压成了单位元（见式~\eqref{eq:kernel-image}），它还精确描述了同态在定义域中丢失的信息.
+
+\begin{proposition}\label{prop:kernel-normal}
+对任意群同态 \(\varphi:G\to H\)，都有 \(\ker\varphi\trianglelefteq G\).
+\end{proposition}
+
+\begin{proof}
+取 \(x\in\ker\varphi\) 与 \(g\in G\).
+则
+\begin{align*}
+    \varphi(gxg^{-1})
+    =\varphi(g)\varphi(x)\varphi(g)^{-1}
+    =e_H.
+\end{align*}
+因此 \(gxg^{-1}\in\ker\varphi\)，所以 \(\ker\varphi\) 是正规子群.
+\end{proof}
+
+\begin{theorem}\label{thm:first-iso}
+设 \(\varphi:G\to H\) 是群同态.
+则存在自然同构
+\begin{align*}
+    G/\ker\varphi\cong\operatorname{im}\varphi.
+\end{align*}
+\end{theorem}
+
+这个结论通常称为群的第一同构定理，关于这一基本结果也可参见 \cite{lang}.
+它说明任何群同态都可以分解为先取商，再把所得商群同构到像上.
+完整证明放在本小节末、习题之前，以展示较长证明的双向跳转方式.
+
+\longprooflink{first-iso-proof}{查看完整证明}
+
+\begin{corollary}\label{cor:injective-kernel}
+群同态 \(\varphi:G\to H\) 是单射，当且仅当 \(\ker\varphi=\{e_G\}\).
+\end{corollary}
+
+\begin{proof}
+由 \autoref{thm:first-iso}，商群 \(G/\ker\varphi\) 与 \(\operatorname{im}\varphi\) 同构.
+因此 \(\varphi\) 不识别任何两个不同元素，当且仅当核中只有单位元.
+\end{proof}
+
+% ================================================================
+%                        交换图
+% ================================================================
+第一同构定理也可以用交换图表示：
+\[
+\begin{tikzcd}
+G \arrow[r,"\varphi"] \arrow[d,"\pi"'] &
+\operatorname{im}\varphi \\
+G/\ker\varphi \arrow[ur,"\overline{\varphi}"',"\sim"]
+\end{tikzcd}
+\]
+其中 \(\pi\) 是自然投影，而 \(\overline{\varphi}\) 是定理给出的同构.
+
+% ================================================================
+%                         例与问题
+% ================================================================
+\begin{example}\label{ex:modn}
+考虑群同态
+\begin{align*}
+    \varphi:\mathbb Z&\longrightarrow\mathbb Z/n\mathbb Z,\\
+    m&\longmapsto\overline m.
+\end{align*}
+它的核是 \(n\mathbb Z\)，像是整个 \(\mathbb Z/n\mathbb Z\).
+因此 \autoref{thm:first-iso} 给出
+\begin{align*}
+    \mathbb Z/n\mathbb Z\cong \operatorname{im}\varphi.
+\end{align*}
+\end{example}
+
+\begin{problem}\label{prob:sign}
+设
+\begin{align*}
+    \operatorname{sgn}:S_n\longrightarrow\{\pm1\}
+\end{align*}
+为符号同态.
+求它的核，并利用 \autoref{thm:first-iso} 描述对应的商群.
+\end{problem}
+
+
+% 较长证明放在本小节末、习题之前.
+\begin{longproof}{first-iso-proof}{\autoref{thm:first-iso}}
+由 \autoref{prop:kernel-normal}，\(\ker\varphi\trianglelefteq G\)，所以商群 \(G/\ker\varphi\) 有定义.
+定义
+\begin{align*}
+    \overline{\varphi}:G/\ker\varphi&\longrightarrow\operatorname{im}\varphi,\\
+    g\ker\varphi&\longmapsto\varphi(g).
+\end{align*}
+
+首先验证这个映射定义良好.
+若
+\begin{align*}
+    g\ker\varphi=h\ker\varphi,
+\end{align*}
+则 \(h^{-1}g\in\ker\varphi\)，从而
+\begin{align*}
+    \varphi(h)^{-1}\varphi(g)
+    =\varphi(h^{-1}g)
+    =e_H.
+\end{align*}
+因此 \(\varphi(g)=\varphi(h)\)，所以 \(\overline{\varphi}\) 与陪集代表元的选择无关.
+
+其次，\(\overline{\varphi}\) 是群同态，因为
+\begin{align*}
+    \overline{\varphi}\bigl((g\ker\varphi)(h\ker\varphi)\bigr)
+    =\varphi(gh)
+    =\varphi(g)\varphi(h).
+\end{align*}
+
+它显然是满射，因为 \(\operatorname{im}\varphi\) 中的每个元素都具有形式 \(\varphi(g)\).
+
+最后验证单射.
+若
+\begin{align*}
+    \overline{\varphi}(g\ker\varphi)=e_H,
+\end{align*}
+则 \(\varphi(g)=e_H\)，故 \(g\in\ker\varphi\).
+于是 \(g\ker\varphi=\ker\varphi\)，所以 \(\overline{\varphi}\) 的核只有单位陪集.
+
+因此 \(\overline{\varphi}\) 是同构，从而
+\begin{align*}
+    G/\ker\varphi\cong\operatorname{im}\varphi.
+\end{align*}
+\end{longproof}
+
+% 本小节的习题紧接在正文与长证明之后.
+\begin{exercises}
+    \item 设 \(\varphi:G\to H\) 为群同态，证明 \(\operatorname{im}\varphi\leq H\).
+    \item 设 \(N\trianglelefteq G\)，证明自然投影 \(G\to G/N\) 的核恰好是 \(N\).
+    \item 设 \(\operatorname{sgn}:S_n\to\{\pm1\}\) 为符号同态，求它的核.
+\end{exercises}

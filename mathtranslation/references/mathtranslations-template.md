@@ -11,8 +11,7 @@ LaTeX template. There are two related templates in circulation, and they are
 - **Legacy (reference only):** `mathtranslations-translation-template.tex` —
   the older single-file `ctexart` template (numbering by subsection,
   `exercises`/`answers`/`longproof`, local `mybibliography`). The skill still
-  bundles this file under `assets/` as a historical reference; prefer the
-  maintained `mathtranslation.cls` for new work.
+  no longer bundles this file; use the maintained `mathtranslation.cls` for new work.
 
 The class file is maintained by the user (canonical copy lives in the user's
 template directory), so inspect the *supplied* `mathtranslation.cls` instead of

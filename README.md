@@ -17,7 +17,7 @@ Claude Code 或任何支持该加载机制的 Agent 都能直接用。
 | 技能 | 做什么 | 典型触发 |
 |---|---|---|
 | **`latex-book-retypeset`** | 数学书**重排**（re-typeset，不翻译）：GTM 类西文书、中文书、分章页码专著、单卷裸编号专著四类原书的工程方法与坑位库 | 「重排这本书」「把 PDF 排成 LaTeX」「修 overfull」「补交叉引用」 |
-| **`mathtranslation`** | 数学书 / 论文 / 讲义的中文 LaTeX **翻译与审校**：以原书 PDF 为内容权威，含编译可视化验证与硬编码引用转链接 | 「翻译这本书」「审校译稿」「修译稿的引用」 |
+| **`mathtranslation`** | 数学书 / 论文 / 讲义的中文 LaTeX **翻译与审校**：以原书 PDF 为内容权威，含批量审校台账、闭包横线核对、编译可视化验证与硬编码引用转链接；附 v3.3 模板工程 | 「翻译这本书」「审校译稿」「修译稿的引用」 |
 | **`latex-eq-numbering-audit`** | 对照原书逐节核对**公式编号**并直接修复：标签与渲染号矛盾、编号公式被压成行内、罗马数字误成阿拉伯数字 | 「公式编号与原书不一致」 |
 | **`latex-display-layout-audit`** | 修正**行间公式的怪异版面**且不动任何编号：过拆、假对齐、嵌套显示环境、连续单行堆叠 | 「公式被拆得太碎」「对齐方式不对」 |
 | **`latex-footnote-fidelity-audit`** | 确保 OCR 记录的**每个脚注都落到 PDF 上**：怪异脚注记号、正文缺失、位置异常、连带丢失的索引条目 | 「脚注丢了」「脚注号不对」 |
@@ -96,6 +96,8 @@ cd agent-skills && git sparse-checkout set exam-passing
 └── assets/           模板与骨架（部分技能有）
 ```
 
+其中 `mathtranslation/assets/template-v3.3/` 提供基于 `mathtranslation.cls` v3.3 的示例工程；新译本可复制该目录作为起点。审校功能包括批量登记源文单位、闭包横线核验和冻结版本证据管理。
+
 `SKILL.md` 正文写的是**工作流与红线**：先做什么、按什么顺序、哪些绝对不许做、如何验收。
 细节展开到 `references/`，可机器判定的部分交给 `scripts/`。这样拆分的好处是：Agent 只在
 需要时读对应的参考文档，不必把几万字规范一次性塞进上下文。
@@ -117,7 +119,7 @@ cd agent-skills && git sparse-checkout set exam-passing
 
 | 目录 | 许可 | 说明 |
 |---|---|---|
-| `mathtranslation/` | MIT | 其模板与 logo 由 MathTranslations 创始人授权以 MIT 分发，见该目录 `NOTICE.md` |
+| `mathtranslation/` | MIT | 用户维护的 v3.3 类文件随技能分发；logo 授权及来源见该目录 `NOTICE.md` |
 | `pdf/` | Proprietary | 第三方分发的技能包，`SKILL.md` frontmatter 声明为专有许可；本仓库不作为著作权人重新许可 |
 
 引用、改编上述两个目录的内容时，请遵循其自身条款。

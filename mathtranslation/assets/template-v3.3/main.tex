@@ -1,0 +1,39 @@
+% !TeX program = xelatex
+% 译本元信息：实际使用时只需修改下面这段类选项。
+% 也可以照旧写成 \renewcommand{\BookTitleCN}{...}，两种方式等价。
+\documentclass[
+  BookTitleCN={代数学},
+  BookTitleEN={Algebra},
+  OriginalAuthor={Serge Lang},
+  OriginalEdition={3rd edition},
+  OriginalPublisher={Springer},
+  OriginalYear={2002},
+  Translator={数译},
+  ModelUsed={GPT-5.6 Sol},
+  TranslationDate={17 Aug 2026}
+]{mathtranslation}
+
+\addbibresource{references.bib}
+
+\begin{document}
+
+\maketitle
+
+\frontmatter
+\input{preface}
+
+\makecontents
+
+\mainmatter
+\input{chapters/chapter01}
+
+\appendix
+\input{appendices/answers}
+
+\makebibliography
+
+% 所有通过 \newterm 首次引入的术语都会自动进入下表，
+% 并记录第一次出现的页码；正式译本应把它放在全文最后.
+\printterminology
+
+\end{document}

@@ -15,11 +15,11 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class AuditLatexTests(unittest.TestCase):
-    def test_bundled_assets_match_authorized_template(self) -> None:
+    def test_bundled_assets_match_release(self) -> None:
         assets = Path(__file__).parents[1] / "assets"
         expected = {
-            "mathtranslations-translation-template.tex": (
-                "b2cc106209969e77878f3ba6dfe0bf050d4d38da0c68e558a96241350827531e"
+            "template-v3.3/mathtranslation.cls": (
+                "abd2a9c4ff112c48878dfa5212b1fdf748901c3c5e70364caf2ee1b5a895fa34"
             ),
             "logo.pdf": (
                 "8b3839adbf870a8c5e825c9f004125816835bbb321617e619e5f589b672fc8d5"

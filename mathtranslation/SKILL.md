@@ -42,10 +42,12 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
    requests it or reliable evidence resolves it.
 5. Separate content authority from presentation authority. The source PDF
    governs mathematical content; when the user chooses the MathTranslations
-   template, `mathtranslations-translation-template.tex` governs typesetting
+   template, the selected `mathtranslation.cls` governs typesetting
    conventions.
 
 ## Prepare The Project
+
+- For this user’s LWW / AJbook template projects, show the compilation date on the cover using a date that updates at compilation (for example, `\today`).
 
 - Preserve an existing project's document class, packages, file layout, labels,
   citation keys, macros, and build system unless a change is necessary or the
@@ -65,13 +67,10 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
   `\printterminology`) and build via `tools/build.sh full` (xelatex ×2 → biber →
   xelatex ×2). biblatex is loaded by the class from `BibStyle`/`BibFile`
   options, so only call `\addbibresource` — never `\usepackage{biblatex}`. The
-  older single-file `mathtranslations-translation-template.tex` (ctexart) is
-  bundled under `assets/` as a legacy reference only.
+  bundled `assets/template-v3.3/` contains the maintained class and a sample project.
 - If the user selects the MathTranslations template but supplies no template
-  files, copy `assets/mathtranslations-translation-template.tex` and
-  `assets/logo.pdf` into the project for the legacy variant, or the maintained
-  `mathtranslation.cls` + `logo.pdf` for the current variant. Keep the bundled
-  masters unchanged; edit the project copies.
+  files, copy the complete `assets/template-v3.3/` project into the new
+  project. Keep the bundled master unchanged; edit the project copy.
 - If the user supplies a newer template, prefer that version after comparing
   its contract with the bundled baseline and recording any meaningful changes.
 - Build a small project glossary before translating substantial text. Reuse
@@ -114,13 +113,27 @@ Current explicit user instructions override these defaults.
 
 For substantial translation or independent review, read
 [references/independent-review.md](references/independent-review.md).
-Use separate translator and reviewer subagents with fresh contexts when available
-(for example `fork_turns="none"`); do not pass translator reasoning or self-review
-to the reviewer. The reviewer inventories the source before opening the frozen
-translation. Give workers disjoint output paths; the coordinator owns shared
-glossary, labels, integration and final builds. Without clean-context tools,
-report staged self-review rather than claiming independent review.
+When translation and independent review are both in scope, use separate
+translator and reviewer subagents with fresh contexts when available (for
+example `fork_turns="none"`); for an existing translation, assign reviewers
+without inventing a translator role. Do not pass translator reasoning or
+self-review to the reviewer. The reviewer inventories the source before opening
+the frozen translation. Give workers disjoint output paths; the coordinator
+owns shared glossary, labels, integration and final builds. Without clean-context
+tools, report staged self-review rather than claiming independent review.
 Preserve necessary mathematical dependencies in each handoff.
+
+For an existing book, reconcile completed review reports and the actual
+remaining scope before dispatching work. Reuse verified prior coverage at its
+recorded level (for example, proof review or exercise-by-exercise review);
+identify a concrete gap before repeating it. Select task sizes by density and
+dependencies, not a fixed page quota. When independent reviewers are available,
+let a reviewer complete source inventory and frozen-target comparison in one
+assignment, preserving the source-first boundary and an independently
+recorded challenge pass. Batch confirmed, nonconflicting edits before the next
+build checkpoint; the final PDF still requires the full build and visual checks.
+See [references/forensic-review.md](references/forensic-review.md) for the
+coverage and evidence requirements and efficient checkpoint rules.
 
 ## French mathematical sources
 
@@ -282,9 +295,12 @@ Key rules (the non-obvious ones):
   `grep -cE '\.tex:[0-9]+:'` and `grep -c '^! '` to be 0 (`-file-line-error`
   makes `^! ` insufficient alone).
 - Do **not** pass `-output-directory` for non-ASCII paths — change cwd instead.
-- Visual verification is mandatory: render cover / TOC / index / last page to
-  PNG and `Read` them (only if the running model is multimodal), then confirm
-  real numbers (never `??`) and real cross-references.
+- Visual verification is mandatory. At repair checkpoints inspect affected
+  final pages and their relevant neighbors; at final delivery also check the
+  cover, TOC, index and last page as appropriate to the changes and project,
+  including real numbers (never `??`) and real cross-references. Reuse valid
+  unchanged baseline evidence rather than rerendering unrelated pages after
+  every isolated correction.
 - When a `.cls` redefines `\[`→`equation*` and `\qedhere`→`\tag*`, never wrap
   `align*` in `\[ \]` and never put `\qedhere` inside `aligned`.
 
@@ -359,11 +375,23 @@ independent source and translation inventories, unit-level correspondence,
 and a recorded challenge pass; distinguish review, repair and final-PDF
 validation in the report.
 
-1. Compile early and repeatedly with the project's actual build command
-   (`bash tools/build.sh full` for the `mathtranslation.cls` workflow: xelatex
-   ×2 → biber → xelatex ×2). Always start from a clean auxiliary state after any
-   template or `main.tex` change — stale `.aux`/`.toc` from a previous template
-   version can crash the first pass.
+When reviewing closure or other overbar notation, follow
+[overbar review](references/overbar-review.md): determine its meaning and exact
+scope from source pages, then compare TeX and final PDF. The optional
+`scripts/inventory_overbars.py` locates explicit TeX commands for manual review;
+it cannot detect a symbol absent from the translation or certify correctness.
+
+For structural, caption, notation and residual-language fidelity candidates,
+consult [targeted fidelity checks](references/fidelity-patterns.md). Interpret
+project-specific scans in context and verify each finding against the source.
+
+1. Establish a trustworthy build baseline, then compile at useful integration
+   checkpoints with the project's actual build command. Group independently
+   confirmed, nonconflicting corrections rather than rebuilding the whole book
+   after each finding. Rebuild sooner when needed to resolve a rendering,
+   pagination, numbering, or dependency question. Perform the full pipeline
+   and final-PDF checks after the final edits. For a template or build-interface
+   change, use a clean auxiliary state if stale files could invalidate the build.
 2. Compare the generated PDF with the source PDF section by section. Also assert
    the *rendered* numbering by extracting text from the PDF (期望 `定义 X.M.K`,
    `定理 X.Y`, `图 X.Y`); a clean build can still ship wrong numbers.
@@ -418,6 +446,10 @@ Summarize:
 - `references/workflow.md` — new-translation staging workflow.
 - `references/forensic-review.md` — evidence standard for complete, sentence-
   and diagram-level review of an existing translation.
+- `references/overbar-review.md` and `scripts/inventory_overbars.py` — source-first
+  review of closure, zero-extension and other overbars, plus a candidate locator.
+- `references/fidelity-patterns.md` — source-aligned structural, caption,
+  notation, OCR and index fidelity checks with candidate-scan limitations.
 - `references/latex-quality.md` — TeX editing / OCR / reference-repair quality rules.
 - `references/mathtranslations-template.md` — `mathtranslation.cls` v3.x template guide.
 - `references/review-checklist.md` — pre-completion review checklist.
@@ -435,10 +467,12 @@ Summarize:
 - `scripts/build_and_check.py` — 5-step build driver + verdict (build-verify).
 - `scripts/review_ledger.py` — source-page coverage, content-unit mapping,
   versioned PDF snapshots, and stale-evidence reporting for book-length reviews.
+- `scripts/import_review_units.py` — preview and bulk-register a source inventory
+  in a `review_ledger.py` ledger; see `references/batch-review-import.md`.
 - `scripts/convert_hardrefs.py` — mathtranslation.cls hard-ref converter (dry-run/`--apply`).
 - `scripts/convert_bare_refs.py` — book-class bare-ref converter (dry-run/`--go`).
 - `tests/test_audit_latex.py` — unit test for the audit script.
-- `assets/mathtranslations-translation-template.tex` — legacy ctexart template.
+- `assets/template-v3.3/` — maintained class and sample project.
 - `assets/logo.pdf` — cover logo.
 - `agents/openai.yaml` — optional OpenAI/Codex interface metadata.
 

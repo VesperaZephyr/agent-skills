@@ -18,6 +18,8 @@ This checklist alone is not evidence that the passes occurred.
 
 - [ ] The Chinese is natural, concise, and suitable for mathematical writing.
 - [ ] No source sentence, heading, caption, footnote, or list item is omitted.
+- [ ] Each caption is compared with its source for omissions and added claims;
+  generated chapter files and their authoritative generators are synchronized.
 - [ ] Every source paragraph, proof step and exercise has a corresponding
       translation unit or a recorded, justified exception; no extra hypothesis,
       conclusion or proof step was silently introduced.

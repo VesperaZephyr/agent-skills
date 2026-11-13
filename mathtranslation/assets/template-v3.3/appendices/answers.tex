@@ -1,0 +1,36 @@
+% !TeX root = ../main.tex
+
+\chapter{参考答案}
+
+\section*{1.1 子群与正规子群}
+
+\begin{answers}{1.1}
+    \item
+    若 \(z\in Z(G)\) 与 \(g\in G\)，则 \(gzg^{-1}=z\in Z(G)\).
+    因此 \(Z(G)\trianglelefteq G\).
+
+    \item
+    \(H\cap K\) 非空，因为 \(e\in H\cap K\).
+    若 \(x,y\in H\cap K\)，则 \(xy^{-1}\in H\) 且 \(xy^{-1}\in K\)，所以 \(xy^{-1}\in H\cap K\).
+    由 \autoref{lem:subgroup-test}，\(H\cap K\leq G\).
+\end{answers}
+
+\section*{1.2 商群与群同态}
+
+\begin{answers}{1.2}
+    \item
+    单位元属于像.
+    若 \(a=\varphi(x)\) 与 \(b=\varphi(y)\) 属于像，则
+    \begin{align*}
+        ab^{-1}=\varphi(xy^{-1})
+    \end{align*}
+    仍属于像.
+    由 \autoref{lem:subgroup-test}，\(\operatorname{im}\varphi\leq H\).
+
+    \item
+    自然投影把 \(g\in G\) 送到陪集 \(gN\).
+    有 \(gN=N\) 当且仅当 \(g\in N\)，因此它的核正是 \(N\).
+
+    \item
+    \(\operatorname{sgn}\) 的核由所有偶置换组成，也就是交错群 \(A_n\).
+\end{answers}

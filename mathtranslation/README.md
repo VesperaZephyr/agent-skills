@@ -8,7 +8,7 @@
 
 本项目的组织方式参考
 [MathTranslations 数学翻译指南](https://mathtranslations.org/guide/)，
-并经 MathTranslations 创始人及版权所有者授权，内置 MIT 许可的模板与 logo。
+内置用户维护的 v3.3 模板工程，以及经 MathTranslations 版权所有者授权的 logo。
 在线术语表保持外部引用，不在仓库内固定可能过期的数据。
 
 ---
@@ -26,6 +26,8 @@
 | 交换图 | 一律 `tikz-cd` 重绘，含逐边规格与独立复核 | `references/diagram-practice.md` |
 | 插图 | 矢量优先、TikZ 重绘、最终页可读性判据 | `references/illustrations.md`、`references/figure-capture.md` |
 | 法语文献 | 法语逻辑构造、前言/简历边界（résumé/préface 与译者新写前言的区分）、多卷术语对账 | `references/french-mathematics.md`、`references/french-calibration.json` |
+| 批量审校台账 | 批量导入内容单位、校验覆盖与版本化证据 | `scripts/review_ledger.py`、`scripts/import_review_units.py` |
+| 闭包横线审校 | 建立候选清单，按原书页图核对横线对象 | `references/overbar-review.md`、`scripts/inventory_overbars.py` |
 | 独立审阅 | 译者/审阅者上下文隔离，避免自审闭环 | `references/independent-review.md` |
 
 ---
@@ -82,8 +84,8 @@ git clone https://github.com/VesperaZephyr/agent-skills.git
 并用 scripts/audit_bare_references.py 盘点后再逐条分类。
 ```
 
-新建译本时只需提供：原书 PDF、MinerU Markdown、提取出的图片；
-模板与 logo 从 `assets/` 复制，不要改动 `assets/` 内的母本。
+新建译本时提供原书 PDF 和可用的源材料；将 `assets/template-v3.3/` 整个复制为项目，
+保留 `assets/` 中的母本。
 
 ---
 
@@ -132,14 +134,17 @@ mathtranslation/
 ├── agents/
 │   └── openai.yaml                  可选：OpenAI/Codex 界面元数据
 ├── assets/
-│   ├── mathtranslations-translation-template.tex   旧版单文件 ctexart 模板（legacy）
-│   └── logo.pdf                     封面 logo（mathtranslation.cls 亦使用）
+│   ├── template-v3.3/               mathtranslation.cls v3.3 与完整示例工程
+│   └── logo.pdf                     已授权的封面 logo
 ├── references/
 │   ├── workflow.md                  新译本分阶段工作流
 │   ├── latex-quality.md             TeX 编辑 / OCR / 引用修复质量规则
 │   ├── mathtranslations-template.md mathtranslation.cls v3.x 模板说明（主路径）
 │   ├── review-checklist.md          完工前审查清单
 │   ├── forensic-review.md           全稿证据驱动审校标准
+│   ├── batch-review-import.md       批量导入源文审校单位
+│   ├── overbar-review.md            闭包与横线候选的页图核验
+│   ├── fidelity-patterns.md         结构、图注、记号与 OCR 保真检查
 │   ├── independent-review.md        译者/审阅者上下文隔离与交接
 │   ├── confirmed-terminology.md     已确定译名（含人名对照，约 2200 行）
 │   ├── terminology-exceptions.md    术语疑点与命名边界
@@ -158,7 +163,10 @@ mathtranslation/
 │   ├── audit_bare_references.py     裸编号引用盘点（只盘点，不改写）
 │   ├── convert_hardrefs.py          cls 路径硬引用转换（dry-run / --apply）
 │   ├── convert_bare_refs.py         book 类裸编号转换（dry-run / --go）
-│   └── capture_pdf_region.py        PDF 区域导出 PDF+PNG+来源信息
+│   ├── capture_pdf_region.py        PDF 区域导出 PDF+PNG+来源信息
+│   ├── review_ledger.py             版本化审校台账
+│   ├── import_review_units.py       批量导入审校单位
+│   └── inventory_overbars.py        闭包横线候选定位
 └── tests/
     └── test_audit_latex.py          审计脚本单元测试
 ```
@@ -274,7 +282,7 @@ python scripts/capture_pdf_region.py book.pdf --page 42 --bbox 80 120 500 640 \
 ## 与 `mathtranslation.cls` 的关系
 
 当前书籍项目实际使用的模板是 **`mathtranslation.cls`**（基于 ctexbook 的类文件，
-由用户维护，**不在本仓库内捆绑**），与 `assets/` 里那份单文件 ctexart 模板同源但不同线。
+由用户维护；本仓库在 `assets/template-v3.3/` 附带 v3.3 类文件及示例工程）。
 
 - `references/mathtranslations-template.md` 以 `mathtranslation.cls` v3.x 为主路径，
   单文件 ctexart 模板仅作历史参考。
@@ -283,8 +291,8 @@ python scripts/capture_pdf_region.py book.pdf --page 42 --bbox 80 120 500 640 \
   （xelatex ×2 → biber → xelatex ×2）。
 - biblatex 由类文件按 `BibStyle` / `BibFile` 选项加载，因此只调 `\addbibresource`，
   **不要**再 `\usepackage{biblatex}`。
-- `assets/` 中仍保留 `mathtranslations-translation-template.tex` 与 `logo.pdf`
-  （封面 logo 仍被 `mathtranslation.cls` 使用）。
+- `assets/template-v3.3/` 提供类文件、示例入口、章节、附录、参考文献及 logo；
+  整个目录复制到新项目后再修改。旧版单文件模板不再打包。
 
 ---
 
@@ -293,10 +301,8 @@ python scripts/capture_pdf_region.py book.pdf --page 42 --bbox 80 120 500 640 \
 工作流依据 MathTranslations 公开指南整理，表述与实现独立完成。在线指南、术语资源与
 模板可能更新，实际项目应以[指南页面](https://mathtranslations.org/guide/)当前版本为准。
 
-模板配置核对过官方 `mathtranslations-translation-template.zip`（2026-08-23 版；
-旧名 `MathTranslations-Template.c9598d4a8d56.zip` 为同一模板的早期发布）的实际 TeX
-与示例 PDF。模板 TeX 与 logo 经版权所有者授权，作为本仓库 MIT 内容公开；
-编译示例 PDF 未打包，因为运行技能不需要它。
+模板包采用用户维护的 `mathtranslation.cls` v3.3（2026-11-04）及示例工程；
+旧单文件模板的来源与 logo 授权见 `NOTICE.md`。编译生成的 PDF 不打包。
 
 **这个技能不替代领域知识与人工判断。** 编译成功、脚本全绿、清单打勾，
 都不能证明数学内容正确、覆盖完整或链接指向正确目标；编号与引用必须从渲染 PDF 抽验。
@@ -305,5 +311,5 @@ python scripts/capture_pdf_region.py book.pdf --page 42 --bbox 80 120 500 640 \
 
 ## License
 
-本仓库内容（含 `assets/mathtranslations-translation-template.tex` 与 `assets/logo.pdf`）
+本仓库内容（含 `assets/template-v3.3/` 与 `assets/logo.pdf`）
 采用 MIT License。在线术语数据与原始数学作品仍受各自许可与版权约束。

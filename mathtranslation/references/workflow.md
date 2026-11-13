@@ -51,9 +51,7 @@ For a new project:
   [mathtranslations-template.md](mathtranslations-template.md), preserve an
   untouched copy, and compile the unchanged template as a baseline;
 - if the user did not supply template files, copy the skill's bundled
-  `assets/mathtranslations-translation-template.tex` and `assets/logo.pdf`
-  into the project for the legacy ctexart variant, or the maintained
-  `mathtranslation.cls` + `logo.pdf` for the current ctexbook variant;
+  `assets/template-v3.3/` project into the new project;
 - otherwise choose a Unicode-capable Chinese TeX setup appropriate to the
   environment;
 - keep source assets and generated build artifacts separate;

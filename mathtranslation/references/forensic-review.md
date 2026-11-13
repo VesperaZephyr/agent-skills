@@ -19,9 +19,11 @@ source text from the translation or from OCR alone.
 
 ### Bind each review batch to exact versions
 
-For every report, evidence image, repair list, and final-PDF check, record the
-source PDF hash and edition, the frozen translation PDF hash, the TeX/build
-input revision, and the build entry point. Review a named snapshot rather than
+For each review snapshot, record the source PDF hash and edition, the frozen
+translation PDF hash, the relevant TeX/build input revision, and the build entry
+point in one manifest. Reports, correspondence tables, evidence images,
+repair records, and final-PDF checks refer to that manifest and their page or
+unit IDs; do not duplicate hashes in every row or file. Review a named snapshot rather than
 a mutable `main.pdf`. Keep three claims separate: source-unit-to-TeX semantic
 correspondence, printed-to-physical page/layout mapping, and PDF link
 destination.
@@ -82,6 +84,55 @@ have been missed, then check translation-only units in reverse. Recheck every
 affected by nearby edits. Re-running the same search or compiler is not an
 independent challenge pass. Record who/what performed each pass and the
 evidence used; if the second pass was not done, report that limit.
+
+## Plan work and verification around the actual risk
+
+- First reconcile existing reports, source edition, current artifact and
+  coverage. Preserve completed exercise, problem and solution reviews at their
+  stated depth; only schedule a further pass when a specific coverage gap or
+  a stricter requested standard requires it. Do not infer that a lack of a
+  sentence ledger means an earlier proof review never happened.
+- Group contiguous material into batches sized for mathematical density,
+  boundaries and reviewer context. Five pages is an option, not a universal
+  unit: a coherent longer section can be a single batch when every required
+  unit and boundary can still be checked. Split when density, dependencies,
+  tool limits or risk threaten coverage. Record the actual unit granularity;
+  paragraphs do not certify a requested sentence-by-sentence review.
+- One suitably scoped assignment can inventory the source first, then inspect
+  the frozen target, reconcile both inventories, and conduct a separate
+  challenge pass. Do not force a coordinator round-trip between those steps if
+  the source-first boundary is recorded. Use separate fresh-context reviewers
+  where requested or warranted; a reviewer rechecking their own work is a
+  challenge pass, not an independent review. Parallelize disjoint ranges when
+  useful and integrate shared files serially. Do not duplicate review work
+  merely to fill agent slots.
+- Maintain one canonical structured correspondence and findings ledger. Use
+  batch reports for scope, dispositions and exceptions; the handoff contains
+  a concise current snapshot, remaining ranges, links and next actions. Link
+  to evidence rather than copying the same narrative across several files.
+  Distinguish page coverage from review depth and preserve prior decisions.
+- Verify confirmed findings against source images and the affected TeX before
+  editing. Queue compatible fixes and integrate at a planned checkpoint rather
+  than running a full book build after each isolated defect. Build earlier if
+  a claim depends on rendering, changed pagination, numbering or a shared
+  dependency. At each checkpoint check all changed items and relevant nearby
+  pages; before delivery run the actual full pipeline and inspect every repair
+  in the final PDF. Use a whole-book pixel comparison when the risk or requested
+  regression requires it; record its baseline and limits, and never treat pixel
+  equality or a successful build as proof of semantic fidelity.
+- Scripts and OCR can locate units, compare coverage and flag candidates;
+  source page images and the actual translation remain the authority for
+  mathematical interpretation. Automate repeatable ledger and snapshot work
+  with the existing `review_ledger.py` where it fits; do not fabricate a
+  per-batch script or high-resolution crop for routine matches. Store crops
+  for ambiguous marks, confirmed findings and decisions requiring evidence.
+  For a compatible source inventory CSV, use `import_review_units.py` to
+  preview and bulk-register unreviewed units; its input and recovery procedure
+  are documented in `batch-review-import.md`. Registration is not a verdict.
+- When efficiency matters, report elapsed time, completed scope and remaining
+  unmatched or unresolved units at checkpoints. Compare throughput only across
+  comparable review depths and densities; never trade a required source image,
+  unit correspondence, challenge or final-PDF verification for a page count.
 
 ## Automatic heading numbers versus translated titles
 

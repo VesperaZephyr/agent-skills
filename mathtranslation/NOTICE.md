@@ -24,11 +24,14 @@ included because it is not required by the skill.
 
 The official archive was renamed to `mathtranslations-translation-template.zip`
 and re-inspected on 2026-08-23 (SHA-256
-`4C2E5AD1C81646B4E8AD53F4B5FD5BAA7D477C749915E32CF52B5EE71F85F12E`). The
-updated `assets/mathtranslations-translation-template.tex` derives from that
+`4C2E5AD1C81646B4E8AD53F4B5FD5BAA7D477C749915E32CF52B5EE71F85F12E`). The previously bundled single-file template derived from that
 authorized archive under the same MIT-License authorization, and the earlier
 `MathTranslations-Template.*` name refers to previous releases of the same
 template.
 
 MathTranslations and its website are not affiliated with or responsible for
 this repository.
+
+The legacy single-file template is no longer distributed. The bundled user-maintained
+`assets/template-v3.3/` is the v3.3 class and sample project supplied for this update.
+The MathTranslations logo remains included under the authorization described above.
