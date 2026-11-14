@@ -31,6 +31,20 @@
   注意 CJK 拼写变体（`图5.1` 可能无空格）。manifest 里的页码映射要复核——
   本例 10.2/10.3 的映射曾排错序，审校员据 manifest 复核时纠正。
 
+### 可复用整页配对工具
+
+    python scripts/figure_page_pair_review.py SOURCE.pdf TRANSLATION.pdf --translation-placement-manifest placements.csv --out REPORT_DIR
+
+该工具从双方可搜索题注建立图号映射，并按实际译稿放置页生成整页并排图。
+清单采用 id,pdf_page，页码是物理页且从 1 开始；跨页续图或同一编号的多个面板
+逐项记录。工具会保存输入哈希、映射 CSV、HTML 总览及页面配对图。输出目录须为空。
+可用 --source-caption-regex 与 --translation-caption-regex 适配题注格式。
+
+先复核 HTML/CSV 的编号和页码，再逐张检查页面对照。若未提供放置清单，工具只
+用题注所在页；若译稿的图漂浮到别页或拆成续图，这不足以覆盖全部出现位置。
+报告里的 matched 只表示题注/页码有映射，不代表图形内容相同或已通过视觉审阅。
+需要 OCR 的扫描件、无题注图或复杂别名时，先补充人工映射/台账再审。
+
 ## 3. 放大协议
 
 凡有疑问（箭头头方向、阴影区域、标签重叠、曲线渐近）必须放大复核，

@@ -24,7 +24,7 @@
 | 模板迁移 | 旧 ctexart 单文件模板 → `mathtranslation.cls` v3.3（ctexbook） | `references/cls-v33-upgrade.md` |
 | 术语治理 | 已确定译名表（含人名对照）+ 疑点与命名边界 | `references/confirmed-terminology.md`、`references/terminology-exceptions.md` |
 | 交换图 | 一律 `tikz-cd` 重绘，含逐边规格与独立复核 | `references/diagram-practice.md` |
-| 插图 | 矢量优先、TikZ 重绘、最终页可读性判据 | `references/illustrations.md`、`references/figure-capture.md` |
+| 插图 | 矢量保真、整页逐图对账、尺寸与绕排回归 | `references/illustrations.md`、`references/figure-audit.md`、`scripts/figure_page_pair_review.py`、`scripts/figure_size_review.py` |
 | 法语文献 | 法语逻辑构造、前言/简历边界（résumé/préface 与译者新写前言的区分）、多卷术语对账 | `references/french-mathematics.md`、`references/french-calibration.json` |
 | 批量审校台账 | 批量导入内容单位、校验覆盖与版本化证据 | `scripts/review_ledger.py`、`scripts/import_review_units.py` |
 | 闭包横线审校 | 建立候选清单，按原书页图核对横线对象 | `references/overbar-review.md`、`scripts/inventory_overbars.py` |
@@ -154,6 +154,7 @@ mathtranslation/
 │   ├── cls-v33-upgrade.md           旧模板 → cls v3.3 迁移与回归审计
 │   ├── diagram-practice.md          交换图规格、练习与独立复核
 │   ├── illustrations.md             数学插图：来源保真与最终页可读性
+│   ├── figure-audit.md              全书原书—译稿逐图对账与页面闭合
 │   ├── figure-capture.md            PDF 裁切 / 截图 / TikZ 重绘实操
 │   ├── french-mathematics.md        法语数学文献翻译与校准
 │   └── french-calibration.json      法语校准样例（源定位、可回归）
@@ -164,6 +165,8 @@ mathtranslation/
 │   ├── convert_hardrefs.py          cls 路径硬引用转换（dry-run / --apply）
 │   ├── convert_bare_refs.py         book 类裸编号转换（dry-run / --go）
 │   ├── capture_pdf_region.py        PDF 区域导出 PDF+PNG+来源信息
+│   ├── figure_page_pair_review.py   按图号生成原书/译稿整页配对表
+│   ├── figure_size_review.py        测量图形尺寸并生成可读性人工复核候选
 │   ├── review_ledger.py             版本化审校台账
 │   ├── import_review_units.py       批量导入审校单位
 │   └── inventory_overbars.py        闭包横线候选定位
@@ -270,8 +273,7 @@ python scripts/capture_pdf_region.py book.pdf --page 42 --bbox 80 120 500 640 \
 - 图：`\begin{figure}[htbp] \centering ... \caption{...} \label{fig:...} \end{figure}`，
   `\caption` 必须在 `\label` 之前；`\caption` 内不得手写「图 3.1:」。
 - 宽度优先用 `\linewidth` 比例，按最终标签字号、纵横比与可用页高决定，不强套固定区间。
-- **不使用 `wrapfigure`**：中文（xeCJK）下环绕图会破坏行间公式、标题缩进并造成
-  overfull；一律改为独立居中图，或并排 `minipage` + `\captionof`。
+- 绕排图须用实际文档类、字体、图注和邻接正文回归测试，覆盖长段、行间公式、定理/证明、列表、节标题及自然/显式分页；检查完整页和后续页的行宽、缩进、阅读顺序与浮动位置。遇到不稳定结构时采用独立图或 minipage；不要因单页成功就认定稳定，也不要一律禁用或强制改写所有绕排图。
 - 矢量清晰的原图优先裁切 PDF 复用；重绘用原生 TikZ/PGFPlots；
   **400 DPI PNG 是位图，不是无损矢量化**。
 - 编辑 TeX、处理 OCR 歧义记号、修复引用结构时，先读

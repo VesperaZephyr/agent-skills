@@ -19,6 +19,7 @@
 | 裸编号专著 | 按关键词/按节重启、`\folio` 只锁分部起点、`bib:n`/`exer:` 锚点、`.aux` 配平解析 | `references/samuel-style-retypeset.md` |
 | 交叉引用补全 | 七轮递进策略 + 习题 label 安全重建 | `references/crossref.md` |
 | 验收与终检 | 构建命令、验收清单、CRLF/BOM 检查、全书终检器 | `references/verification.md` |
+| 普通数学插图 | 原图保真、图幅可读性、绕排回归与整页对账 | `../mathtranslation/references/illustrations.md`、`scripts/figure_page_pair_review.py`、`scripts/figure_size_review.py` |
 
 ## 核心纪律（红线）
 
@@ -53,7 +54,9 @@ latex-book-retypeset/
     ├── gen_tikz_curve.py         参数/笛卡尔/极坐标曲线 → plot[smooth] coordinates
     ├── verify_cjk_book.py        全书终检（?? / 书签 / 回填落点 / 文献 / 缺字符）
     ├── dump_page_heads.py        分章页码书页眉/页码 + 目录页码超链接终检
-    └── check_link_color.py       PDF Link 矩形像素采样，断言链接颜色
+    ├── figure_page_pair_review.py  按图号生成原书/重排稿整页配对表
+    ├── figure_size_review.py       测量插图尺寸并生成可读性复核候选
+    └── check_link_color.py         PDF Link 矩形像素采样，断言链接颜色
 ```
 
 ## 脚本参考
@@ -68,6 +71,8 @@ latex-book-retypeset/
 | `gen_tikz_curve.py` | 生成 `plot[smooth] coordinates` 曲线片段 | 输出片段 |
 | `verify_cjk_book.py` | 全书终检 | 只读 |
 | `dump_page_heads.py` | 逐页导出顶/底文本带，核对页眉页码 | 只读 |
+| `figure_page_pair_review.py` | 按图号生成整页配对表，支持实际放置页清单 | 只读 |
+| `figure_size_review.py` | 测量最终 PDF 插图尺寸并生成人工复核候选 | 只读 |
 | `check_link_color.py` | 渲染 PDF 后对 Link 矩形采样，防 `\hypersetup` 后写覆盖 | 只读 |
 
 ## 安装与调用

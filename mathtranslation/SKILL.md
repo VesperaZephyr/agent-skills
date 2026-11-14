@@ -220,7 +220,11 @@ of model weight training or performance on unseen sources.
   high-impact claim in the TikZ source (arrow direction is deterministic:
   `(a)--(b)` has its head at b), repair via persisted script files (never inline
   shell heredocs with backslashes — `\f` silently becomes formfeed), then
-  rebuild and re-render each repaired figure for visual confirmation.
+  rebuild and re-render each repaired figure for visual confirmation. The reusable
+  scripts/figure_page_pair_review.py maps captions to actual placement pages and
+  generates full-page pairs; scripts/figure_size_review.py measures final vector
+  placements and flags pages for manual review. These tools organize coverage but
+  do not establish mathematical correctness, visibility, or legibility.
 - For concrete PDF screenshot/crop operations and TikZ redraws, read
   [references/figure-capture.md](references/figure-capture.md). Use
   `scripts/capture_pdf_region.py` to export a physical page or reviewed bounding
@@ -246,7 +250,7 @@ of model weight training or performance on unseen sources.
     both as a standalone graphic and on its final book page.
   * Order: always place `\caption{...}` before `\label{fig:...}`, never reversed.
   * Captions: never type manual numbering prefixes inside `\caption` (e.g. no `\caption{图 3.1: ...}`); let LaTeX generate counters automatically. In prose, reference figures with `图~\ref{fig:X-Y}` or `(见图~\ref{fig:X-Y})`.
-  * Text-wrapped figures (wrapfigure): In Chinese mathematical books (xeCJK), text-wrapping around figures breaks on display formulas (`\[ \]`, `align`), creates severe font stretching/overfull hbox, and destroys theorem indents. Strictly adopt **Option A (Promote to standalone centered figures)**: upgrade all wrapped figures from the original book to standard centered `\begin{figure}[htbp]` environments (`0.45\textwidth` to `0.65\textwidth`), preserving clean vertical derivation flow. If horizontal compactness is required, use side-by-side `minipage` grids (`\captionof{figure}`) rather than `wrapfigure`.
+  * Figure placement: decide case by case from the published page and Chinese context. For small uncaptioned figures, test text wrapping in uninterrupted prose, or use adjacent minipages when stable alignment matters more. Use a full-width or centered figure when the drawing is wide, labels require the space, or nearby text contains displays, lists, theorem environments, or a page break. wrapfigure can fail around those structures; avoid it there unless the actual project proves stable. Do not force a universal width or make every source-wrapped figure standalone. Inspect the entire final page and adjacent pages, reading order, paragraph indentation, line spacing, and figure position after the full build. Preserve caption and anchor semantics when present.
 - Typeset display formulas uniformly in `align`, `aligned`, or `align*`
   environments. Never place multiple `\[ \]` blocks side by side; merge them
   into a single environment.
@@ -460,6 +464,10 @@ Summarize:
   pipeline (source-PDF identity check, full-page pair rendering, zoom protocol,
   reviewer dispatch with calibrated samples, source-level claim verification,
   scripted repair, re-render verification); calibrated on GTM 304.
+- `scripts/figure_page_pair_review.py` — caption inventory and full-page source /
+  translation page-pair report; accepts the actual placement manifest.
+- `scripts/figure_size_review.py` — final-PDF placement measurements and visual
+  review candidates; it does not assign pass/fail or judge legibility.
 - `references/build-verify.md` — full compile + visual-verification recipe (Windows/WorkBuddy).
 - `references/hardref.md` — hard-coded reference → clickable cross-reference procedure.
 - `references/cls-v33-upgrade.md` — old-template → `mathtranslation.cls` v3.3 migration.

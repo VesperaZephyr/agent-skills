@@ -65,7 +65,17 @@ metadata:
 
 本节适用于曲线、曲面、向量场、坐标网格、定向/边界、分面几何图等；
 交换图继续执行下一节的逐边审计。使用两技能共用的
-[插图修复流程](../mathtranslation/references/illustrations.md)，不要机械套用某一本书的裁框或缩放比例。
+[插图修复流程](../mathtranslation/references/illustrations.md) 和
+[全书原书—译稿对账流程](../mathtranslation/references/figure-audit.md)，不要机械套用某一本书的裁框或缩放比例。
+使用 scripts/figure_page_pair_review.py 按图号生成整页对照：传入实际放置页清单
+（id,pdf_page，物理页码从 1 开始），让浮动图、拆分续图也进入映射。它只建立
+题注/页码导航，不判断图形正确。scripts/figure_size_review.py 依据逐图清单和
+最终 PDF 输出实测尺寸、页面总览及可读性候选，并在 summary.json 记录输入哈希。
+先看全部含图页，再用提示页缩小复核范围，最后打开完整页面和相邻页判断；信号可
+重叠或误报，未提示页仍须覆盖。更新 PDF 或清单后重跑。字号、图高和矢量匹配只是
+人工核查线索，不是合格判定。
+
+绕排图不要凭单个简单页面推断稳定性。候选版式须用实际文档类、字体、图注和邻接正文试编，覆盖长段、行间公式、定理/证明、列表、节标题，以及自然和显式分页；检查完整页面与后续页的行宽、缩进、阅读顺序和浮动位置。编译无错不代表绕排可靠。
 
 先独立盘点原书与实际构建链中的图，再建逐图台账，记录物理页/裁框、图号、
 所有子图、标签、箭头/定向、源资产、最终 PDF 页与验证证据。相同数量或相同文件名
@@ -85,6 +95,15 @@ metadata:
 `\linewidth`，保持纵横比。密集分图可放大或重排，不能靠裁掉边缘/标签来缩小。
 全书交付须逐图有最终页对应关系；编译通过、256 个图号对应 256 个文件、
 像素相似度高，都分别不能代替内容、覆盖率和目视验收。
+
+图幅由最终标注大小、图题、同页正文与相邻图共同决定。图浮动页或局部页面明显留白时，
+可以利用空间放大；页高或周边正文挤压使图显得过小时，可移至独立浮动页、调整前后文位置，
+或在数学关系允许时重排独立面板并用续图承接，不要为塞进当前页而一味缩小。分面后须确认
+每一面仍可独立理解，并保留面板顺序、共同尺度、连接箭头、图号、标签与引用。连成一体的图
+不要为放大而截断，应考虑合适的大页面或忠实重绘，并比较新增页数、留白与清晰度。调整后
+查看完整页及相邻页，确认图题、段落顺序、编号链接和分页。检查实际内容边界：PDF 盒子虽占满
+版心，内部空白仍可能让主体显小；天然窄图也不应强行放大。尺寸工具的匹配和字号估计都可能
+失败或受上下标、轮廓字与非主标签影响，只能提示人工复核；高度不含图题，也不判定位图清晰度。
 
 ## 交换图与箭头保真审校
 
@@ -216,6 +235,8 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 
 ## 关键脚本
 
+- `scripts/figure_page_pair_review.py`：按图号建立原书与重排 PDF 的整页配对，支持实际放置页清单；只提供页面导航，不验证图形内容。
+- `scripts/figure_size_review.py`：测量最终 PDF 图形尺寸、生成含图页总览和人工复核候选；不输出通过判定。
 - `scripts/audit_text_refs.py`：扫描 `.tex` 列出尚未 `\ref` 化的硬编码引用（开工清单，不改文件）。
 - `scripts/rebuild_exercise_labels.py`：安全重建 `exercise:c.s.i`（默认 dry-run，正确处理同行
   `\gtmtarget` 与手工习题块）。
@@ -238,6 +259,10 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 
 ## Resources
 
+- `../mathtranslation/references/illustrations.md` — 两技能共用的普通数学插图保真、裁切、尺寸、绕排与页面验收流程
+- `../mathtranslation/references/figure-audit.md` — 全书原书—译稿逐图对账流程
+- `scripts/figure_page_pair_review.py` — 按图号建立整页配对，支持实际放置页映射
+- `scripts/figure_size_review.py` — 最终 PDF 尺寸测量与人工复核候选
 - `references/discipline.md` — 文档类 / 计数器速查、页码映射、文献区排印参数
 - `references/pitfalls.md` — 西文书全部坑位（OCR / 编号公式 / Claim / 环境标签 / overfull / 交叉引用 A–E）
 - `references/cjk-retypeset.md` — **中文书专项**（TikZ 曲线 / 缺字回退 / CJKglue 松排 / 标签重叠 / extref 回填 / memory exhausted / biber 书目 / 单一落盘出口）
