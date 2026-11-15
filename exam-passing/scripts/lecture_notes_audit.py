@@ -16,7 +16,8 @@ lecture_notes_audit.py - 期末复习讲义源码层静态验收 (跨科目通�
   9. 复盘改造硬规则: 真题只标卷别未标教材出处 (exam-source),
      definition 内引入的术语未用 \textbf 标出 (term-bold)
   10. 直陈文体基准 (references/lecture_notes_voice.md): 元话语总起句 (voice-meta, WARN),
-      编者复述 / 防御性提醒 / 提示框密度 / 强制分页 (voice-recap, voice-defense,
+      编者复述 / 防御性提醒 / 解答末尾回顾 / 提示框密度 / 强制分页
+     (voice-recap, voice-tail-recap, voice-defense,
       tip-density, forced-pagebreak, 均为 INFO). 这些码只用于定位, 清零不等于文体达标;
       既有成稿可 --ignore 放行, 问题仍保留在报告中.
 
@@ -36,9 +37,9 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-CONCLUSION_ENVS = ("definition", "theorem", "proposition", "lemma", "corollary")
+CONCLUSION_ENVS = ("definition", "theorem", "proposition", "lemma", "corollary", "conclusion", "keyconclusion")
 PROBLEM_ENVS = ("example", "exercise")
-ALL_ENVS = ("definition", "theorem", "proposition", "lemma", "corollary",
+ALL_ENVS = ("definition", "theorem", "proposition", "lemma", "corollary", "conclusion", "keyconclusion",
             "example", "exercise", "solution", "proof", "remark",
             "tabularx", "equation", "align", "gather", "itemize", "enumerate")
 
@@ -46,15 +47,15 @@ ALL_ENVS = ("definition", "theorem", "proposition", "lemma", "corollary",
 BANNED_ERROR = (
     "本讲义", "本稿", "本册", "本节将", "本章将", "编写体例", "勘误",
     "易错点", "记忆要点", "审题技巧", "避坑指南", "避坑", "Pitfalls",
-    "拿到题", "高频失分", "考试范围", "自编", "需要注意", "特别注意",
+    "拿到题", "高频失分", "考试范围", "自编",
     "以下把", "下列提示", "考试主要", "答题规范", "考试时间", "时间分配",
-    "先遮住", "了解即可", "操作模板", "套路", "突破口", "三步走",
-    "必须闭卷", "建议", "失分点",
+    "先遮住", "了解即可", "操作模板", "必须闭卷", "失分点",
 )
-# 边界词, 命中给警告, 由使用者按科目判断
+# 2026-11-15: 「需要注意 / 特别注意 / 建议 / 本章 / 本节 / 题型 / 套路 / 突破口 / 三步走」
+# 从禁用与边界词表移出. 它们是正常中文学术写作词, 列入检查表会让 Agent 主动回避, 写成电报体.
 # 「必背」已移出边界词表: 期末复习讲义末章章名「必背公式与结论手册」
 # 由用户 2026-11-08 明确确认保留; 章名之外的用法在 check_language 里单独警告.
-BANNED_WARN = ("本章", "本节", "题型", "解题技巧", "模板")
+BANNED_WARN = ("解题技巧", "套路", "模板")
 
 # 直陈文体基准 (references/lecture_notes_voice.md) 的高置信度定位码.
 # 只收「删掉后不改变数学内容」的固定说法, 避免误伤; 词面清零不等于文体达标.
@@ -70,6 +71,17 @@ VOICE_DEFENSE_INFO = (
     "适用条件与前提", "如何验证", "两边非负, 平方等价",
     "使用题设的非退化条件", "还须由", "还需要由",
 )
+# voice §3.2: 解答 / 证明环境末尾的回顾性语句 (只定位, 判删/外移靠人工)
+# 2026-11-15: 「由此可见 / 换句话说 / 也就是说 / 不难看出 / 值得注意的是 / 可见」等
+# 正常衔接词全部移出; 只保留真正的机械复述与复验说法.
+VOICE_TAIL_RECAP_RE = re.compile(
+    r"可作校验|校验[:：]|经检验.*完全一致|与标准答案一致|"
+    r"此判断使用了题设|满足全部条件|验证了上述|由此也满足|这也再次说明")
+
+# 原生示意图 (voice §7.1): 位图引用是红线.
+RASTER_EXT_RE = re.compile(
+    r"\\includegraphics\s*(?:\[[^\]]*\])?\s*\{[^}]*\.(?:png|jpe?g|bmp|gif|tiff?|webp)\s*\}",
+    re.I)
 
 FULLWIDTH_ERROR = ("；", "：", "（", "）", "“", "”")
 FULLWIDTH_WARN = ("、",)
@@ -386,6 +398,34 @@ class Auditor(object):
         self.stats["definition_total"] = len(ranges)
         self.stats["definition_without_bold"] = len(no_bold)
 
+    @staticmethod
+    def _next_content_line(lines, k):
+        """跳过空行, 注释, \\label, 思路框与图块, 返回首个内容行下标.
+
+        voice §3.1 要求 \\idea{} 放在题干与解答之间, 不能因为它挡在
+        \\begin{solution} 前面就判 exercise / solution 不配对.
+        """
+        n = len(lines)
+        while k < n:
+            t = lines[k].strip()
+            if t == "" or t.startswith("%") or t.startswith(r"\label{"):
+                k += 1
+                continue
+            if t.startswith(r"\begin{geofig}"):
+                while k < n and not lines[k].strip().startswith(r"\end{geofig}"):
+                    k += 1
+                k += 1
+                continue
+            if t.startswith(r"\idea{"):
+                depth = t.count("{") - t.count("}")
+                k += 1
+                while depth > 0 and k < n:
+                    depth += lines[k].count("{") - lines[k].count("}")
+                    k += 1
+                continue
+            break
+        return k
+
     def check_exercise_solutions(self):
         """每道练习紧跟完整 solution; 全书禁止「练习提示」段."""
         hint_re = re.compile(r"\\section\*\{[^}]*练习提示[^}]*\}")
@@ -398,8 +438,10 @@ class Auditor(object):
         ranges = self.env_ranges("exercise")
         paired = 0
         for s, e in ranges:
-            tail = self.code[e:e + 120]
-            if re.match(r"\s*\\begin\{solution\}", tail):
+            tail = self.code[e:e + 800]
+            tlines = tail.split("\n")
+            k = self._next_content_line(tlines, 0)
+            if k < len(tlines) and tlines[k].strip().startswith(r"\begin{solution}"):
                 paired += 1
             else:
                 self.add("ERROR", "exercise-solution",
@@ -545,21 +587,52 @@ class Auditor(object):
             self.add("INFO", "voice-recap",
                      "「同一个...解决了...两问」式编者点评命中 %d 次" % n)
             stats["recap-pattern"] = n
+        # voice §3.2 解答环境的收尾边界: 环境末 3 行内的回顾句只作定位
+        tail_hits = []
+        for m in re.finditer(r"(?m)^\\end\{(?:solution|proof)\}\s*$", self.code):
+            end_line = self.line_of(m.start())
+            start = self.line_starts[max(0, end_line - 4)]
+            for lm in re.finditer(r"[^\n]*[\u4e00-\u9fff][^\n]*", self.code[start:m.start()]):
+                if VOICE_TAIL_RECAP_RE.search(lm.group(0)):
+                    tail_hits.append(self.line_of(start + lm.start()))
+        if tail_hits:
+            self.add("INFO", "voice-tail-recap",
+                     "解答 / 证明环境末尾 %d 行含回顾性语句, 行 %s; 按 voice §3.2 默认删, "
+                     "含实质新信息者移到环境外 (只定位, 不判达标)" %
+                     (len(tail_hits), tail_hits[:8]))
+        stats["tail-recap"] = len(tail_hits)
         for w in VOICE_DEFENSE_INFO:
             n = self.body.count(w)
             if n:
                 self.add("INFO", "voice-defense",
                          "防御性提醒措辞「%s」命中 %d 次; 前提按 voice §4 一次原则处理" % (w, n))
                 stats[w] = n
+        # 2026-11-15: 撤销「提示框默认 0 / 总数不超 5」配额. 只提示重点是否显性, 不判不达标.
         tips = self.stats.get("takeaway", 0) + self.stats.get("examtip", 0)
-        if tips > 5:
-            self.add("INFO", "tip-density",
-                     "提示框调用 %d 个 (>5); 按 voice §6 默认不用, 逐条评估能否升级为编号结论或删除" % tips)
+        key_concls = self.stats.get("env_counts", {}).get("keyconclusion", 0)
+        self.stats["key_conclusions"] = key_concls
         secs = self.stats.get("section_count", 0)
+        if secs >= 3 and key_concls == 0 and tips == 0:
+            self.add("INFO", "key-emphasis",
+                     r"全篇共 %d 节但未见 keyconclusion 高光框与记忆卡; "
+                     r"按 spec §3 第 4 条为需记忆的核心结论配显性标注 (只提示, 不判不达标)" % secs)
         cp = len(re.findall(r"\\clearpage\b", self.body))
         if secs >= 3 and cp >= secs:
             self.add("INFO", "forced-pagebreak",
                      "正文强制分页 %d 处 / 章 %d 个; 按 voice §7 优先连续排版并逐页查孤儿空白页" % (cp, secs))
+        # 2026-11-11 裁决: 思路框已从跨科目规范移除; 旧稿残留只定位, 提示删除而非迁移
+        leftover = len(re.findall(r"\\idea\s*\{", self.code))
+        if leftover:
+            self.add("INFO", "idea-residue",
+                     "仍有 %d 处 \\idea 思路框残留; 按 2026-11-11 裁决删除 "
+                     "(思路写进解答首句或题面之后的自然衔接, 不用独立色块), 不要补回" % leftover)
+        self.stats["idea_blocks"] = leftover
+        # voice §7.1 原生矢量图: 位图引用是红线
+        for m in RASTER_EXT_RE.finditer(self.code):
+            self.add("WARN", "raster-graphic",
+                     "第 %d 行引用位图 %s; 按 voice §7.1 改用原生 TikZ / pgfplots 矢量图" %
+                     (self.line_of(m.start()), m.group(0)[:60]), m.start())
+        self.stats["vector_figures"] = len(re.findall(r"\\begin\{(?:figure|geofig)\}", self.body))
         self.stats["voice_hits"] = stats
 
     def run(self):
@@ -583,9 +656,11 @@ class Auditor(object):
                      ("UTF-8 ", "带 BOM" if self.bom else "无 BOM", self.eol,
                       self.stats["crlf"], self.stats["lf"], self.stats["bytes"]))
         ec = self.stats["env_counts"]
-        lines.append("结构: 结论型环境 %d | example %d / solution %d | exercise %d | proof %d | "
+        lines.append("结构: 结论型环境 %d (核心结论 %d) | 记忆卡 %d | example %d / solution %d | exercise %d | proof %d | "
                      "tabularx %d | equation %d | boxed %d" %
-                     (self.stats["conclusion_total"], ec["example"], ec["solution"],
+                     (self.stats["conclusion_total"], ec.get("keyconclusion", 0),
+                      self.stats.get("takeaway", 0) + self.stats.get("examtip", 0),
+                      ec["example"], ec["solution"],
                       ec["exercise"], ec["proof"], ec["tabularx"], ec["equation"],
                       self.stats["boxed"]))
         lines.append("引用: label %d | 重复 %d | 引用 %d | 未定义 %d" %
@@ -603,6 +678,10 @@ class Auditor(object):
                      (self.stats["exam_source_missing"],
                       self.stats["definition_without_bold"],
                       self.stats["definition_total"]))
+        lines.append("图示: 思路框残留 %d | 原生图环境 %d | 位图引用 %d" %
+                     (self.stats.get("idea_blocks", 0),
+                      self.stats.get("vector_figures", 0),
+                      sum(1 for i in self.issues if i.code == "raster-graphic")))
         lines.append("结论: ERROR %d / WARN %d / INFO %d" %
                      (c["ERROR"], c["WARN"], c["INFO"]))
         lines.append("")

@@ -155,6 +155,9 @@ python scripts/lecture_notes_scaffold.py init --out "<项目>/讲义.tex" \
 
 **只有第三层能发现的错误最容易被漏掉**, 而它们恰恰不产生任何编译警告. 交付前必须做, 不能因为「日志 0 error / 0 warning」就跳过. 语言层的四项计数都是 0, 也不等于英文写得对: 术语要在全书中保持一致 (例如 "general solution", "fundamental system of solutions", "integrating factor" 各只用一种译法), 这一项只能人工通读. 文体层同理: `audit.py` 全绿只覆盖词面与结构, 直陈与否必须连读一章, 不计入三层工具验收.
 
+
+**图示层 (人工, 并入视觉层执行)**: 几何 / 空间类科目按 `lecture_notes_voice.md` §7.1 配原生 TikZ 示意图, 禁用位图; 逐张渲染检查曲线是否误导, 标注是否压线, 图注与图是否分离. 逐张渲染与连读一章都是人工判据, 编译日志与静态验收都查不出.
+
 ---
 
 ## 6. 第五步: 交付与记忆回写

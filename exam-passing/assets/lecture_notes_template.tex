@@ -1,8 +1,8 @@
 % !TeX program = xelatex
 % 期末复习讲义通用骨架模板 (与科目无关)
 % 使用前先阅读 references/lecture_notes_spec.md; 下文方括号中的内容均为占位说明, 不是讲义正文.
-% 规范要点: 目录即考纲, 直陈叙述体推导 (references/lecture_notes_voice.md), 教材原题配完整解答,
-% 结论编号沉淀, 提示框默认不用, 末章按「必背公式与结论手册」收口 (期末复习默认章名). 题目编排见规范 §1.1.
+% 规范要点: 目录即考纲, 流畅中文直陈叙述, 核心结论用 keyconclusion 暖色高光框分级标出,
+% 教材原题照抄配完整解答, 末章按「必背公式与结论手册」收口. 题目编排见规范 §1.1.
 \documentclass[11pt,a4paper]{article}
 \usepackage{ctex}
 \usepackage[a4paper,margin=22mm,headheight=15pt]{geometry}
@@ -19,6 +19,8 @@
 \definecolor{tipbg}{RGB}{253,248,245}
 \definecolor{thmback}{HTML}{EFF4FB}
 \definecolor{thmframe}{HTML}{2C5AA0}
+\definecolor{keyback}{HTML}{FFF8EC}
+\definecolor{keyframe}{HTML}{C0562A}
 
 \hypersetup{
     colorlinks=true,
@@ -40,7 +42,17 @@
     enhanced, breakable,
     colback=thmback, colframe=thmframe,
     boxrule=0pt, leftrule=3.5pt,
+    toprule at break=0pt, bottomrule at break=0pt,
     arc=1.5pt,
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    drop fuzzy shadow,
+  },
+  keystyle/.style={
+    enhanced, breakable,
+    colback=keyback, colframe=keyframe,
+    boxrule=0.6pt, leftrule=4pt,
+    toprule at break=0pt, bottomrule at break=0pt,
+    arc=2pt,
     left=8pt, right=8pt, top=6pt, bottom=6pt,
     drop fuzzy shadow,
   },
@@ -62,6 +74,12 @@
 \newaliascnt{theorem}{definition}
 \newtheorem{theorem}[theorem]{定理}
 \aliascntresetthe{theorem}
+\newaliascnt{proposition}{definition}
+\newtheorem{proposition}[proposition]{命题}
+\aliascntresetthe{proposition}
+\newaliascnt{lemma}{definition}
+\newtheorem{lemma}[lemma]{引理}
+\aliascntresetthe{lemma}
 \newaliascnt{corollary}{definition}
 \newtheorem{corollary}[corollary]{推论}
 \aliascntresetthe{corollary}
@@ -69,6 +87,10 @@
 \newaliascnt{conclusion}{definition}
 \newtheorem{conclusion}[conclusion]{结论}
 \aliascntresetthe{conclusion}
+% 核心必记结论: 暖色高光框, 与一般命题框视觉分级. 星号用 $\bigstar$, 不要写字面 ★ (缺字符).
+\newaliascnt{keyconclusion}{definition}
+\newtheorem{keyconclusion}[keyconclusion]{$\bigstar$ 核心结论}
+\aliascntresetthe{keyconclusion}
 \newaliascnt{example}{definition}
 \newtheorem{example}[example]{例}
 \aliascntresetthe{example}
@@ -79,16 +101,22 @@
 \Crefname{equation}{式}{式}
 \crefname{definition}{定义}{定义}
 \crefname{theorem}{定理}{定理}
+\crefname{proposition}{命题}{命题}
+\crefname{lemma}{引理}{引理}
 \crefname{corollary}{推论}{推论}
 \crefname{conclusion}{结论}{结论}
+\crefname{keyconclusion}{核心结论}{核心结论}
 \crefname{example}{例}{例}
 \crefname{exercise}{练习}{练习}
 \theoremstyle{remark}
 \newtheorem*{remark}{注}
 \tcolorboxenvironment{definition}{theoremstyle}
 \tcolorboxenvironment{theorem}{theoremstyle}
+\tcolorboxenvironment{proposition}{theoremstyle}
+\tcolorboxenvironment{lemma}{theoremstyle}
 \tcolorboxenvironment{corollary}{theoremstyle}
 \tcolorboxenvironment{conclusion}{theoremstyle}
+\tcolorboxenvironment{keyconclusion}{keystyle}
 \tcolorboxenvironment{example}{examplestyle}
 \tcolorboxenvironment{exercise}{examplestyle}
 \tcolorboxenvironment{remark}{theoremstyle}
@@ -116,8 +144,8 @@
 
 \numberwithin{equation}{section}
 
-% 提示框默认不用 (voice §6): 可复用结构关系优先写成编号 conclusion 并 \cref 引用.
-% 确需使用时, 淡蓝知识卡只讲数学结构, 机理直觉与前提限制; 两个参数.
+% 重点记忆卡 (voice §5/§6): 点透「记什么」「什么时候能用」「最容易和哪个结论混用」.
+% 不复述题设前提, 不写「适用条件与前提」「如何验证」; 两个参数.
 \newcommand{\takeaway}[2]{%
   \vspace{6pt}\noindent\colorbox{boxbg}{%
     \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
@@ -125,13 +153,40 @@
     }%
   }\vspace{6pt}%
 }
-% 淡橙考点框默认不用; 确需使用时只讲结构, 不写「适用条件与前提」式复述; 一个参数, 调用时不要传第二个参数.
+% 淡橙考点框: 只讲结构, 不写「适用条件与前提」式复述; 一个参数, 调用时不要传第二个参数.
 \newcommand{\examtip}[1]{%
   \vspace{6pt}\noindent\colorbox{tipbg}{%
     \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
       \vspace{4pt}\textbf{\color{secondary}适用条件与关键前提:}\hspace{0.5em}#1\vspace{4pt}%
     }%
   }\vspace{6pt}%
+}
+
+% ---- 原生矢量示意图 (voice §7.1) ----
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,calc}
+\definecolor{geoline}{HTML}{2C5AA0}
+\definecolor{geoaug}{HTML}{8FA0B6}
+\definecolor{geofill}{HTML}{E7F0FB}
+\definecolor{geohi}{HTML}{C0562A}
+\definecolor{geohi2}{HTML}{1F8A70}
+\tikzset{
+  geom/.style={line width=0.9pt, color=geoline},
+  hidden/.style={line width=0.6pt, color=geoaug, dashed},
+  aux/.style={line width=0.5pt, color=geoaug},
+  vec/.style={->, >=stealth, line width=1.1pt, color=geohi},
+  lbl/.style={font=\small, color=geoline, inner sep=1.5pt}
+}
+% 图与图注同处一个 minipage, 不浮动; 按章编号, 可 \ref 引用; 禁用位图.
+\newcounter{geofig}[section]
+\renewcommand{\thegeofig}{\thesection.\arabic{geofig}}
+\newenvironment{geofig}[2]{%
+  \par\medskip\noindent\begin{minipage}{\textwidth}\centering
+  \refstepcounter{geofig}\label{#1}%
+  \def\geofigcaption{#2}%
+}{%
+  \par\vspace{3pt}{\small\color{geoline}\textbf{图~\thegeofig}\quad\geofigcaption}\par
+  \end{minipage}\par\medskip
 }
 
 \newcommand{\R}{\mathbb{R}}
@@ -181,6 +236,14 @@ L u = f, \qquad B u\big|_{\partial\Omega} = g,
 % 若 $L$ 与 $B$ 线性, 则两解之差满足齐次问题, 唯一性归结为齐次问题只有零解.
 % \end{conclusion}
 % 后续解答写「由 \cref{concl:homogeneous}」, 不重新解释; 前提失效的情形在该结论陈述里写一次.
+
+% 原生矢量示意图 (voice §7.1): 每个核心几何对象配一张, 图随内容走, 逐张渲染验收.
+% \begin{geofig}{fig:model}{[一句话图注: 该图让读者记住的不变量]}
+% \begin{tikzpicture}[>=stealth]
+%   \draw[aux] (0,0)--(3,0);
+%   \draw[vec] (0,0)--(2,1) node[right,lbl]{$\bm v$};
+% \end{tikzpicture}
+% \end{geofig}
 
 \begin{example}[教材习题 X.Y]
 [此处粘贴教材原题, 保留原题表述与数据.]
