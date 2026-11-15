@@ -103,7 +103,7 @@ python scripts/source_ledger.py init --out 题源台账.md --course "某课程"
 python scripts/source_ledger.py scan 讲义.tex
 ```
 
-两点实测提醒：
+三点实测提醒：
 
 - `audit.py` 默认期望讲义为 CRLF；Linux 项目可加 `--eol lf`。仓库本身由 `.gitattributes` 统一为 LF 存储, 与讲义产物的行尾要求是两回事。
 - `--strict` 遇 WARN 即返回非零。顿号「、」在中文并列词语里规范允许, 但会被记为 `fullwidth-ideographic-comma` WARN, 人工复核后用 `--ignore` 显式放行（问题仍留在报告中）。
