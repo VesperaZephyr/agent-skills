@@ -18,6 +18,7 @@
 | 分章页码专著 | `\chapcode` 页码机制、`\pagestyle{empty}` 泄漏、`biblatex` sortkey、目录页码超链接 | `references/chapcode-retypeset.md` |
 | 裸编号专著 | 按关键词/按节重启、`\folio` 只锁分部起点、`bib:n`/`exer:` 锚点、`.aux` 配平解析 | `references/samuel-style-retypeset.md` |
 | 交叉引用补全 | 七轮递进策略 + 习题 label 安全重建 | `references/crossref.md` |
+| 现稿逐句审阅 | 印次核验、正反对读与页内链接语义 | [审阅流程与 Conway 复盘](references/content-audit.md) |
 | 验收与终检 | 构建命令、验收清单、CRLF/BOM 检查、全书终检器 | `references/verification.md` |
 | 普通数学插图 | 原图保真、图幅可读性、绕排回归与整页对账 | `../mathtranslation/references/illustrations.md`、`scripts/figure_page_pair_review.py`、`scripts/figure_size_review.py` |
 
@@ -25,7 +26,7 @@
 
 - **0 LaTeX 错误 / 0 缺字符（`Missing character`）/ 0 未定义引用 / 无新增 overfull**。
 - 该技能的示例工程约定 UTF-8 无 BOM、CRLF；新项目应先核对现有构建约定。图形可用原生 TikZ 重绘，原书可靠矢量图可直接保留为 PDF；原书位图须注明其限制。
-- 物理页 = 书页 + 偏移，页码映射必须显式记录，不得凭感觉换算。
+- 按实际扫描记录印刷页与 PDF 物理页映射。只有经核实的连续区间可以用固定偏移换算。
 - 生成器工程应修改生成器源头后重新生成；直接维护 TeX 的工程应修改真实源文件。不删正文、公式或引用来绕过编译错误。
 - 编号正确性必须从**渲染 PDF 文本实抽**验证，不能只看退出码。
 
@@ -42,6 +43,7 @@ latex-book-retypeset/
 │   ├── samuel-style-retypeset.md 单卷裸编号专著专项
 │   ├── crossref.md              交叉引用七轮 + 习题重建 + 保留纯文本清单
 │   ├── verification.md          构建命令、验收清单、CRLF/BOM 检查
+│   ├── content-audit.md         逐句审阅流程与 Conway 两册复盘
 │   ├── parallel-retypeset.md    有界并行与页级 OCR 来源
 │   ├── narrow-ams-retypeset.md  窄栏 ams 环境排版
 │   └── recalled-exams.md        中文回忆版试卷合集
