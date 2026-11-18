@@ -158,6 +158,11 @@
 | 提案应用脚本：断言式幂等替换 | 应用审阅提案统一走 python 驱动脚本（禁 shell argv 传非 ASCII——δ 等字符
   会被工具链毁掉）：每条 `old` 必须在文中**唯一**出现（count==1）、已应用则记 skip 不报错，
   反斜杠一律 `chr(92)` 拼接；末尾打印 applied/skipped 清单。幂等性让中断后可重跑。 |
+| 提案串的三类失配（应用时逐类排查） | ① **换行**：md 提案表里的多行 old 用 `\n`，CRLF 文件须先
+  `replace('\n','\r\n')` 或 `newline=''` 读写；② **提案陈旧**：同批提案若修改同一行
+  （如先插记号再改标签），先生成的 old 串会因后生成的改动而失配——须重新核对当前上下文和目标身份，再使用行号辅助定位或范围驱动替换，不得仅凭旧行号强行修改；③ **转义**：md 表格 `\|`
+  需还原为 `|`，`\a`/`\v`/`\b` 是合法转义会静默毁坏（SyntaxWarning 只报非法转义），
+  字面量一律三引号 raw 串。 |
 | 修复提案本身会引入回归 | 整行重写图的提案常丢行分隔 `\\`、丢 `\end{tikzcd}`，且 `\cdots`/`\cdot`/`\dot`
   三兄弟极易写混（复形上标 X^· 是 `\cdot`，省略列是 `\cdots`）。应用后**必须立即构建**，
   编译错误按行修；「提案合理」不等于「应用无错」。 |
@@ -181,3 +186,13 @@
 | 原稿自相矛盾处维持转写并记疑点 | 原稿同页对同一记号给出两种矛盾约定（如微分方向 d^n: X^n→X^{n+1} 与反向并见）
   时，照抄其中一种现状、完整记录矛盾并标「待作者定夺」（挂全局疑点号），
   绝不替作者裁决。 |
+| io.open 默认 universal newlines 吞 \r | `io.open(p, encoding='utf-8').readlines()` 默认 newline=None，
+  读入即把 `\r\n` 转成 `\n`；再以 `newline=''` 写回就把**全文件** CRLF 静默转成 LF
+  （违反项目红线且不报错）。修复脚本读写一律 `newline=''`；交付前抽查
+  `open(f,'rb').read().count(b'\r\n')` 对行数。 |
+| 手工编号章节的 \ref 需手动设 \@currentlabel | 手工排版章/节（不 \refstepcounter）里直接
+  `\label{sec:X}` 会让 `\ref{sec:X}` 输出**空**——\label 捕获的 \@currentlabel 此时为空。
+  正解：`\phantomsection` 后加 `\protected@edef\@currentlabel{X}` 再 `\label`。
+  另外 xeCJK 书里让 \textbf 走黑体、\textit 走楷体：重设
+  `\setCJKmainfont{FandolSong}[BoldFont=FandolHei, ItalicFont=FandolKai,
+  BoldItalicFont=FandolKai]`。 |
