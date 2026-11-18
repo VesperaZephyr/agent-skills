@@ -1,6 +1,6 @@
 ---
 name: latex-book-retypeset
-description: 为高保真 LaTeX 数学书重排（re-typeset，非翻译）沉淀工程方法论与坑位时使用本技能：适用于四类原书——① Springer GTM 类西文书（共享 gtmitem 计数器、原生 TikZ、CRLF 无 BOM、xelatex 构建）：PDF 双层 OCR 乱码、编号公式共享计数器错位、Claim 按章编号、overfull 修复、交叉引用补全；② 中文数学书（xeCJK + Fandol + 自建 cls，如徐森林《数学分析》）：TikZ 参数曲线 plot[domain] 解析失败须转 plot[smooth] coordinates、Fandol 缺生僻字须加 SimSun 回退字族、纯 CJK 行 overfull 须用局部 xeCJKsetup{CJKglue} 均匀松排（\hspace 与 fil 皆无效）、密集图标签重叠、\extref 回填、biber 中文书目；③ 分章页码西文专著（自建 cls，如 Serre《Abelian l-Adic Representations》）：\chapcode 分章页码 I-1/II-42/B-5/Index-3、手工编号陈述环境、biblatex sortkey 锁定原书 [1]-[88]、\pagestyle{empty} 泄漏致续页页眉与页码全书丢失、biblatex \addtocategory 末键尾空格吞条、目录页码超链接（\hyperref 到条目 label）；④ 单卷连续页码、小节内裸编号专著（自建 cls，如 Samuel《Algebraic Theory of Numbers》）：陈述/公式按节重启印裸号，Supplement 连续编号；只锁分部起点的 \folio 页码对齐；双模式页眉带 §§ c.s1–c.s2 区间；外部文献 Chapter 号须排除；参考文献 [n] 锚点与正文 \hyperref[bib:n]；习题 \exitem 按章 label（Review Problems 用 R 前缀）；列表条目 (1)(2) 锚点；\hyperref 颜色可能被后置 \hypersetup 覆盖，须像素采样验收；.aux 的 \newlabel 解析与裸引用扫描都必须花括号配对。涵盖硬性纪律、坑位表、交叉引用策略、验收门槛与终检脚本。不适用于 mathtranslation 类纯翻译项目。
+description: 高保真重排扫描版数学书为 LaTeX，或按原书逐句、逐式审阅现有重排稿。适用于 Springer GTM、中文及自定义页码专著，覆盖公式、习题、插图和 PDF 链接的核对与修订。纯翻译项目使用 mathtranslation。
 metadata:
   agent_created: true
 ---
@@ -9,10 +9,9 @@ metadata:
 
 ## 目标与范围
 
-把扫描版 / PDF 版数学专著**高保真重排**为可编译、可检索、可跳转的 LaTeX 源码的工程方法论与坑位库。
+把扫描版 / PDF 版数学专著**高保真重排**为可编译、可检索、可跳转的 LaTeX，并按原书审阅现成重排稿。
 实战来源：
-- **西文**：Conway《A Course in Functional Analysis》GTM 96 全书重排（436 页、11 章 + 3 附录、
-  0 编译错误 / 0 死链 / 1606 个内部跳转）。
+- **西文**：Conway GTM 11 与 GTM 96 两册全书逐句审阅，涵盖印次差异、漏排、公式及卷末链接落点。
 - **中文**：徐森林、薛春华《数学分析（第一册）》全书重排（551 页、6 章 + 前言 + 参考文献、
   40 个章节源文件、23 幅原生 TikZ、0 错误 / 0 缺字符 / 0 未定义引用 / 0 Overfull / PDF 层 `??` 0）。
 - **分章页码西文**：Serre《Abelian l-Adic Representations and Elliptic Curves》全书重排
@@ -22,7 +21,7 @@ metadata:
   小节裸编号 `Theorem 1`/`(1)`、参考文献 [1]–[9]、习题按章编号、索引 V.2 链接；
   371 label / 846 内部链接目标 / 922 PDF Link 注释 / 110 Q.E.D.，0 错误 / 0 死链 / 链接颜色实测 (0,0,178)）。
 
-- 适用：**原书重排（不翻译）**。三条路线：① Springer GTM 类单计数器版式（`gtmitem` 共享计数器，
+- 适用：**原书重排（不翻译）**。四条路线：① Springer GTM 类单计数器版式（`gtmitem` 共享计数器，
   编号 `\thesection.\arabic{gtmitem}`）；② 中文书自建 cls（xeCJK + Fandol，按章分文件 + 生成器落盘）；
   ③ 分章页码专著自建 cls（`\chapcode` + 重定义 `\thepage`，手工编号陈述环境）；
   ④ 单卷连续页码、小节裸编号专著自建 cls（按关键词分计数器 + 按节重启、只锁分部起点的 `\folio`）。
@@ -32,6 +31,7 @@ metadata:
 ## 何时使用
 
 - 用户说「重排某书」「把 PDF 排成 LaTeX」「补交叉引用」「修 overfull」「公式编号错位」「OCR 乱码」。
+- 用户要求按原书逐句、逐式校勘现有重排稿，或审计全章、全书的内容保真度。
 - 接手一个重排项目，需要先建立纪律红线再动手。
 - 编译出现 `multiply defined` / `undefined references` / 编号错位 / 大量 overfull。
 
@@ -39,18 +39,20 @@ metadata:
 
 | 项 | 要求 |
 |---|---|
-| 行尾 | **CRLF**，**UTF-8 无 BOM**（`.tex/.cls/.py` 全部） |
-| 构建 | `xelatex -interaction=batchmode main.tex` × 3（改 label 后清 aux × 4） |
+| 行尾 | 按工程的编码与行尾约定。Conway 工程的 `.tex/.cls/.py` 用 CRLF、UTF-8 无 BOM |
+| 构建 | 需要修订或成品验收时走工程的实际构建入口，直到目录、编号、引用和索引收敛。XeLaTeX 示例见[构建与终检](references/verification.md) |
 | 质量红线 | 0 编译错误、0 未定义引用、0 缺字符、新增章节 0 overfull |
 | 内容来源 | **以原书 PDF 图像为准**，OCR 仅作检索索引 |
-| 改内容 | 只改生成器（`make_chNN_secM.py`）→ assemble；绝不直接编辑 `chapters/*.tex` |
+| 改内容 | 生成器工程改生成源并重新生成。直接维护 TeX 的工程改真实源文件 |
 | 编号 | 先按原书选路线：GTM 用 `gtmitem` 共享计数器；手工编号专著或试卷可用原始显示号 + 隐藏锚点计数器。不得为连续性擅改原号 |
 | 公式 | 未编号行间公式用裸 `\[\]` / `align*`，或 `equation\notag`；**严禁**给它们编号 |
 | 图形 | 重绘优先原生 TikZ/PGFPlots；原书有可靠矢量图时可直接保留矢量 PDF。禁止把矢量图先转 PNG 再声称无损；原书本身的位图须记录原始限制 |
 
+既有 Conway、徐森林项目仍遵循其项目规定：CRLF、UTF-8 无 BOM，生成器项目修改生成源；构建遍数和清理辅助文件依各项目现行构建纪律执行。不得把这些项目约定推广到所有工程。
+
 ## 原书页码映射
 
-`物理页 = 书页 + offset`（GTM96 offset = 15）。先量出偏移，后续所有「回原书核对」都按物理页定位。
+按实际扫描分段核对印刷页和 PDF 物理页。核实连续区间后才加固定偏移；章界、前置与卷末附页按实定位。
 
 重排开工时同步建立稳定的来源映射台账：记录原书版次/勘误、源 PDF 哈希、书页与物理页偏移、
 范围、构建入口，以及源内容单元到生成器/TeX 标签的对应关系；索引父子层级与原书页码也从此时
@@ -60,6 +62,12 @@ metadata:
 [开工来源映射流程](references/parallel-retypeset.md#重排开工时建立来源映射)。
 可用共享脚本 `../mathtranslation/scripts/review_ledger.py` 生成覆盖表、内容单元表和版本状态报告；
 它只检查台账与证据新旧，不替代源书对照。
+
+## 现有重排稿逐句审阅
+
+按原书逐句、逐式审阅时，读[内容审阅流程与 Conway 复盘](references/content-audit.md)。核印次与实际扫描范围，冻结校样，从原书查校样遗漏，再从校样回查增写和错配。全书任务分别核完两份文件的物理页覆盖，并逐条核实目录、索引与符号表在 PDF 中指向的正文。交接示例作为已知线索纳入连续对读。
+
+只审阅时交付覆盖台账、差异与图证。任务包含修订时，用工程真实入口修改和重建，按新校样复查受影响的正文、页码和链接。源文件身份、当前审阅范围及未决项逐一注明。
 
 ## 普通数学插图：保真、可读与逐图验收
 
@@ -122,6 +130,8 @@ metadata:
 实际打开原书整图和最终书页，记录哈希及具体未决；无法目视时参考
 [无视觉核验](../latex-array-diagram-audit/references/no-vision-verification.md)或记录同等结构/几何证据，
 不以编译或OCR文字代替视觉验收。
+
+图审中发现同族缺陷时，按原书逐例复核，不能将同名箭头一概批量修改；碰撞修复和提案复核的具体方法见[连续图审细节](../latex-array-diagram-audit/references/continuous-review.md#同族缺陷与碰撞修复)。自动修改须保留项目既有编码、BOM与行尾；例如 Python 处理 CRLF 时注意通用换行转换。全书标点体例和作者待定疑点单独登记，不在局部图审中擅自统一。
 
 ## 关键坑位速查
 
@@ -218,8 +228,7 @@ Chapter 号、原书笔误（如 “§4, Proposition 2” 而该节只有 Propos
 
 ## 验收门槛
 
-见 `references/verification.md`：清 aux 后 4 遍 exit=0；0 错误 / 0 重复 / 0 未定义 / 0 死链；
-习题编号逐节连续；CRLF/BOM 合规；原书自身编号不一致处保留纯文本并审计数量。
+成品构建验收见[构建与终检](references/verification.md)，检查错误、缺字符、重复标签、未定义引用、死链及项目约定的编码。习题按原书逐题核对内容与编号，登记原印跳号。逐句审阅另验原图对读和链接语义。
 
 中文书额外三项（用 `scripts/verify_cjk_book.py main.pdf --log main.log --bib-page N` 一次跑完）：
 PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF 中确实解析为编号（而非原文）。
