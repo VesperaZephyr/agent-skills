@@ -17,6 +17,7 @@ audit_text_refs.py — 列出 LaTeX 源中尚未 \\ref 化的硬编码交叉引�
   避免把已经链接的引用再次报出。
 - 检测规则覆盖：跨章/章内 条目引用 (Theorem/Lemma/...)、括号公式引用 (N.M)/(C.2)、
   Section / § 引用、跨章/章内 Exercise 引用。
+- 中文候选包括带数字的陈述、图表、习题和章/节引用。并列续号及无关键词引用需人工补查。
 - 本工具是"清单"不是"精确分类器"，少量误报（如正文里恰好出现的 (2.3)）属正常，
   最终以人工 + 编译验证为准。
 """
@@ -41,7 +42,17 @@ def strip_linked(t):
     t = re.sub(r'\\hyperlink\{[^}]*\}\{[^}]*\}', ' ', t)
     return t
 
+# Keep punctuation translation one-to-one so source line positions stay intact.
+PUNCTUATION = str.maketrans('（）［］．', '()[].')
+
+# Chinese prose has no word boundary between the preceding verb and 定理/引理.
+CJK_NUMBER = r'(?:[A-Z]+\s*\.\s*)?[0-9]+(?:\s*\.\s*[0-9]+)*(?![0-9]|[.]\s*[0-9])'
+CJK_TYPES = r'(?:定理|命题|引理|推论|定义|例题?|例子|注记|猜想|图|表|习题|练习)'
+
 RULES = [
+    ('cjk-object', re.compile(CJK_TYPES + r'\s*~?\s*' + CJK_NUMBER)),
+    ('cjk-division', re.compile(
+        r'第\s*~?\s*(?:' + CJK_NUMBER + r'|[一二三四五六七八九十百]+)\s*[章节篇卷]')),
     # 跨章 条目引用: Theorem II.3.1 / Lemma IV.3.2
     ('stmt-xchapter', re.compile(
         r'\b' + STMT + r'\s*~?\s*(' + CHAPTER + r')\s*\.\s*(\d+)\.(\d+)')),
@@ -60,6 +71,8 @@ RULES = [
 ]
 
 SUGGEST = {
+    'cjk-object': '按原书对象和实际标签核对',
+    'cjk-division': 'chap: / sec:',
     'stmt-xchapter': 'kind:c.s.i',
     'stmt-plain': 'kind:s.i (按当前节补章号)',
     'eq-xchapter': 'eq:c.s.i',
@@ -73,7 +86,7 @@ def scan_file(path):
     out = []
     with open(path, 'r', encoding='utf-8', errors='replace') as f:
         for lineno, raw in enumerate(f, 1):
-            line = strip_linked(raw)
+            line = strip_linked(raw).translate(PUNCTUATION)
             if line.lstrip().startswith('%'):
                 continue
             for name, rx in RULES:

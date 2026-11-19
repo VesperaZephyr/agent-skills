@@ -65,8 +65,12 @@ across included files.
 
 ## Chinese Typesetting
 
-- Use natural Chinese punctuation in prose and mathematical punctuation that
-  matches the surrounding syntax.
+- Use English half-width `, . ; : ! ? ( ) [ ]` in translated Chinese
+  prose and generated Chinese headings, captions, notes, exercises and
+  index/terminology entries. Use TeX quote markers where appropriate.
+  Use normal text spaces after separators and sentence punctuation where
+  the sentence continues. Handle closing brackets, quotes, line ends,
+  abbreviations and decimals according to context.
 - Keep spaces, nonbreaking spaces, and line breaks intentional around references,
   names, units, and inline mathematics.
 - Avoid raw Unicode mathematical lookalikes when a LaTeX command is intended.
@@ -75,18 +79,88 @@ across included files.
 - Follow the project's existing convention for theorem names, quotation marks,
   emphasis, and parenthetical English.
 
-The inspected MathTranslations profile has an unusual but explicit rule:
-Chinese punctuation is used inside prose, while sentence-final punctuation is
-an ASCII period `.` rather than `。`. Apply this only when that template is the
-selected presentation authority. The same profile requires display formulas in
-`align`, `aligned`, or `align*` environments (never multiple `\[ \]` blocks in
-a row), ordered lists in `enumerate`, and Chinese double quotes written with
-the TeX ligatures — two grave accents opening, two straight apostrophes
-closing — rather than Unicode curly quotes.
+Use this house style for translations regardless of the selected template.
+Check both authored text and punctuation emitted by the project's macros
+(e.g. theorem heads and glossary parentheses). Preserve literal quotations,
+source titles required verbatim and retained artwork as applicable. Treat
+LaTeX syntax, URLs and mathematical operators by their own rules.
 
-The same profile uses Song for prose and examples, Kai for first-introduction
+Before delivery, scan all compiled sources and the final PDF text for full-width
+punctuation. The `mathtranslations` profile of `scripts/audit_latex.py` reports
+source candidates. For other classes, use a character search or
+`latex-book-retypeset/scripts/unify_punct_halfwidth.py --report` on the project
+sources. Review hits in context, record intentional exceptions and inspect the
+final pages for punctuation spacing and line breaks. If text extraction omits
+the relevant glyphs, inspect the rendered pages directly. Corrections to
+generated text belong in the project's template or generator.
+
+<a id="display-alignment"></a>
+
+## Display Alignment And Acceptance
+
+- Group related rows into one display. Align the principal relation in each
+  continued derivation (`&=`, `&\le`, `&\iff`, etc.). Break the chain at a
+  natural relation or operation so the continuing terms remain easy to follow.
+  Keep separate derivations independent.
+- Use `align*` for an unnumbered derivation, `equation` with `split` or
+  `aligned` for a group with one original number, and `align` with explicit
+  per-row numbering control for a group with several original numbers.
+  Use `cases` for piecewise structure, `gather` for independent centered rows,
+  `multline` for a single long expression without a shared alignment point,
+  and `\[...\]` for a standalone unnumbered display. Keep original labels,
+  displayed numbers, reference targets and mathematical punctuation.
+- Compare each multi-line display in the reviewed range with the source page
+  and the final rendered PDF. Check that the intended relation signs share a
+  column, continuation indentation follows the derivation, tags sit with
+  their intended rows or group, and math and annotations fit the page.
+  Inspect page breaks and surrounding prose spacing. Record the checked range
+  and any unresolved formula location. Automated environment and overflow
+  checks only identify candidates; direct PDF inspection establishes layout.
+
+The MathTranslations profile uses Song for prose and examples, Kai for first-introduction
 terms, Fang for most theorem-like bodies, and CMU Serif for English. Preserve
 those roles unless the supplied template version says otherwise.
+
+## Display Paragraph Spacing
+
+A blank source line ends a TeX paragraph; it is not merely visual source
+formatting. When prose introduces a display in the same paragraph, put the
+opening `\[`, `$$` (only if inherited from the project), or display environment
+on the next line with no intervening blank line or `\par`. For example:
+
+```tex
+由定义可得
+\begin{align*}
+  f(x) &= x^2.
+\end{align*}
+```
+
+Review blank lines before `\[`, `equation`, `align`, `gather`, `multline`,
+and their starred forms as candidates, including comment-only intervening
+lines. Do not remove them blindly: a formula may begin a genuinely new
+paragraph, a list item, theorem, proof, or other structural unit. Ignore
+verbatim content, macro definitions and commented-out examples; inspect the
+actual compiled inputs and local context. Preserve intentional paragraph
+breaks and numbering, labels, punctuation, and surrounding structure.
+
+Inspect the complete sentence around each display, not just the immediately
+preceding line. An accidental paragraph break may occur before a short lead-in
+such as “是集合”, leaving it indented on its own line before the formula.
+Likewise, check the text after the display: remove a blank line there only
+when it incorrectly starts a new paragraph within the same sentence or
+paragraph. In examples and theorem statements check the surrounding environment
+as well as ordinary body text. Treat a series of visually similar cases across
+different pages as a reason to audit all compiled sources, rather than fixing
+only the first observed page. Record which candidates were checked and inspect
+representative prose, theorem and example pages in the final PDF.
+
+After changes, build using the project pipeline and inspect affected final
+pages, including display-before/after spacing and following paragraph indent.
+Large gaps can also come from display skips, list/theorem spacing, page
+stretching, floats, or explicit spacing; diagnose those separately rather than
+assuming every gap proves a source blank line. A PDF alone cannot establish
+the exact source cause, and candidate counts or a successful build do not
+replace visual inspection.
 
 ## Multiline Formulas And Compactness Discipline
 

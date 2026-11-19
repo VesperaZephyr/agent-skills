@@ -63,7 +63,8 @@ LONGPROOF_ENV_RE = re.compile(r"\\begin\s*\{longproof\}\s*\{([^{}]+)\}\s*\{")
 COMMAND_DEFINITION_RE = re.compile(
     r"\\(?:newcommand|renewcommand|providecommand)\s*\{\\([A-Za-z@]+)\}"
 )
-CURLY_QUOTE_RE = re.compile("[“”]")
+FULLWIDTH_PUNCTUATION_RE = re.compile("[，。．、；：！？（）［］【】「」『』]")
+CURLY_QUOTE_RE = re.compile("[“”‘’]")
 CONSECUTIVE_DISPLAY_MATH_RE = re.compile(r"\\\]\s*\\\[")
 MANUAL_NUMBERING_LINE_RE = re.compile(r"^\s*\d+[.、)]\s+\S")
 METADATA_DEFAULTS = {
@@ -222,17 +223,18 @@ def audit_mathtranslations_profile(
         display = source_file.relative_to(project_root)
         manual_numbering_run = 0
         for number, line in enumerate(active.splitlines(), start=1):
-            if "。" in line:
+            punctuation = sorted(set(FULLWIDTH_PUNCTUATION_RE.findall(line)))
+            if punctuation:
                 warnings.append(
-                    f"{display}:{number}: MathTranslations prose uses ASCII '.' "
-                    "for sentence endings; found '。'"
+                    f"{display}:{number}: use English half-width punctuation in prose; "
+                    f"review {''.join(punctuation)!r}"
                 )
-            for quote_match in CURLY_QUOTE_RE.finditer(line):
+            quote_match = CURLY_QUOTE_RE.search(line)
+            if quote_match:
                 warnings.append(
                     f"{display}:{number}: MathTranslations quotes use TeX "
                     f"`` and '' markers; found {quote_match.group(0)!r}"
                 )
-                break
             if MANUAL_NUMBERING_LINE_RE.match(line):
                 manual_numbering_run += 1
                 if manual_numbering_run == 2:

@@ -21,6 +21,7 @@
 | 现稿逐句审阅 | 印次核验、正反对读与页内链接语义 | [审阅流程与 Conway 复盘](references/content-audit.md) |
 | 验收与终检 | 构建命令、验收清单、CRLF/BOM 检查、全书终检器 | `references/verification.md` |
 | 普通数学插图 | 原图保真、图幅可读性、绕排回归与整页对账 | `../mathtranslation/references/illustrations.md`、`scripts/figure_page_pair_review.py`、`scripts/figure_size_review.py` |
+| 对照材料（汇报/审阅） | 无文字层扫描件的单调对页配对、同一内容裁切、墨迹行带量标注坐标 | `references/evidence-comparison.md`、`scripts/pair_page_by_text.py`、`scripts/make_compare_crops.py` |
 
 ## 核心纪律（红线）
 

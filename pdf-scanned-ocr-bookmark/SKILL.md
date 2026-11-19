@@ -9,7 +9,6 @@ description: >-
   能否批量 OCR 再加书签"). Do NOT rely on Foxit/Adobe built-in OCR — it is
   GUI-only and cannot be scripted.
 agent_created: true
-license: CC-BY-4.0
 ---
 
 # Scanned PDF -> OCR text layer -> faithful bookmarks
@@ -25,7 +24,7 @@ cannot write custom bookmarks. Adobe Acrobat OCR is likewise not scriptable via 
 
 ## 1. Environment (one-time)
 ```bash
-PYV="C:/Users/asus/.workbuddy/binaries/python/envs/default/Scripts/python.exe"
+PYV="python"
 "$PYV" -m pip install -i https://pypi.org/simple --upgrade onnxruntime rapidocr pymupdf
 ```
 - rapidocr 3.x bundles PP-OCRv6 models (`.../rapidocr/models/*.onnx`), fully offline.

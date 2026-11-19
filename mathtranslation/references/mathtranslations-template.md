@@ -11,7 +11,8 @@ LaTeX template. There are two related templates in circulation, and they are
 - **Legacy (reference only):** `mathtranslations-translation-template.tex` —
   the older single-file `ctexart` template (numbering by subsection,
   `exercises`/`answers`/`longproof`, local `mybibliography`). The skill still
-  no longer bundles this file; use the maintained `mathtranslation.cls` for new work.
+  bundles this file under `assets/` as a historical reference; prefer the
+  maintained `mathtranslation.cls` for new work.
 
 The class file is maintained by the user (canonical copy lives in the user's
 template directory), so inspect the *supplied* `mathtranslation.cls` instead of
@@ -162,19 +163,20 @@ Verify the *actual* rendered numbers by extracting text from the compiled PDF
 
 ## Display Math, Lists, And Quotes
 
-The template requires three uniform typesetting habits:
+Apply the following conventions to the project copy:
 
-- display formulas use `align`, `aligned`, or `align*` environments only;
-  multiple `\[ \]` blocks in a row must be merged into one environment;
+- group and align related display rows according to their mathematical
+  structure; see [display alignment](latex-quality.md#display-alignment);
 - every ordered list uses `enumerate`; manual numbering is not accepted;
 - Chinese double quotes use the TeX ligatures — two grave accents for the
   opening quote and two straight apostrophes for the closing quote — never
   Unicode curly quotes;
-- Chinese prose sentences end with an ASCII `.` (not `。`), matching the
-  template's punctuation policy.
+- use English half-width punctuation in translated Chinese prose and
+  template-generated text. Check older template copies for full-width
+  defaults such as theorem colons and terminology parentheses.
 
-The audit script flags consecutive display-math blocks, Unicode curly quotes,
-manual numbering, and stray `。` under the `mathtranslations` profile.
+The `mathtranslations` audit profile flags consecutive display blocks,
+manual numbering, full-width punctuation and Unicode curly quotes for review.
 
 ## Figures
 
@@ -235,7 +237,7 @@ figure caption `Fig. N.M` from an explanatory paragraph that merely begins with
    `tools/rewire_figures.py` (back up first).
 7. Use `\newterm` once per indexed concept; keep long-proof and
    exercise-answer link pairs balanced.
-8. Typeset display math with `align`-family environments, ordered lists with
-   `enumerate`, Chinese quotes with the TeX ligatures.
+8. Group and align displays by mathematical structure; use `enumerate`
+   for ordered lists, half-width punctuation and TeX quote markers.
 9. Put `\printterminology` last; run `tools/build.sh full`; compare the
    generated PDF with both the source PDF and the expected numbering.

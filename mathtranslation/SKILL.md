@@ -42,7 +42,7 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
    requests it or reliable evidence resolves it.
 5. Separate content authority from presentation authority. The source PDF
    governs mathematical content; when the user chooses the MathTranslations
-   template, the selected `mathtranslation.cls` governs typesetting
+   template, `mathtranslations-translation-template.tex` governs typesetting
    conventions.
 
 ## Prepare The Project
@@ -67,10 +67,13 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
   `\printterminology`) and build via `tools/build.sh full` (xelatex ×2 → biber →
   xelatex ×2). biblatex is loaded by the class from `BibStyle`/`BibFile`
   options, so only call `\addbibresource` — never `\usepackage{biblatex}`. The
-  bundled `assets/template-v3.3/` contains the maintained class and a sample project.
+  older single-file `mathtranslations-translation-template.tex` (ctexart) is
+  bundled under `assets/` as a legacy reference only.
 - If the user selects the MathTranslations template but supplies no template
-  files, copy the complete `assets/template-v3.3/` project into the new
-  project. Keep the bundled master unchanged; edit the project copy.
+  files, copy `assets/mathtranslations-translation-template.tex` and
+  `assets/logo.pdf` into the project for the legacy variant, or the maintained
+  `mathtranslation.cls` + `logo.pdf` for the current variant. Keep the bundled
+  masters unchanged; edit the project copies.
 - If the user supplies a newer template, prefer that version after comparing
   its contract with the bundled baseline and recording any meaningful changes.
 - Build a small project glossary before translating substantial text. Reuse
@@ -220,11 +223,11 @@ of model weight training or performance on unseen sources.
   high-impact claim in the TikZ source (arrow direction is deterministic:
   `(a)--(b)` has its head at b), repair via persisted script files (never inline
   shell heredocs with backslashes — `\f` silently becomes formfeed), then
-  rebuild and re-render each repaired figure for visual confirmation. The reusable
-  scripts/figure_page_pair_review.py maps captions to actual placement pages and
-  generates full-page pairs; scripts/figure_size_review.py measures final vector
-  placements and flags pages for manual review. These tools organize coverage but
-  do not establish mathematical correctness, visibility, or legibility.
+  rebuild and re-render each repaired figure for visual confirmation. The
+  reusable scripts/figure_page_pair_review.py builds full-page source/final
+  pairs from captions plus actual placement pages; scripts/figure_size_review.py
+  measures final vector placements and creates size-review candidates. Use them
+  to organize manual coverage, not to declare a figure correct or readable.
 - For concrete PDF screenshot/crop operations and TikZ redraws, read
   [references/figure-capture.md](references/figure-capture.md). Use
   `scripts/capture_pdf_region.py` to export a physical page or reviewed bounding
@@ -250,10 +253,16 @@ of model weight training or performance on unseen sources.
     both as a standalone graphic and on its final book page.
   * Order: always place `\caption{...}` before `\label{fig:...}`, never reversed.
   * Captions: never type manual numbering prefixes inside `\caption` (e.g. no `\caption{图 3.1: ...}`); let LaTeX generate counters automatically. In prose, reference figures with `图~\ref{fig:X-Y}` or `(见图~\ref{fig:X-Y})`.
-  * Figure placement: decide case by case from the published page and Chinese context. For small uncaptioned figures, test text wrapping in uninterrupted prose, or use adjacent minipages when stable alignment matters more. Use a full-width or centered figure when the drawing is wide, labels require the space, or nearby text contains displays, lists, theorem environments, or a page break. wrapfigure can fail around those structures; avoid it there unless the actual project proves stable. Do not force a universal width or make every source-wrapped figure standalone. Inspect the entire final page and adjacent pages, reading order, paragraph indentation, line spacing, and figure position after the full build. Preserve caption and anchor semantics when present.
-- Typeset display formulas uniformly in `align`, `aligned`, or `align*`
-  environments. Never place multiple `\[ \]` blocks side by side; merge them
-  into a single environment.
+  * Figure placement: decide case by case from the published page and the Chinese context. For small uncaptioned figures, test text wrapping in uninterrupted prose, or use adjacent minipages when stable alignment is more important. Use a full-width or centered figure when the drawing is wide, labels require the space, or the nearby text contains displays, lists, theorem environments or a page break. `wrapfigure` can fail around those structures; avoid it there unless the actual project proves stable. Do not force a universal width or make every source-wrapped figure standalone. Inspect the entire final page and adjacent pages, reading order, paragraph indentation, line spacing and figure position after the full build. Preserve caption and anchor semantics when present.
+- When a display continues the preceding prose paragraph, put its opening
+  delimiter or environment directly after that prose, without a blank line or
+  `\par`. Preserve genuine paragraph and structural boundaries; inspect rendered
+  spacing as described in [display paragraph spacing](references/latex-quality.md#display-paragraph-spacing).
+- Group multi-line displays by their mathematical structure. Align the main
+  relation signs in a derivation, using `&=` or the corresponding relation
+  marker. Choose the environment for the grouping, preserve printed equation
+  numbers and anchors, and verify the final PDF using
+  [display alignment and acceptance](references/latex-quality.md#display-alignment).
 - Use the `enumerate` environment for every ordered list; never type the
   numbering manually.
 - Write Chinese double quotes with TeX ligatures: two grave accents for the
@@ -266,9 +275,11 @@ of model weight training or performance on unseen sources.
 - With the MathTranslations template, introduce a concept once with
   `\newterm{stable-key}{中文术语}{English term}`, write the Chinese term normally
   afterward, and keep `\printterminology` as the final document content.
-- Follow the selected template's punctuation policy. The inspected
-  MathTranslations template uses Chinese punctuation except for an ASCII `.`
-  at the end of Chinese prose sentences.
+- Use English half-width punctuation throughout translated Chinese text,
+  including headings, theorem heads, captions, list text, footnotes and
+  Chinese text inside formulas. Apply it to project template output as well.
+  Inspect both sources and the final PDF according to
+  [Chinese typesetting](references/latex-quality.md#chinese-typesetting).
 - Use `\label` plus the project's reference command for numbered objects. Do
   not hard-code theorem, equation, section, figure, table, or page numbers in
   translated prose.
@@ -425,8 +436,10 @@ project-specific scans in context and verify each finding against the source.
    Add `--profile mathtranslations` for projects based on the
    `mathtranslation.cls` template, and use `--strict` when warnings should fail
    CI.
-5. Read [references/review-checklist.md](references/review-checklist.md) before
-   declaring a chapter or project complete.
+5. Apply [references/review-checklist.md](references/review-checklist.md) before
+   declaring a chapter or project complete. Record punctuation and display
+   alignment coverage, exceptions and unresolved locations by chapter or
+   reviewed range, using the final PDF after the last edits.
 
 ## Report The Result
 
@@ -461,13 +474,12 @@ Summarize:
   procedure (variant-family sweep, index audit, parallel chapter readers,
   scripted repair, PDF-level regression); calibrated on GTM 304.
 - `references/figure-audit.md` — book-wide source-vs-translation figure audit
-  pipeline (source-PDF identity check, full-page pair rendering, zoom protocol,
-  reviewer dispatch with calibrated samples, source-level claim verification,
-  scripted repair, re-render verification); calibrated on GTM 304.
+  pipeline, including full-page pair tool usage, page-map reconciliation, zoom
+  review, source-level claim verification, scripted repair and re-render closure.
 - `scripts/figure_page_pair_review.py` — caption inventory and full-page source /
   translation page-pair report; accepts the actual placement manifest.
 - `scripts/figure_size_review.py` — final-PDF placement measurements and visual
-  review candidates; it does not assign pass/fail or judge legibility.
+  review candidates; does not assign pass/fail or judge legibility.
 - `references/build-verify.md` — full compile + visual-verification recipe (Windows/WorkBuddy).
 - `references/hardref.md` — hard-coded reference → clickable cross-reference procedure.
 - `references/cls-v33-upgrade.md` — old-template → `mathtranslation.cls` v3.3 migration.
@@ -480,7 +492,7 @@ Summarize:
 - `scripts/convert_hardrefs.py` — mathtranslation.cls hard-ref converter (dry-run/`--apply`).
 - `scripts/convert_bare_refs.py` — book-class bare-ref converter (dry-run/`--go`).
 - `tests/test_audit_latex.py` — unit test for the audit script.
-- `assets/template-v3.3/` — maintained class and sample project.
+- `assets/mathtranslations-translation-template.tex` — legacy ctexart template.
 - `assets/logo.pdf` — cover logo.
 - `agents/openai.yaml` — optional OpenAI/Codex interface metadata.
 

@@ -35,11 +35,14 @@ This checklist alone is not evidence that the passes occurred.
 - [ ] Pronouns and omitted subjects remain unambiguous.
 - [ ] Logical connectors retain their force.
 - [ ] Proper names, transliterations, acronyms, and capitalization are stable.
-- [ ] Punctuation and spacing are consistent.
+- [ ] Translated Chinese prose and project-generated punctuation use English
+  half-width characters. Compiled sources and final PDF were scanned, hits
+  resolved or documented, and rendered spacing and line breaks checked.
 - [ ] Chinese double quotes use the TeX ligatures (two grave accents opening,
       two straight apostrophes closing), not Unicode curly quotes.
 - [ ] If the MathTranslations template is selected, Chinese prose sentences
-      end in ASCII `.` and first-introduction terms use unique `\newterm` keys.
+      follow the half-width punctuation rule above and first-introduction terms
+      use unique `\newterm` keys.
 - [ ] Translator additions are visibly distinguished from source content.
 
 ## Pass 2: Mathematics And Structure
@@ -71,9 +74,12 @@ This checklist alone is not evidence that the passes occurred.
 - [ ] Figure environments strictly enforce scheme A: standard floats `\begin{figure}[htbp] \centering ... \end{figure}`; no `\begin{center}` inside `figure`; widths in relative `\textwidth` fractions (`0.40\textwidth` to `0.80\textwidth`), never absolute physical lengths.
 - [ ] No `wrapfigure` used where display math or xeCJK paragraph shaping breaks: wrapped diagrams from the original book are safely promoted to independent centered figures or side-by-side `minipage` blocks.
 - [ ] Figure captions and cross-references are sound: `\caption{...}\label{fig:...}` sequence preserved; no manual numbering prefix (e.g. no `图 3.1:`) inside `\caption`; 100% of defined figures are referenced in prose via `\ref`.
-- [ ] Display formulas use `align`-family or `gather` environments with no juxtaposed
-  `\[ \]` blocks or stacked independent `equation`/`gtmeq` blocks; multi-line equations are vertically compact and cohesive.
-- [ ] Numbered equation drift prevented: only formulas explicitly tagged with numbers in the original book use numbering environments; unnumbered displays use bare `\[ \]`; alphabetical suffix equations (e.g. 1.19a) use sub-tags without incrementing base counters.
+- [ ] Each multi-line display in scope was checked against the source and the
+  final PDF. Related rows share a display, principal relation signs align
+  where intended, and continuation indentation, spacing, page breaks and
+  visible tags fit the mathematical structure. Record coverage and unresolved
+  locations under [display alignment](latex-quality.md#display-alignment).
+- [ ] Numbered equation drift prevented: only formulas explicitly tagged with numbers in the original book use numbering environments; unnumbered displays use an unnumbered environment; alphabetical suffix equations (e.g. 1.19a) use sub-tags without incrementing base counters.
 - [ ] Proof boundaries are sound: auxiliary proofs inside a main theorem proof do NOT nest `\begin{proof} ... \end{proof}`, but use `\noindent\textbf{Proof ...} ... \blacksquare`.
 - [ ] High-DPI micro-glyph verification performed: complex conjugation overbars (`\bar{}` vs `\overline{}`), accents, prime symbols, and fine subscripts checked via $\ge 800$ DPI crops with ascender headroom.
 - [ ] Labels are unique and all references resolve to the intended objects.

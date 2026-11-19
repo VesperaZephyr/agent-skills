@@ -1,6 +1,6 @@
 ---
 name: latex-book-retypeset
-description: 高保真重排扫描版数学书为 LaTeX，或按原书逐句、逐式审阅现有重排稿。适用于 Springer GTM、中文及自定义页码专著，覆盖公式、习题、插图和 PDF 链接的核对与修订。纯翻译项目使用 mathtranslation。
+description: 高保真重排扫描版数学书为 LaTeX，或按原书逐句、逐式审阅现有重排稿。适用于 Springer GTM、中文及自定义页码专著，覆盖公式、习题、插图和 PDF 链接的核对与修订。翻译并重排时与 mathtranslation 配合，纯翻译项目使用 mathtranslation。
 metadata:
   agent_created: true
 ---
@@ -26,7 +26,7 @@ metadata:
   ③ 分章页码专著自建 cls（`\chapcode` + 重定义 `\thepage`，手工编号陈述环境）；
   ④ 单卷连续页码、小节裸编号专著自建 cls（按关键词分计数器 + 按节重启、只锁分部起点的 `\folio`）。
   图形按下文「普通数学插图」分流：可编辑重绘用原生 TikZ；保真复用可保留原书矢量 PDF。
-- 不适用：mathtranslation 类**纯翻译**项目（属 `mathtranslation` 技能）。
+- 翻译并重排：用 [mathtranslation](../mathtranslation/SKILL.md) 处理术语、译文保真与语言校订，同时执行本技能的重排与成品验收要求。若配套技能不可用，仍执行下表和终检。纯翻译由 mathtranslation 负责。
 
 ## 何时使用
 
@@ -46,6 +46,9 @@ metadata:
 | 改内容 | 生成器工程改生成源并重新生成。直接维护 TeX 的工程改真实源文件 |
 | 编号 | 先按原书选路线：GTM 用 `gtmitem` 共享计数器；手工编号专著或试卷可用原始显示号 + 隐藏锚点计数器。不得为连续性擅改原号 |
 | 公式 | 未编号行间公式用裸 `\[\]` / `align*`，或 `equation\notag`；**严禁**给它们编号 |
+| 交叉引用 | 建立稳定标签。书内可解析的章、节、陈述、公式、图表、习题和文献条目引用须可点击，保留原显示号。逐章盘点待回填项，合稿后核对剩余裸引用与最终 PDF 落点 |
+| 中文标点 | 中文数学正文默认用英文半角标点，含标题、陈述、图表题注、习题、脚注及公式中的中文说明。按正常英文标点间距排版。用户或工程明确指定其他体例时按其约定验收 |
+| 行间公式版式 | 按数学关系选择对齐点。多行等式链沿主要关系符对齐，分情况、并列公式和单式折行按结构排版。对照原页与最终 PDF，保留编号、标签与引用 |
 | 图形 | 重绘优先原生 TikZ/PGFPlots；原书有可靠矢量图时可直接保留矢量 PDF。禁止把矢量图先转 PNG 再声称无损；原书本身的位图须记录原始限制 |
 
 既有 Conway、徐森林项目仍遵循其项目规定：CRLF、UTF-8 无 BOM，生成器项目修改生成源；构建遍数和清理辅助文件依各项目现行构建纪律执行。不得把这些项目约定推广到所有工程。
@@ -68,6 +71,8 @@ metadata:
 按原书逐句、逐式审阅时，读[内容审阅流程与 Conway 复盘](references/content-audit.md)。核印次与实际扫描范围，冻结校样，从原书查校样遗漏，再从校样回查增写和错配。全书任务分别核完两份文件的物理页覆盖，并逐条核实目录、索引与符号表在 PDF 中指向的正文。交接示例作为已知线索纳入连续对读。
 
 只审阅时交付覆盖台账、差异与图证。任务包含修订时，用工程真实入口修改和重建，按新校样复查受影响的正文、页码和链接。源文件身份、当前审阅范围及未决项逐一注明。
+
+需要对外交付「原书 vs 重排」对照页图、进度汇报图或逐句审阅的定位图时，读[原书—重排对照材料](references/evidence-comparison.md)。扫描件无文字层时先做单调对页配对，再取图、裁同一处内容、按墨迹行带量出标注坐标；对照图只说明同位置同内容，不当作数学正确性的证据。
 
 ## 普通数学插图：保真、可读与逐图验收
 
@@ -230,6 +235,10 @@ Chapter 号、原书笔误（如 “§4, Proposition 2” 而该节只有 Propos
 
 成品构建验收见[构建与终检](references/verification.md)，检查错误、缺字符、重复标签、未定义引用、死链及项目约定的编码。习题按原书逐题核对内容与编号，登记原印跳号。逐句审阅另验原图对读和链接语义。
 
+完整重排、翻译并重排及整书成品终审都须执行[正文引用、标点与行间公式终检](references/verification.md#body-review)。
+开工时定标签、中文标点体例和多行公式排法，分章时记录未决，合稿后按最终构建产物关闭三项。
+逐章覆盖与未决项必须可追溯。构建通过后仍须完成这三项审阅；证据不足时报告未验范围。
+
 中文书额外三项（用 `scripts/verify_cjk_book.py main.pdf --log main.log --bib-page N` 一次跑完）：
 PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF 中确实解析为编号（而非原文）。
 
@@ -245,6 +254,8 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 ## 关键脚本
 
 - `scripts/figure_page_pair_review.py`：按图号建立原书与重排 PDF 的整页配对，支持实际放置页清单；只提供页面导航，不验证图形内容。
+- `scripts/pair_page_by_text.py`：扫描件无文字层时用逐页 OCR 文本对重排页做单调对齐配对（12-gram + 数字加权 + 前缀最大值 DP），输出 `pairs.json`；低分项须人工复核。
+- `scripts/make_compare_crops.py`：按归一化框裁出同一内容块并降采样，打印墨迹行带表与可直接粘贴的高亮 CSS 坐标。
 - `scripts/figure_size_review.py`：测量最终 PDF 图形尺寸、生成含图页总览和人工复核候选；不输出通过判定。
 - `scripts/audit_text_refs.py`：扫描 `.tex` 列出尚未 `\ref` 化的硬编码引用（开工清单，不改文件）。
 - `scripts/rebuild_exercise_labels.py`：安全重建 `exercise:c.s.i`（默认 dry-run，正确处理同行
@@ -272,12 +283,15 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 - `../mathtranslation/references/figure-audit.md` — 全书原书—译稿逐图对账流程
 - `scripts/figure_page_pair_review.py` — 按图号建立整页配对，支持实际放置页映射
 - `scripts/figure_size_review.py` — 最终 PDF 尺寸测量与人工复核候选
+- `scripts/pair_page_by_text.py` — 扫描件 ↔ 重排页单调配对（OCR 文本 12-gram，低分需复核）
+- `scripts/make_compare_crops.py` — 对照图裁切 + 行带坐标 + 高亮 CSS
 - `references/discipline.md` — 文档类 / 计数器速查、页码映射、文献区排印参数
 - `references/pitfalls.md` — 西文书全部坑位（OCR / 编号公式 / Claim / 环境标签 / overfull / 交叉引用 A–E）
 - `references/cjk-retypeset.md` — **中文书专项**（TikZ 曲线 / 缺字回退 / CJKglue 松排 / 标签重叠 / extref 回填 / memory exhausted / biber 书目 / 单一落盘出口）
 - `references/chapcode-retypeset.md` — **分章页码专著专项**（`\chapcode` 页码机制 / `\pagestyle{empty}` 泄漏 / 四类页眉约定 / 手工编号陈述 / biblatex sortkey 锁定 / 目录页码超链接）
 - `references/samuel-style-retypeset.md` — **单卷裸编号专著专项**（按关键词/按节重启编号、`\folio` 只锁分部起点、页眉节号区间、外部文献章号排除、`bib:n` 与 `exer:` 锚点、列表条目引用、`.aux` 配平解析、链接颜色像素验收）
 - `references/handwritten-notes-retypeset.md` — **手写笔记重排专项**（扫描 PDF 误报加密 / 手写交换图 OCR 压碎须逐图重画 / 手写 OCR 字符级误识 / 物理页偏移实测 / 手工编号陈述锚点 / 可选参数位置 / plain 页眉 / 记号统一表）
+- `references/evidence-comparison.md` — **原书—重排对照材料**（无文字层扫描件的对页配对 / 同一内容裁切 / 墨迹行带量标注坐标 / 对照图的诚实边界）
 - `references/crossref.md` — 交叉引用七轮补全策略 + 习题重建算法 + 保留纯文本清单
 - `references/verification.md` — 构建命令、验收清单、CRLF/BOM 检查
 - `scripts/audit_text_refs.py` — 硬编码引用扫描器

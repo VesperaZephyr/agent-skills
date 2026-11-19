@@ -15,11 +15,11 @@ SPEC.loader.exec_module(AUDIT)
 
 
 class AuditLatexTests(unittest.TestCase):
-    def test_bundled_assets_match_release(self) -> None:
+    def test_bundled_assets_match_authorized_template(self) -> None:
         assets = Path(__file__).parents[1] / "assets"
         expected = {
-            "template-v3.3/mathtranslation.cls": (
-                "abd2a9c4ff112c48878dfa5212b1fdf748901c3c5e70364caf2ee1b5a895fa34"
+            "mathtranslations-translation-template.tex": (
+                "2b0046b64a2ddf70961d9d7a5d19682bbc3a60acc9ae9109354d8186001ee3a1"
             ),
             "logo.pdf": (
                 "8b3839adbf870a8c5e825c9f004125816835bbb321617e619e5f589b672fc8d5"
@@ -104,7 +104,7 @@ class AuditLatexTests(unittest.TestCase):
             (root / "main.tex").write_text(
                 "% !TeX program = xelatex\n"
                 "\\documentclass[UTF8,12pt,fontset=none]{ctexart}\n"
-                "\\newcommand{\\newterm}[3]{#2（#3）}\n"
+                "\\newcommand{\\newterm}[3]{#2 (#3)}\n"
                 "\\newcommand{\\printterminology}{}\n"
                 "\\newcommand{\\longprooflink}[2]{#2}\n"
                 "\\newenvironment{longproof}[2]{}{}\n"
@@ -117,7 +117,7 @@ class AuditLatexTests(unittest.TestCase):
                 f"{metadata_tex}\n"
                 "\\begin{document}\n"
                 "\\newterm{topology}{拓扑}{topology}.\n"
-                "封面：\\Translator\\ 翻译及重排.\n"
+                "封面:\\Translator\\ 翻译及重排.\n"
                 "\\longprooflink{main-proof}{查看证明}\n"
                 "\\begin{longproof}{main-proof}{主定理}证明.\\end{longproof}\n"
                 "\\printterminology\n"
@@ -139,7 +139,8 @@ class AuditLatexTests(unittest.TestCase):
                 "\\begin{document}\n"
                 "\\[ a+b \\]\n"
                 "\\[ c+d \\]\n"
-                "中文“引号”示例.\n"
+                "中文“引号”示例，附（说明）.\n"
+                "% 中文注释，保留。\n"
                 "1. 手动编号第一条\n"
                 "2. 手动编号第二条\n"
                 "\\end{document}\n",
@@ -153,6 +154,10 @@ class AuditLatexTests(unittest.TestCase):
             )
             self.assertTrue(any("TeX `` and ''" in item for item in warnings))
             self.assertTrue(any("enumerate" in item for item in warnings))
+            punctuation = [item for item in warnings if "half-width" in item]
+            self.assertEqual(len(punctuation), 1)
+            for character in "，（）":
+                self.assertIn(character, punctuation[0])
 
     def test_mathtranslations_profile_reports_drift(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -173,7 +178,7 @@ class AuditLatexTests(unittest.TestCase):
 
             self.assertTrue(any("terminology key" in item for item in errors))
             self.assertTrue(any("long-proof key" in item for item in errors))
-            self.assertTrue(any("ASCII '.'" in item for item in warnings))
+            self.assertTrue(any("half-width" in item and "'。'" in item for item in warnings))
             self.assertTrue(any("XeLaTeX" in item for item in warnings))
             self.assertTrue(any("printterminology" in item for item in warnings))
 
@@ -181,7 +186,7 @@ class AuditLatexTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             (root / "mathtranslation.cls").write_text(
-                "\\newcommand{\\newterm}[3]{#2（#3）}\n"
+                "\\newcommand{\\newterm}[3]{#2 (#3)}\n"
                 "\\newcommand{\\printterminology}{}\n"
                 "\\newcommand{\\longprooflink}[2]{#2}\n"
                 "\\newenvironment{longproof}[2]{}{}\n"
