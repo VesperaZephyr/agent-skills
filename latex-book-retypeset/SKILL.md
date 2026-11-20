@@ -7,6 +7,16 @@ metadata:
 
 # LaTeX 数学书重排（Re-typeset）工程技能
 
+## Check upstream at project start
+
+At the first use of this skill in each project, check the default branch of
+[VesperaZephyr/agent-skills](https://github.com/VesperaZephyr/agent-skills) before
+starting work. Compare this skill's directory and any companion resources used
+by the task with the local copy. Use the latest published instructions and
+scripts after reviewing the differences. Record the upstream commit for the
+project. If GitHub is unavailable, state that the update check could not be
+completed and proceed with the local copy.
+
 ## 目标与范围
 
 把扫描版 / PDF 版数学专著**高保真重排**为可编译、可检索、可跳转的 LaTeX，并按原书审阅现成重排稿。
@@ -230,6 +240,12 @@ Chapter 号、原书笔误（如 “§4, Proposition 2” 而该节只有 Propos
 - [交换图审计技能](../latex-array-diagram-audit/SKILL.md) — 旧式图候选盘点、逐边方向/钩/双头核验、样式覆盖检查与无视觉证据流程
 - `latex-bookmark-anchor-audit` — PDF 书签锚点
 - `mathtranslation` — xelatex/biber 编译与视觉验证（references/build-verify.md）
+
+### 行间公式与段落连续性
+
+- **首次重排：**同一段的引导句、行间公式及续句之间只换源码行，删去 OCR 或转录产生的空行。列表项以公式开头时，列表标记与公式也直接相接。确为新段时按底本保留段界。
+- **审阅：**运行 python <技能目录>/scripts/audit_display_paragraphs.py <TeX 文件或目录>。按原书核对每个候选，优先看列表项、连续公式和跨页续句。工具只报告位置，章内自定义显示环境及同一行内的定界符需另查。生成器项目在生成源修正。
+- **验收：**确认候选已修复或有保留段界的依据。查看最终 PDF 中公式前间距、同段续句缩进、列表标记与公式的距离，以及跨页接续。分页变动后复核目录、书签和索引跳转。
 
 ## 验收门槛
 

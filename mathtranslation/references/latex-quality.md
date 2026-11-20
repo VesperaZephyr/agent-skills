@@ -154,6 +154,8 @@ different pages as a reason to audit all compiled sources, rather than fixing
 only the first observed page. Record which candidates were checked and inspect
 representative prose, theorem and example pages in the final PDF.
 
+For ordered lists, check the gap between the \item line and its display, including items that start with a formula. Scan the compiled TeX sources with python ../latex-book-retypeset/scripts/audit_display_paragraphs.py <TeX files or project directory> (resolve the script path relative to the mathtranslation skill directory). The script lists candidates for manual review. When unavailable, inspect display boundaries in the compiled sources manually. Check custom displays and inline delimiters separately.
+
 After changes, build using the project pipeline and inspect affected final
 pages, including display-before/after spacing and following paragraph indent.
 Large gaps can also come from display skips, list/theorem spacing, page

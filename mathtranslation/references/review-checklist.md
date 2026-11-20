@@ -74,6 +74,8 @@ This checklist alone is not evidence that the passes occurred.
 - [ ] Figure environments strictly enforce scheme A: standard floats `\begin{figure}[htbp] \centering ... \end{figure}`; no `\begin{center}` inside `figure`; widths in relative `\textwidth` fractions (`0.40\textwidth` to `0.80\textwidth`), never absolute physical lengths.
 - [ ] No `wrapfigure` used where display math or xeCJK paragraph shaping breaks: wrapped diagrams from the original book are safely promoted to independent centered figures or side-by-side `minipage` blocks.
 - [ ] Figure captions and cross-references are sound: `\caption{...}\label{fig:...}` sequence preserved; no manual numbering prefix (e.g. no `图 3.1:`) inside `\caption`; 100% of defined figures are referenced in prose via `\ref`.
+- [ ] Display paragraph spacing reviewed in the compiled sources and final PDF. Check same-paragraph continuations, list marker to formula gaps, and page breaks. Resolve every candidate in scope or record why the paragraph boundary is intentional. If pagination changes, verify affected TOC, bookmark and index targets. See [display paragraph spacing](latex-quality.md#display-paragraph-spacing).
+
 - [ ] Each multi-line display in scope was checked against the source and the
   final PDF. Related rows share a display, principal relation signs align
   where intended, and continuation indentation, spacing, page breaks and

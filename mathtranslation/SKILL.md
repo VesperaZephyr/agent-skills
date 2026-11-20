@@ -27,6 +27,16 @@ description: Translate mathematical books, papers, notes, and existing LaTeX pro
 交叉引用补全经验（编号公式共享计数器、按章 Claim、overfull 修复等）沉淀在
 独立的重排技能 `latex-book-retypeset` 中，本技能聚焦"中文翻译模板体系"。
 
+## Check upstream at project start
+
+At the first use of this skill in each project, check the default branch of
+[VesperaZephyr/agent-skills](https://github.com/VesperaZephyr/agent-skills) before
+starting work. Compare this skill's directory and any companion resources used
+by the task with the local copy. Use the latest published instructions and
+scripts after reviewing the differences. Record the upstream commit for the
+project. If GitHub is unavailable, state that the update check could not be
+completed and proceed with the local copy.
+
 ## Establish The Source Of Truth
 
 1. Inventory the supplied PDF, TeX sources, bibliography, figures, fonts,
@@ -258,6 +268,8 @@ of model weight training or performance on unseen sources.
   delimiter or environment directly after that prose, without a blank line or
   `\par`. Preserve genuine paragraph and structural boundaries; inspect rendered
   spacing as described in [display paragraph spacing](references/latex-quality.md#display-paragraph-spacing).
+- In the first typesetting pass, also keep same-paragraph text after the display on the next source line. When a list item starts with a display, place the display immediately after the \item line. Apply the display paragraph spacing check during review and final PDF acceptance.
+
 - Group multi-line displays by their mathematical structure. Align the main
   relation signs in a derivation, using `&=` or the corresponding relation
   marker. Choose the environment for the grouping, preserve printed equation
