@@ -160,6 +160,10 @@ completed and proceed with the local copy.
 - **不要凭语义加环境标签**：原书大量裸段落，误包 `remark` 会吃掉编号、顶高后续全部条目。
 - **交叉引用 A–E**（详见 `references/crossref.md`）：`\item` 前 `\gtmtarget` 错位、习题块两种写法、
   正则 `\\S` 误伤、批量补空格二次替换 + 陈旧 .aux 假错误、补零章号 / 空 `\ref{}`。
+- **裸编号书链接化**：裸 sec.item 引用是主体例时，audit_text_refs 只报关键词引用——
+  用 label 键清单驱动的链接器（键未命中不替换）；尾随断言放行句号；
+  tikz 几何语句整段屏蔽；交付前跑 audit_label_numbers.py 核对 label 名与渲染号
+  （抓漏排/跳号未实现/计数器漂移，详见 crossref.md §8）。
 - **`\pagestyle{empty}` 泄漏（全书页眉页码丢失）**：扉页文件设 `\pagestyle{empty}` 却从不恢复，
   致**全书所有续页无页眉无页码**。`\thispagestyle` 只影响首页，须在章/前置/文献/索引各头宏里
   显式 `\pagestyle{fancy}` 恢复（详见下文「分章页码专著专项」）。
@@ -274,6 +278,7 @@ PDF 文本层 `??` 0 处、`Missing character` 0 处、回填后的引用在 PDF
 - `scripts/make_compare_crops.py`：按归一化框裁出同一内容块并降采样，打印墨迹行带表与可直接粘贴的高亮 CSS 坐标。
 - `scripts/figure_size_review.py`：测量最终 PDF 图形尺寸、生成含图页总览和人工复核候选；不输出通过判定。
 - `scripts/audit_text_refs.py`：扫描 `.tex` 列出尚未 `\ref` 化的硬编码引用（开工清单，不改文件）。
+- `scripts/audit_label_numbers.py`：label 名编号 ↔ 渲染号一致性核对（抓漏排/跳号未实现/计数器漂移）。
 - `scripts/rebuild_exercise_labels.py`：安全重建 `exercise:c.s.i`（默认 dry-run，正确处理同行
   `\gtmtarget` 与手工习题块）。
 - `scripts/gen_tikz_curve.py`：xeCJK cls 下 `plot[domain=…]` 不可用，用它把参数 / 笛卡尔 / 极坐标

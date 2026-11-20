@@ -17,8 +17,9 @@
 | 中文书（xeCJK） | TikZ 曲线 `plot[domain]` 失败转 `plot[smooth] coordinates`、Fandol 缺字回退、CJKglue 松排、biber 中文书目 | `references/cjk-retypeset.md` |
 | 分章页码专著 | `\chapcode` 页码机制、`\pagestyle{empty}` 泄漏、`biblatex` sortkey、目录页码超链接 | `references/chapcode-retypeset.md` |
 | 裸编号专著 | 按关键词/按节重启、`\folio` 只锁分部起点、`bib:n`/`exer:` 锚点、`.aux` 配平解析 | `references/samuel-style-retypeset.md` |
-| 交叉引用补全 | 七轮递进策略 + 习题 label 安全重建 | `references/crossref.md` |
+| 交叉引用补全 | 七轮递进策略 + 习题 label 安全重建；裸编号书（正文以裸 sec.item 引用为主）的键清单驱动链接化 | `references/crossref.md` |
 | 现稿逐句审阅 | 印次核验、正反对读与页内链接语义 | [审阅流程与 Conway 复盘](references/content-audit.md) |
+| 编号一致性审计 | label 名编号 ↔ 渲染号全量核对：抓漏排整条陈述、跳号未实现、计数器多步/少步 | `scripts/audit_label_numbers.py` |
 | 验收与终检 | 构建命令、验收清单、CRLF/BOM 检查、全书终检器 | `references/verification.md` |
 | 普通数学插图 | 原图保真、图幅可读性、绕排回归与整页对账 | `../mathtranslation/references/illustrations.md`、`scripts/figure_page_pair_review.py`、`scripts/figure_size_review.py` |
 | 对照材料（汇报/审阅） | 无文字层扫描件的单调对页配对、同一内容裁切、墨迹行带量标注坐标 | `references/evidence-comparison.md`、`scripts/pair_page_by_text.py`、`scripts/make_compare_crops.py` |
@@ -42,7 +43,7 @@ latex-book-retypeset/
 │   ├── cjk-retypeset.md         中文书专项
 │   ├── chapcode-retypeset.md    分章页码专著专项
 │   ├── samuel-style-retypeset.md 单卷裸编号专著专项
-│   ├── crossref.md              交叉引用七轮 + 习题重建 + 保留纯文本清单
+│   ├── crossref.md              交叉引用七轮 + 习题重建 + 裸编号书链接化 + label 审计
 │   ├── verification.md          构建命令、验收清单、CRLF/BOM 检查
 │   ├── content-audit.md         逐句审阅流程与 Conway 两册复盘
 │   ├── parallel-retypeset.md    有界并行与页级 OCR 来源
@@ -51,7 +52,9 @@ latex-book-retypeset/
 └── scripts/
     ├── audit_text_refs.py        硬编码引用扫描器（只读清单）
     ├── audit_bare_xrefs.py       屏蔽已链接文本后的裸引用枚举
+    ├── audit_display_paragraphs.py 行间公式段落连续性候选扫描（只读清单）
     ├── audit_internal_links.py   内部链接目标对 aux 全量核验
+    ├── audit_label_numbers.py    label 名编号 ↔ 渲染号一致性核对（错位即 exit 1）
     ├── audit_log_4pass.py        4-pass 编译日志审计
     ├── rebuild_exercise_labels.py 习题 label 安全重建（默认 dry-run）
     ├── gen_tikz_curve.py         参数/笛卡尔/极坐标曲线 → plot[smooth] coordinates
@@ -68,7 +71,9 @@ latex-book-retypeset/
 |---|---|---|
 | `audit_text_refs.py` | 扫描 `.tex` 中尚未 `\ref` 化的硬编码引用 | 只读 |
 | `audit_bare_xrefs.py` | 枚举 STMT/PAREN/FORM/BIB/EXERC 各类裸引用 | 只读 |
+| `audit_display_paragraphs.py` | 扫描行间公式前后空行，生成段落连续性人工复核候选 | 只读 |
 | `audit_internal_links.py` | 校验 `\ref/\eqref/\pageref/\hyperref` 目标是否存在于 aux | 只读 |
+| `audit_label_numbers.py` | 比对 aux 中 label 名的编号尾段与渲染号；任何错位（漏排/跳号/漂移）exit 1 | 只读 |
 | `audit_log_4pass.py` | 四轮编译日志逐轮判定 | 只读 |
 | `rebuild_exercise_labels.py` | 安全重建 `exercise:c.s.i` | 默认 dry-run |
 | `gen_tikz_curve.py` | 生成 `plot[smooth] coordinates` 曲线片段 | 输出片段 |

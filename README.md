@@ -16,7 +16,7 @@ Claude Code 或任何支持该加载机制的 Agent 都能直接用。
 
 | 技能 | 做什么 | 典型触发 |
 |---|---|---|
-| **[`latex-book-retypeset`](latex-book-retypeset/README.md)** | 数学书**重排**（re-typeset，不翻译）：GTM 类西文书、中文书、分章页码专著、单卷裸编号专著四类原书的工程方法与坑位库 | 「重排这本书」「把 PDF 排成 LaTeX」「修 overfull」「补交叉引用」 |
+| **[`latex-book-retypeset`](latex-book-retypeset/README.md)** | 数学书**重排**（re-typeset，不翻译）：GTM 类西文书、中文书、分章页码专著、单卷裸编号专著四类原书的工程方法与坑位库；含裸编号书的交叉引用链接化与 label↔渲染号一致性审计 | 「重排这本书」「把 PDF 排成 LaTeX」「修 overfull」「补交叉引用」「编号对不上原书」 |
 | **[`mathtranslation`](mathtranslation/README.md)** | 数学书 / 论文 / 讲义的中文 LaTeX **翻译与审校**：以原书 PDF 为内容权威，含批量审校台账、闭包横线核对、编译可视化验证与硬编码引用转链接；附 v3.3 模板工程 | 「翻译这本书」「审校译稿」「修译稿的引用」 |
 | **[`latex-eq-numbering-audit`](latex-eq-numbering-audit/README.md)** | 对照原书逐节核对**公式编号**并直接修复：标签与渲染号矛盾、编号公式被压成行内、罗马数字误成阿拉伯数字 | 「公式编号与原书不一致」 |
 | **[`latex-display-layout-audit`](latex-display-layout-audit/README.md)** | 修正**行间公式的怪异版面**且不动任何编号：过拆、假对齐、嵌套显示环境、连续单行堆叠 | 「公式被拆得太碎」「对齐方式不对」 |
