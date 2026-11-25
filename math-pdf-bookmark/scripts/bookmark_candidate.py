@@ -112,9 +112,25 @@ def build(source, items_path, output, report):
         shutil.copyfile(source, temp)
         with pymupdf.open(temp) as doc:
             def probe(values):
+                """用原始 /XYZ 反算真实落点做标定。
+
+                不能用 get_toc()['to'].y: 当 cropbox.y0 != 0 时, 这个回读值
+                本身就带了 crop/media 偏移(实测本书约 60 pt), 拿它做探针
+                会把偏移二次补偿进写入值。原始数据 /XYZ top 才是阅读器落点。
+                """
                 doc.set_toc([[item['level'], f'probe-{i}', item['page'], value]
                              for i, (item, value) in enumerate(zip(items, values))])
-                return [float(row[3]['to'].y) for row in doc.get_toc(simple=False)]
+                toc = doc.get_toc(simple=False)
+                out = []
+                for row, item in zip(toc, items):
+                    top = raw_dest_top(doc, row[3].get('xref'))
+                    page = doc[item['page'] - 1]
+                    if top is None or page.rotation:
+                        # 无法反算的页在后面统一拒绝; 这里给个占位避免中断标定
+                        out.append(float(row[3]['to'].y))
+                    else:
+                        out.append(page.cropbox.y1 - top)
+                return out
             ys = [float(item['y']) for item in items]
             a, b = probe(ys), probe([y + 37 for y in ys])
             calibrated = []
@@ -134,9 +150,18 @@ def build(source, items_path, output, report):
             expected = [(x['level'], x['title'], x['page']) for x in items]
             if [tuple(row[:3]) for row in toc] != expected:
                 raise ValueError('回读书签结构与输入不一致')
-            errors = [abs(float(row[3]['to'].y) - y) for row, y in zip(toc, ys)]
+            # 同样不能用 get_toc()['to'].y 与输入比: cropbox.y0 != 0 时它带
+            # 固定偏移, 会误报(本书实测 62 pt)。真正的落点从原始 /XYZ 反算。
+            errors = []
+            for row, item in zip(toc, items):
+                top = raw_dest_top(doc, row[3].get('xref'))
+                page = doc[item['page'] - 1]
+                if top is None or page.rotation:
+                    errors.append(0.0)  # 后面单列 unverified
+                else:
+                    errors.append(abs(page.cropbox.y1 - top - float(item['y'])))
             if max(errors) > 0.05:
-                raise ValueError(f'回读落点误差过大: {max(errors):.6f} pt')
+                raise ValueError(f'原始 /XYZ 落点误差过大: {max(errors):.6f} pt')
             # 上面的回读恒等于输入, 是循环验证(见 detailed-rules.md 规则 23)。
             # 真正的落点必须从原始 /XYZ 反算。**无法用公式反算的页(旋转页)既不能
             # 断言通过, 也不能算进误差最大值**, 必须单列为 unverified 并写进报告,
