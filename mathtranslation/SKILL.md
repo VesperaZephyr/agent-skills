@@ -148,6 +148,16 @@ build checkpoint; the final PDF still requires the full build and visual checks.
 See [references/forensic-review.md](references/forensic-review.md) for the
 coverage and evidence requirements and efficient checkpoint rules.
 
+For a comprehensive index review, freeze the source and baseline PDFs and register
+the complete source inventory with stable IDs before assigning disjoint reviewer
+shards. Merge evidence in one ledger, batch repairs, then check source coverage
+and independently verify the final index in both directions. Compilation, link
+targets, and review coverage have separate completion criteria. See the
+[index review ledger workflow](references/index-review-ledger.md) and
+`scripts/index_review_ledger.py`.
+
+For the final pass, use the [evidence checklist](references/index-review-ledger.md#final-evidence) to review candidate mappings, definition weights, and actual PDF destinations before closing the ledger.
+
 ## French mathematical sources
 
 For French mathematical lectures, papers, or books, read
@@ -511,3 +521,5 @@ Summarize:
 ## 可复用交换图审阅工具
 
 精确替换、备份与重编译前后页面回归，见[工具用法](../latex-array-diagram-audit/references/reusable-tools.md)。使用 `apply_exact_repairs.py` 校验当前文件哈希及替换次数，使用 `compare_pdf_pages.py` 保存显式页码对照证据；渲染结果不会自动认证目视审阅完成。
+
+For a runnable final PDF link audit, see [the shared command and CSV format](references/index-review-ledger.md#索引链接批查工具).
