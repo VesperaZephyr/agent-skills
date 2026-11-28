@@ -36,7 +36,7 @@ LITERAL_SLASH_RE = re.compile(
     r"oplus|otimes|qquad|quad|to|mapsto|iso|cong|sum|prod|partial|nabla|"
     r"frac|sqrt|text|mathrm|mathbb|overline|gen|id|Ker|Ima|normal|sgn)\b"
 )
-CREF_NAME_RE = re.compile(r"(定义|定理|命题|推论|引理|例|练习|式)\s*(\d+(?:\.\d+)*)")
+CREF_NAME_RE = re.compile(r"(核心结论|定义|定理|命题|推论|引理|例|练习|式)\s*(\d+(?:\.\d+)*)")
 EQREF_RE = re.compile(r"式\s*\((\d+(?:\.\d+)+)\)")
 
 

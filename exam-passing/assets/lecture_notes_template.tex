@@ -153,11 +153,12 @@
     }%
   }\vspace{6pt}%
 }
-% 淡橙考点框: 只讲结构, 不写「适用条件与前提」式复述; 一个参数, 调用时不要传第二个参数.
-\newcommand{\examtip}[1]{%
+% 淡橙易混边界卡: 两个参数 {具体标题}{内容}, 点透近似边界或易混结论;
+% 严禁硬编码或手写「适用条件与关键前提」「如何验证」式复述.
+\newcommand{\examtip}[2]{%
   \vspace{6pt}\noindent\colorbox{tipbg}{%
     \parbox{\dimexpr\textwidth-2\fboxsep\relax}{%
-      \vspace{4pt}\textbf{\color{secondary}适用条件与关键前提:}\hspace{0.5em}#1\vspace{4pt}%
+      \vspace{4pt}\textbf{\color{secondary}#1:}\hspace{0.5em}#2\vspace{4pt}%
     }%
   }\vspace{6pt}%
 }
@@ -192,6 +193,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\dd}{\mathop{}\!\mathrm{d}}
 \newcommand{\e}{\mathrm{e}}
+\newcommand{\vect}[1]{\overrightarrow{#1}}
 
 \title{\Huge\bfseries\color{primary} [课程名]期末复习}
 \author{[编写者]}
@@ -231,11 +233,24 @@ L u = f, \qquad B u\big|_{\partial\Omega} = g,
     \item 代入 [已知数据] 定出待定量.
 \end{enumerate}
 
-% 提示框默认不用 (voice §6). 可复用的结构关系优先写成编号结论并在正文 \cref 引用一次:
+% 三级重点分层示范 (spec §1.2, voice §5):
+% 1) 一般支撑命题用 theorem / proposition / lemma (蓝色常规框);
+% 2) 考场必记或真题高频结论用 keyconclusion (暖色高光框, 每节 1-2 个, 防泛滥);
+% 3) 一句话记忆锚点或易混边界用 \takeaway{具体标题}{内容} 或 \examtip{具体标题}{内容}.
+\begin{keyconclusion}[核心定律或枢纽判据名]
+\label{key:core}
+在 [明确适用条件/物理近似] 下, 有核心关系
+\begin{equation}\label{eq:core}
+\boxed{L u = f.}
+\end{equation}
+\end{keyconclusion}
+
+\takeaway{易混边界或记忆锚点}{[一句话点透何时成立, 何时失效或最易与哪个结论混用, 不复述题设前提.]}
+
+% 可复用的结构关系写成编号结论并在正文 \cref 引用, 不在每处重新解释:
 % \begin{conclusion}\label{concl:homogeneous}
 % 若 $L$ 与 $B$ 线性, 则两解之差满足齐次问题, 唯一性归结为齐次问题只有零解.
 % \end{conclusion}
-% 后续解答写「由 \cref{concl:homogeneous}」, 不重新解释; 前提失效的情形在该结论陈述里写一次.
 
 % 原生矢量示意图 (voice §7.1): 每个核心几何对象配一张, 图随内容走, 逐张渲染验收.
 % \begin{geofig}{fig:model}{[一句话图注: 该图让读者记住的不变量]}
@@ -268,6 +283,18 @@ L u = f, \qquad B u\big|_{\partial\Omega} = g,
 
 \section{必背公式与结论手册}
 公式的适用范围由推导时所用的条件决定; $L$ 或 $B$ 的条件改变时, 相应结论需由原推导重新判定.
+
+\subsection{题干特征与核心工具速查路由}
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\hsize=0.85\hsize}X >{\hsize=1.15\hsize}X c}
+\toprule
+\textbf{题干 / 物理情景特征} & \textbf{优先调用的工具或方法} & \textbf{正文定位} \\
+\midrule
+[特征 A, 如: 具球/柱对称性的静电场] & [核心工具, 如: 选同心球面/同轴柱面用高斯定理] & \mbox{\cref{key:core}} \\
+[特征 B, 如: 线性齐次边值唯一性] & [核心工具, 如: 作差归结为齐次零解] & \mbox{\cref{thm:unique}} \\
+\bottomrule
+\end{tabularx}
+\end{center}
 
 \subsection{[主题一]}
 \begin{enumerate}

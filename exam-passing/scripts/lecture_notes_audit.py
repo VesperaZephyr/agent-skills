@@ -400,11 +400,7 @@ class Auditor(object):
 
     @staticmethod
     def _next_content_line(lines, k):
-        """跳过空行, 注释, \\label, 思路框与图块, 返回首个内容行下标.
-
-        voice §3.1 要求 \\idea{} 放在题干与解答之间, 不能因为它挡在
-        \\begin{solution} 前面就判 exercise / solution 不配对.
-        """
+        """跳过空行, 注释, \\label, 图块与旧稿残留 \\idea{}, 返回首个内容行下标."""
         n = len(lines)
         while k < n:
             t = lines[k].strip()
@@ -546,12 +542,17 @@ class Auditor(object):
                              (cmd, arity, self.line_of(m.start()), got), m.start())
             self.stats[cmd + "_calls"] = calls
             self.stats[cmd + "_arity_mismatch"] = mismatch
-        # 导言区提示框硬编码标题: 文风信息项
-        for m in re.finditer(r"\\textbf\{([^}]{0,40})\}", self.preamble):
+        # 导言区提示框硬编码标题: 检查攻略腔或防御性硬编码标题
+        for m in re.finditer(r"\\textbf\{([^}]{0,60})\}", self.preamble):
             label = m.group(1)
-            if any(w in label for w in ("考点", "技巧", "易错", "记忆", "提示")):
+            if any(w in label for w in ("适用条件与关键前提", "适用条件与前提")):
+                self.add("WARN", "tip-label-defense",
+                         "导言区提示框硬编码防御性标题「%s」; 应改为参数化具体标题" % label,
+                         m.start())
+            elif any(w in label for w in ("考点", "技巧", "易错", "记忆", "提示")):
                 self.add("INFO", "tip-label",
-                         "导言区提示框标题「%s」会显示在 PDF 中, 请确认符合规范 §3" % label)
+                         "导言区提示框标题「%s」会显示在 PDF 中, 请确认符合规范 §3" % label,
+                         m.start())
         # 章节名 (目录即考纲)
         titles = [m.group(1) for m in re.finditer(r"\\(?:chapter|section)\{([^}]*)\}", self.code)]
         self.stats["chapter_titles"] = [m.group(1) for m in re.finditer(r"\\chapter\{([^}]*)\}", self.code)]
@@ -607,15 +608,43 @@ class Auditor(object):
                 self.add("INFO", "voice-defense",
                          "防御性提醒措辞「%s」命中 %d 次; 前提按 voice §4 一次原则处理" % (w, n))
                 stats[w] = n
-        # 2026-11-15: 撤销「提示框默认 0 / 总数不超 5」配额. 只提示重点是否显性, 不判不达标.
+        # 重点分级检查: 既查缺失也查泛滥 (spec §1.2)
         tips = self.stats.get("takeaway", 0) + self.stats.get("examtip", 0)
         key_concls = self.stats.get("env_counts", {}).get("keyconclusion", 0)
+        concl_total = self.stats.get("conclusion_total", 0)
         self.stats["key_conclusions"] = key_concls
         secs = self.stats.get("section_count", 0)
         if secs >= 3 and key_concls == 0 and tips == 0:
             self.add("INFO", "key-emphasis",
                      r"全篇共 %d 节但未见 keyconclusion 高光框与记忆卡; "
-                     r"按 spec §3 第 4 条为需记忆的核心结论配显性标注 (只提示, 不判不达标)" % secs)
+                     r"按 spec §1.2 为高频核心结论配显性标注 (只提示, 不判不达标)" % secs)
+        elif concl_total >= 6 and key_concls / float(concl_total) > 0.5:
+            self.add("INFO", "key-dilution",
+                     "核心结论 keyconclusion 占比过高 (%d/%d = %.0f%%); "
+                     "按 spec §1.2 控制在 45%% 以内, 避免全篇高光稀释重点" %
+                     (key_concls, concl_total, 100.0 * key_concls / concl_total))
+        # 电报体信号: 连续 3 行及以上以 \textbf{短标签}: 开头
+        tele_re = re.compile(r"^\s*(?:\\item\s+)?\\textbf\{[^}]{1,20}\}\s*[:：]")
+        run_start, run_len = None, 0
+        tele_blocks = []
+        body_lines = self.body.split("\n")
+        for idx, line in enumerate(body_lines):
+            if tele_re.match(line):
+                if run_len == 0:
+                    run_start = idx
+                run_len += 1
+            else:
+                if run_len >= 3:
+                    tele_blocks.append((self.line_of(self.body_start) + run_start, run_len))
+                run_len = 0
+        if run_len >= 3:
+            tele_blocks.append((self.line_of(self.body_start) + run_start, run_len))
+        if tele_blocks:
+            self.add("INFO", "telegraphic-list",
+                     "疑似电报体「标签: 内容」连续出现 %d 处 (%s); "
+                     "按 spec §3.1 核查是否应改写为完整叙述句" %
+                     (len(tele_blocks), ", ".join("L%d(%d行)" % b for b in tele_blocks[:6])))
+        self.stats["telegraphic_blocks"] = len(tele_blocks)
         cp = len(re.findall(r"\\clearpage\b", self.body))
         if secs >= 3 and cp >= secs:
             self.add("INFO", "forced-pagebreak",
